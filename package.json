@@ -1,9 +1,9 @@
 {
-  "name": "avrodoc",
-  "description": "Documentation tool for Avro schemas",
-  "version": "0.3.0",
-  "author": "Martin Kleppmann http://martinkl.com/",
-  "bin": "./bin/avrodoc",
+  "name": "@ckatzorke/avrodoc-plus",
+  "description": "Documentation tool for Avro schemas. Forked from https://github.com/ept/avrodoc",
+  "version": "0.1.0",
+  "author": "Christian Katzorke https://www.katzorke.io",
+  "bin": "./bin/avrodoc+",
   "scripts": {
     "start": "node app",
     "test": "grunt"
@@ -25,8 +25,7 @@
     "wd": "0.0.32"
   },
   "engines": {
-    "node": "0.8.x",
-    "npm": "1.1.x"
+    "node": "10.x"
   },
   "license": "Apache 2.0"
 }

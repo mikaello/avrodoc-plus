@@ -1,6 +1,6 @@
 # avrodoc-plus
 
-avrodoc-plus is a documentation tool for [Avro](http://avro.apache.org/) schemas.  
+avrodoc-plus is a documentation tool for [Apache Avro](http://avro.apache.org/) schemas.  
 This project originates from [https://github.com/ept/avrodoc](https://github.com/ept/avrodoc), which is great, but received no further updates.
 
 ## Usage

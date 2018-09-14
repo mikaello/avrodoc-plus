@@ -9,6 +9,6 @@ Biggest change here is, that it supports an input folder as source, that will be
 Usage
 
 ```bash
-npm install global @ckatzorke/avrodoc-plus
+npm install --global @ckatzorke/avrodoc-plus | yarn add global @ckatzorke/avrodoc-plus
 avrodoc-plus -i source -o out.html
 ```

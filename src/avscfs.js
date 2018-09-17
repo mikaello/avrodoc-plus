@@ -6,6 +6,7 @@
 const path = require('path');
 const fs = require('fs');
 const sys = require('util');
+const debug = require('debug')('avrodoc:avscfs');
 
 /**
  * Reads in the given file and parses as json
@@ -14,7 +15,7 @@ const sys = require('util');
  */
 function readJSON(filename) {
     let json, parsed;
-    console.debug('Parsing ', filename);
+    debug('Parsing ', filename);
     json = fs.readFileSync(path.resolve(process.cwd(), filename), 'utf-8');
     try {
         parsed = JSON.parse(json);
@@ -33,25 +34,25 @@ function readJSON(filename) {
 function collectInputFiles(folder) {
     let files = new Array();
     const resolvedFolder = path.resolve(process.cwd(), folder);
-    console.debug('Input dir: ', folder);
-    console.debug('Resolved folder: ', resolvedFolder);
+    debug('Input dir: ', folder);
+    debug('Resolved folder: ', resolvedFolder);
     let dirEntries = fs.readdirSync(resolvedFolder, {
         withFileTypes: true
     });
-    console.debug('DirEntries: ', dirEntries);
+    debug('DirEntries: ', dirEntries);
     dirEntries.forEach((entry) => {
-        console.debug('Current entry: ', entry);
+        debug('Current entry: ', entry);
         if (entry.isFile()) {
             let file = folder + '/' + entry.name;
-            console.debug('adding file', file);
+            debug('adding file', file);
             if(file.endsWith('.avsc')){
                 files.push(file);
             } else {
-                console.debug(`Ignoring ${file}, not an avro schema file (.avsc)`);
+                debug(`Ignoring ${file}, not an avro schema file (.avsc)`);
             }
         } else if (entry.isDirectory()) {
             let subfolder = folder + '/' + entry.name;
-            console.debug('Digging into ', subfolder);
+            debug('Digging into ', subfolder);
             files.push(...collectInputFiles(subfolder));
         }
     })

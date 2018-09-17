@@ -10,21 +10,22 @@
  * avrodoc-plus schemata/user.avsc schemata/account.avsc -o userdoc.html
  */
 
-const avscfs = require('./avscfs'),
-    content = require('./static_content'),
-    fs = require('fs'),
-    sys = require('util'),
-    argv = require('optimist').alias('o', 'output').alias('i', 'input').argv;
+const avscfs = require('./avscfs');
+const content = require('./static_content');
+const fs = require('fs');
+const sys = require('util');
+const argv = require('optimist').alias('o', 'output').alias('i', 'input').argv;
+const debug = require('debug')('avrodoc:cli');
 
 let inputFiles = null;
 let outputFile = null;
 
 // Determine list of input files file1.avsc file2.avsc
 if (argv.input) {
-    console.debug('Collecting all avsc files from root folder ', argv.input);
+    debug('Collecting all avsc files from root folder ', argv.input);
     inputFiles = avscfs.collectInputFiles(argv.input);
 } else if (argv._) {
-    console.debug('Using passed arguments as inputfiles...');
+    debug('Using passed arguments as inputfiles...');
     inputFiles = argv._;
 }
 

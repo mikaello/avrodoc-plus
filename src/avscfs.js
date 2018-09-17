@@ -32,11 +32,15 @@ function readJSON(filename) {
  */
 function collectInputFiles(folder) {
     let files = new Array();
-    console.log('Input dir: ', folder);
-    let dirEntries = fs.readdirSync(path.resolve(process.cwd(), folder), {
+    const resolvedFolder = path.resolve(process.cwd(), folder);
+    console.debug('Input dir: ', folder);
+    console.debug('Resolved folder: ', resolvedFolder);
+    let dirEntries = fs.readdirSync(resolvedFolder, {
         withFileTypes: true
     });
+    console.debug('DirEntries: ', dirEntries);
     dirEntries.forEach((entry) => {
+        console.debug('Current entry: ', entry);
         if (entry.isFile()) {
             let file = folder + '/' + entry.name;
             console.debug('adding file', file);

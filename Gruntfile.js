@@ -4,7 +4,7 @@ module.exports = function (grunt) {
         pkg: '<json:package.json>',
 
         jshint: {
-            files: ['app.js', 'lib/*.js', 'public/js/*.js', 'test/**/*.js'],
+            files: ['app.js', 'src/*.js', 'public/js/*.js', 'test/**/*.js'],
             options: {
                 bitwise: true,
                 eqeqeq: true,
@@ -24,10 +24,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
 
-    grunt.registerTask('selenium', 'Run Selenum tests', function () {
-        require('./test/selenium/basic-test.js')(this.async());
-    });
 
-    grunt.registerTask('test', ['jshint', 'selenium']);
+    grunt.registerTask('test', ['jshint']);
     grunt.registerTask('default', ['test']);
 };

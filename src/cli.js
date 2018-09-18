@@ -35,7 +35,7 @@ if (argv.output) {
 }
 
 //valid input?
-if (!inputFiles || inputFiles.length === 0 || outputFile == null) {
+if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
     sys.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o=my-documentation.html]');
     process.exit(1);
 }

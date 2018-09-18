@@ -1,13 +1,12 @@
 {
   "name": "@ckatzorke/avrodoc-plus",
   "description": "Documentation tool for Avro schemas. Forked from https://github.com/ept/avrodoc.",
-  "version": "0.1.3",
+  "version": "0.3.0",
   "author": "Christian Katzorke https://www.katzorke.io",
   "bin": "./bin/avrodoc-plus",
   "scripts": {
     "start": "node src/cli",
-    "server": "node app",
-    "test": "grunt"
+    "server": "node app"
   },
   "dependencies": {
     "debug": "^4.0.1",
@@ -22,8 +21,6 @@
     "underscore": "1.4.2"
   },
   "devDependencies": {
-    "grunt": "0.4.1",
-    "grunt-contrib-jshint": "0.5.4",
     "wd": "0.0.32"
   },
   "engines": {

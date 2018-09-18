@@ -6,8 +6,7 @@
   "bin": "./bin/avrodoc-plus",
   "scripts": {
     "start": "node src/cli",
-    "server": "node app",
-    "test": "grunt"
+    "server": "node app"
   },
   "dependencies": {
     "debug": "^4.0.1",

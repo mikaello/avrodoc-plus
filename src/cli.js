@@ -10,9 +10,9 @@
  * avrodoc-plus schemata/user.avsc schemata/account.avsc -o userdoc.html
  */
 
-const avscfs = require('./avscfs');
-const content = require('./static_content');
+const avrodoc = require('./avrodoc');
 const fs = require('fs');
+const path = require('path');
 const sys = require('util');
 const argv = require('optimist').alias('o', 'output').alias('i', 'input').argv;
 const debug = require('debug')('avrodoc:cli');
@@ -23,7 +23,7 @@ let outputFile = null;
 // Determine list of input files file1.avsc file2.avsc
 if (argv.input) {
     debug('Collecting all avsc files from root folder ', argv.input);
-    inputFiles = avscfs.collectInputFiles(argv.input);
+    inputFiles = collectInputFiles(argv.input);
 } else if (argv._) {
     debug('Using passed arguments as inputfiles...');
     inputFiles = argv._;
@@ -40,20 +40,40 @@ if (!inputFiles || inputFiles.length === 0 || outputFile == null) {
     process.exit(1);
 }
 
+avrodoc.createAvroDoc(inputFiles, outputFile);
 
-var schemata = inputFiles.map(function (filename) {
-    return {
-        json: avscfs.readFileAsJSON(filename),
-        filename: filename
-    };
-});
 
-content.topLevelHTML({
-    inline: true,
-    schemata: schemata
-}, function (err, html) {
-    if (err) {
-        throw err;
-    }
-    avscfs.writeAvroDoc(outputFile, html);
-});
+//private stuff
+
+/**
+ * Steps through the given folder and recursively collects all avsc files.
+ * @param {string} folder the input folder to iterate and gather all found *.avsc files
+ * @returns {Array<string>} the list with all found inputfiles
+ */
+function collectInputFiles(folder) {
+    let files = new Array();
+    const resolvedFolder = path.resolve(process.cwd(), folder);
+    debug('Input dir: ', folder);
+    debug('Resolved folder: ', resolvedFolder);
+    let dirEntries = fs.readdirSync(resolvedFolder, {
+        withFileTypes: true
+    });
+    debug('DirEntries: ', dirEntries);
+    dirEntries.forEach((entry) => {
+        debug('Current entry: ', entry);
+        if (entry.isFile()) {
+            let file = folder + '/' + entry.name;
+            debug('adding file', file);
+            if(file.endsWith('.avsc')){
+                files.push(file);
+            } else {
+                debug(`Ignoring ${file}, not an avro schema file (.avsc)`);
+            }
+        } else if (entry.isDirectory()) {
+            let subfolder = folder + '/' + entry.name;
+            debug('Digging into ', subfolder);
+            files.push(...collectInputFiles(subfolder));
+        }
+    })
+    return files;
+}

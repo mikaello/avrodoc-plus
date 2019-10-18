@@ -56,7 +56,7 @@ function dustTemplates() {
 
 function lessFileAs(type) {
     return function(file) {
-        return {name: file, type: "internal"};
+        return {name: file, type: type};
     }
 }
 
@@ -66,7 +66,7 @@ function stylesheets(extra_less_files, callback) {
     client_css.map(lessFileAs("internal")).concat(extra_less_files.map(lessFileAs("external"))).forEach(function (file) {
         if (file.name.match(/\.less$/)) {
             to_do++;
-            var style = file.type === "internal" ? fs.readFileSync(path.join(public_dir, file.name), 'utf-8') : fs.readFileSync(path.join("", file.name), 'utf-8');
+            var style = file.type === "internal" ? fs.readFileSync(path.join(public_dir, file.name), 'utf-8') : fs.readFileSync(file.name, 'utf-8');
             var parser = new(less.Parser)({
                 paths: file.type === "internal" ? [path.join(public_dir, 'stylesheets')] : "",
                 filename: file.name

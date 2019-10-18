@@ -54,16 +54,16 @@ function dustTemplates() {
     return compiled;
 }
 
+function lessFileAs(type) {
+    return function(file) {
+        return {name: file, type: "internal"};
+    }
+}
+
 // Compiles LESS stylesheets and calls callback(error, minified_css).
 function stylesheets(extra_less_files, callback) {
     var compiled = '', to_do = 0;
-    client_css.map(function(f) {
-        return {name: f, type: "internal"};
-    }).concat(
-        extra_less_files.map(function(f) {
-            return {name: f, type: "external"}
-        })
-    ).forEach(function (file) {
+    client_css.map(lessFileAs("internal")).concat(extra_less_files.map(lessFileAs("external"))).forEach(function (file) {
         if (file.name.match(/\.less$/)) {
             to_do++;
             var style = file.type === "internal" ? fs.readFileSync(path.join(public_dir, file.name), 'utf-8') : fs.readFileSync(path.join("", file.name), 'utf-8');

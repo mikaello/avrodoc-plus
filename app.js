@@ -31,7 +31,7 @@ app.configure(function () {
 });
 
 app.get('/', function (req, res) {
-    content.topLevelHTML({schemata: schemata}, function (err, html) {
+    content.topLevelHTML([], {schemata: schemata}, function (err, html) {
         res.set('Content-Type', 'text/html').send(html);
     });
 });

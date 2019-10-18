@@ -55,17 +55,22 @@ function dustTemplates() {
 }
 
 // Compiles LESS stylesheets and calls callback(error, minified_css).
-function stylesheets(callback) {
+function stylesheets(extra_less_files, callback) {
     var compiled = '', to_do = 0;
-    client_css.forEach(function (file) {
-        if (file.match(/\.less$/)) {
+    client_css.map(function(f) {
+        return {name: f, type: "internal"};
+    }).concat(
+        extra_less_files.map(function(f) {
+            return {name: f, type: "external"}
+        })
+    ).forEach(function (file) {
+        if (file.name.match(/\.less$/)) {
             to_do++;
-            var style = fs.readFileSync(path.join(public_dir, file), 'utf-8');
+            var style = file.type === "internal" ? fs.readFileSync(path.join(public_dir, file.name), 'utf-8') : fs.readFileSync(path.join("", file.name), 'utf-8');
             var parser = new(less.Parser)({
-                paths: [path.join(public_dir, 'stylesheets')],
-                filename: file
+                paths: file.type === "internal" ? [path.join(public_dir, 'stylesheets')] : "",
+                filename: file.name
             });
-
             parser.parse(style, function (err, tree) {
                 if (!err) {
                     compiled += tree.toCSS({compress: true});
@@ -86,9 +91,9 @@ function stylesheets(callback) {
 
 // Calls callback(error, html) with HTML containing URL references to all JS and CSS required by the
 // browser.
-function remoteContent(callback) {
+function remoteContent(extra_less_files, callback) {
     var html = [];
-    client_css.forEach(function (file) {
+    client_css.concat(extra_less_files).forEach(function (file) {
         var css_file = file.replace(/\.less$/, '.css');
         html.push('<link rel="stylesheet" type="text/css" href="/' + css_file + '"/>');
     });
@@ -100,8 +105,8 @@ function remoteContent(callback) {
 }
 
 // Returns HTML containing all JS and CSS required by the browser inline.
-function inlineContent(callback) {
-    stylesheets(function (err, css) {
+function inlineContent(extra_less_files, callback) {
+    stylesheets(extra_less_files, function (err, css) {
         if (err) {
             callback(err);
             return;
@@ -123,8 +128,8 @@ function inlineContent(callback) {
     });
 }
 
-function topLevelHTML(options, callback) {
-    (options.inline ? inlineContent : remoteContent)(function (err, content) {
+function topLevelHTML(extra_less_files, options, callback) {
+    (options.inline ? inlineContent : remoteContent)(extra_less_files, function (err, content) {
         if (err) {
             callback(err);
             return;

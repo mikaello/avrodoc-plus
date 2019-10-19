@@ -24,16 +24,26 @@
 {/protocols}
 
 <h2>Types</h2>
+<div class="container-search">
+    <div>
+        <span>Search for your schema</span>
+    </div>
+    <input id="search-schemas">
+    <div style="text-align: left;">
+        <input id="showNamespace" type="checkbox" style="float: left; margin-left: 20px;" checked="checked">
+        <label style="font-size: 0.8em; float: left; margin-left: 5px;" for="showNamespace">Show the whole namespace that contains a matching Schema</label>
+    </div>
+</div>
 <ul class="types">
     {#namespaces}
-        <li>
+        <li data-namespace="{namespace}" data-schemas="{#types}{name}{@sep},{/sep}{/types}">
             <p class="namespace">{namespace}</p>
             {?types}
-                <ul>
-                    {#types}
+                {#types}
+                    <ul class="schema" data-schema="{name}">
                         {>schema_list_item:./}
-                    {/types}
-                </ul>
+                    </ul>
+                {/types}
             {/types}
         </li>
     {/namespaces}

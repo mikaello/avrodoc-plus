@@ -6,7 +6,7 @@ This project originates from [https://github.com/ept/avrodoc](https://github.com
 ## Usage
 
 ```bash
-npm install --global @leosilvadev/avrodoc-plus | yarn add global @ckatzorke/avrodoc-plus
+npm install --global @leosilvadev/avrodoc-plus | yarn add global @leosilvadev/avrodoc-plus
 avrodoc-plus -i source -o out.html
 ```
 

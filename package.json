@@ -1,7 +1,7 @@
 {
   "name": "@leosilvadev/avrodoc-plus",
   "description": "Documentation tool for Avro schemas. Forked from https://github.com/ckatzorke/avrodoc.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Leonardo Silva https://github.com/leosilvadev",
   "bin": "./bin/avrodoc-plus",
   "scripts": {

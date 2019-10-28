@@ -203,8 +203,6 @@ function AvroDoc(input_schemata) {
         }
     });
 
-    $("#search-schemas").on("keydown", function(){ console.log("hauhauha")});
-
     schemata_to_load = in_progress;
 
     if (in_progress === 0) {

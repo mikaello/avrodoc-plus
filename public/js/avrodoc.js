@@ -213,7 +213,6 @@ function AvroDoc(input_schemata) {
 }
 
 function search(text, showNamespace) {
-    console.log("Calling search", text, showNamespace);
     var schemas = $(".schema").map(function(index, e){
         var el = $(e);
         return {name: el.data("schema"), element: el, namespaceElement: el.parent()};

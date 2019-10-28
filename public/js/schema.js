@@ -393,3 +393,4 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
 
     return _public;
 };
+

@@ -14,7 +14,7 @@ const avrodoc = require('./avrodoc');
 const fs = require('fs');
 const path = require('path');
 const sys = require('util');
-const argv = require('optimist').alias('o', 'output').alias('i', 'input').argv;
+const argv = require('optimist').alias('o', 'output').alias('i', 'input').alias('s', 'style').argv;
 const debug = require('debug')('avrodoc:cli');
 
 let inputFiles = null;
@@ -34,13 +34,14 @@ if (argv.output) {
     outputFile = argv.output;
 }
 
+const extra_less_files = argv.style ? [argv.style] : [];
+
 //valid input?
 if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
-    sys.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o=my-documentation.html]');
+    sys.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o=my-documentation.html] [-s=my-style.less]');
     process.exit(1);
 }
-
-avrodoc.createAvroDoc(inputFiles, outputFile);
+avrodoc.createAvroDoc(extra_less_files, inputFiles, outputFile);
 
 
 //private stuff

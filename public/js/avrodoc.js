@@ -211,3 +211,43 @@ function AvroDoc(input_schemata) {
 
     return _public;
 }
+
+function search(text, showNamespace) {
+    var schemas = $(".schema").map(function(index, e){
+        var el = $(e);
+        return {name: el.data("schema"), element: el, namespaceElement: el.parent()};
+    });
+    schemas.each(function(index, schema) {
+        if (schema.namespaceElement.data("schemas").includes(text) || schema.namespaceElement.data("namespace").includes(text)) {
+            schema.namespaceElement.show();
+
+            if (showNamespace) {
+                schema.element.show();
+            } else if (schema.name.includes(text)) {
+                schema.element.show();
+            } else {
+                schema.element.hide();
+            }
+
+        } else {
+            schema.namespaceElement.hide();
+            schema.element.hide();
+        }
+    });
+}
+
+$(function() {
+    setTimeout(function() {
+        $("#search-schemas").on("keyup", function() {
+            var text = $(this).val();
+            var showNamespace = $("#showNamespace").prop("checked");
+            search(text, showNamespace);
+        });
+
+        $("#showNamespace").on("change", function() {
+            var text = $("#search-schemas").val();
+            var showNamespace = $(this).prop("checked");
+            search(text, showNamespace);
+        });
+    }, 1000);
+});

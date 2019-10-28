@@ -1,8 +1,8 @@
 {
-  "name": "@ckatzorke/avrodoc-plus",
-  "description": "Documentation tool for Avro schemas. Forked from https://github.com/ept/avrodoc.",
-  "version": "0.3.0",
-  "author": "Christian Katzorke https://www.katzorke.io",
+  "name": "@mobimeo/avrodoc-plus",
+  "description": "Documentation tool for Avro schemas. Forked from https://github.com/ckatzorke/avrodoc.",
+  "version": "0.4.0",
+  "author": "Mobimeo https://github.com/mobimeo",
   "bin": "./bin/avrodoc-plus",
   "scripts": {
     "start": "node src/cli",
@@ -26,7 +26,7 @@
     "wd": "0.0.32"
   },
   "engines": {
-    "node": "10.10.x"
+    "node": ">=10.10.x"
   },
   "license": "Apache-2.0"
 }

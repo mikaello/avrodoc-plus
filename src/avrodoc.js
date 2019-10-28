@@ -11,7 +11,7 @@ const debug = require('debug')('avrodoc:avrodoc');
  * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed and eventually added to the avrodoc
  * @param {string} outputfile the html file that should be written
  */
-function createAvroDoc(inputfiles, outputfile){
+function createAvroDoc(extra_less_files, inputfiles, outputfile){
     debug(`Creating ${outputfile} from `, inputfiles);
     let schemata = inputfiles.map(function (filename) {
         return {
@@ -19,7 +19,7 @@ function createAvroDoc(inputfiles, outputfile){
             filename: filename
         };
     });
-    content.topLevelHTML({
+    content.topLevelHTML(extra_less_files, {
         inline: true,
         schemata: schemata
     }, function (err, html) {

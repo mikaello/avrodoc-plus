@@ -36,10 +36,13 @@ var public_dir   = path.join(__dirname, '..', 'public');
 
 // Reads a local Javascript file and returns it in minified form.
 function minifiedJS(filename) {
-    var ast = uglify.parser.parse(fs.readFileSync(filename, 'utf-8'));
-    ast = uglify.uglify.ast_mangle(ast);
-    ast = uglify.uglify.ast_squeeze(ast);
-    return uglify.uglify.gen_code(ast);
+    const options = {}
+    const result = uglify.minify(fs.readFileSync(filename, 'utf-8'), options)
+    if (result.error) {
+        console.error(`Could not minify file ${filename} with UglifyJs:\n` + result.error)
+        return ""
+    }
+    return result.code
 }
 
 // Precompiles all templates found in the templates directory, and returns them as a JS string.

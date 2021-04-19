@@ -1,14 +1,14 @@
 /*jshint node:true */
 
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var glob = require('glob');
-var fs = require('fs');
-var content = require('./lib/static_content');
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const glob = require('glob');
+const fs = require('fs');
+const content = require('./lib/static_content');
 
-var schema_dir = path.resolve(process.cwd(), process.env.SCHEMA_DIR || 'schemata');
-var schemata = [];
+const schema_dir = path.resolve(process.cwd(), process.env.SCHEMA_DIR ?? 'schemata');
+const schemata = [];
 glob('**/*.avsc', {cwd: schema_dir}, function (err, files) {
     if (err) throw err;
     files.sort().forEach(function (file) {
@@ -17,9 +17,9 @@ glob('**/*.avsc', {cwd: schema_dir}, function (err, files) {
 });
 
 // Precompile dust templates at app startup, and then serve them out of memory
-var dust_templates = content.dustTemplates();
+const dust_templates = content.dustTemplates();
 
-var app = express();
+const app = express();
 
 app.configure(function () {
     app.set('port', process.env.PORT || 8124);

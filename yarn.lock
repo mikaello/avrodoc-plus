@@ -3326,10 +3326,6 @@ underscore@1.2.x:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.2.4.tgz#e8da6241aa06f64df2473bb2590b8c17c84c3c7e"
 
-underscore@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.4.2.tgz#cb2aae6a7999a89fd55aaee75bce0311698cebfb"
-
 underscore@1.4.x:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.4.4.tgz#61a6a32010622afa07963bf325203cf12239d604"

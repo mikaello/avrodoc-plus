@@ -19,10 +19,10 @@ function AvroDoc(input_schemata) {
     // Render all the popovers ahead of time, because Dust's rendering is async but the popover
     // plugin expects to receive the popover content synchronously when it is triggered.
     function renderPopovers() {
-        _(schema_by_name).each(function (schema, filename) {
+        for (const [filename, schema] of Object.entries(schema_by_name)) {
             popover_by_name[filename] = {};
-            _(schema.named_types).each(function (type, qualified_name) {
-                var popover = popover_by_name[filename][qualified_name] = {};
+            Object.entries(schema.named_types).forEach(([qualified_name,type]) => {
+                let popover = popover_by_name[filename][qualified_name] = {};
 
                 // Do the actual rendering in the background, to keep the page responsive
                 window.setTimeout(function () {
@@ -34,7 +34,7 @@ function AvroDoc(input_schemata) {
                     });
                 }, 100);
             });
-        });
+        };
     }
 
     // Configures all links to types in the current content pane to show popovers on hover.
@@ -89,48 +89,48 @@ function AvroDoc(input_schemata) {
     // versions (conflicting definitions for the same qualified name). Each version may have one or
     // more definitions (equivalent definitions of the same type in different schema files).
     function typeByQualifiedName() {
-        var by_qualified_name = {};
-        _(shared_types).each(function (versions, qualified_name) {
-            by_qualified_name[qualified_name] = _(versions[0]).clone();
+        const by_qualified_name = {};
+        for (const [qualified_name, versions] of Object.entries(shared_types)) {
+            by_qualified_name[qualified_name] = { ...versions[0] };
             by_qualified_name[qualified_name].versions = versions;
-        });
+        };
         return by_qualified_name;
     }
 
     // Groups the types defined in all schemas by namespace, and sorts them alphabetically.
     // A namespace has many named types (records, enums or fixed).
     function typesByNamespace() {
-        var namespaces = {};
-        _(_public.by_qualified_name).each(function (shared_type) {
+        const namespaces = {};
+        for (const shared_type of Object.values(_public.by_qualified_name)) {
             if (shared_type.is_record || shared_type.is_enum || shared_type.is_fixed) {
-                var namespace = shared_type.namespace || '';
-                if (!_(namespaces).has(namespace)) {
-                    namespaces[namespace] = {namespace: namespace, types: []};
+                const namespace = shared_type.namespace || '';
+                if (!namespaces.hasOwnProperty(namespace)) {
+                    namespaces[namespace] = { namespace, types: [] };
                 }
                 namespaces[namespace].types.push(shared_type);
             }
-        });
+        };
 
-        return _(_(namespaces).sortBy('namespace')).map(function (ns_types) {
+        return Object.values(namespaces).sort(stringCompareBy('namespace')).map(function (ns_types) {
             return {
                 namespace: ns_types.namespace || 'No namespace',
-                types: _(ns_types.types).sortBy('name')
+                types: [...(ns_types.types)].sort(stringCompareBy("name"))
             };
         });
     }
 
     // Selects all the protocols from all namespaces, and sorts them alphabetically.
     function protocolsSorted() {
-        var protocols = _(_public.by_qualified_name).filter(function (shared_type) {
-            return shared_type.is_protocol;
-        });
-        return _(protocols).sortBy('qualified_name');
+        const protocols = Object.values(_public.by_qualified_name)
+            .filter((shared_type) => shared_type.is_protocol);
+
+        return protocols.sort(stringCompareBy("qualified_name"));
     }
 
     // Call this once when the schemata have been loaded and we want to launch the app.
     function ready() {
         // Fields used by the schema_list template
-        _public.schemata = _(schema_by_name).values();
+        _public.schemata = Object.values(schema_by_name);
         _public.by_qualified_name = typeByQualifiedName();
         _public.namespaces = typesByNamespace();
         _public.protocols = protocolsSorted();
@@ -169,7 +169,7 @@ function AvroDoc(input_schemata) {
 
         // If the name is already taken, append a number to make it unique
         if (schema_by_name[filename]) {
-            var i = 1;
+            let i = 1;
             while (schema_by_name[filename + i]) i++;
             filename = filename + i;
         }
@@ -181,8 +181,8 @@ function AvroDoc(input_schemata) {
     // Load any schemata that were specified by filename. When they are loaded, start up the app.
     var in_progress = 0, schemata_to_load;
 
-    _public.input_schemata = input_schemata || [];
-    _(_public.input_schemata).each(function (schema) {
+    _public.input_schemata = input_schemata ?? [];
+    _public.input_schemata.forEach(function (schema) {
         if (schema.json) {
             addSchema(schema.json, schema.filename);
         } else if (schema.filename) {
@@ -254,3 +254,10 @@ $(function() {
         });
     }, 1000);
 });
+
+/** Case insensitive string compare */
+const stringCompareBy = (property) => (a, b) => {
+    const aProp = a[property] ?? "";
+    const bProp = b[property] ?? "";
+    return aProp.localeCompare(bProp)
+}

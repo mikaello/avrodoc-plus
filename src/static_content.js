@@ -15,7 +15,6 @@ const client_css = [
 // JS code required in the browser (relative to public/ directory)
 const client_js = [
     'vendor/jquery-1.8.2.js',
-    'vendor/underscore-1.4.2.js',
     'vendor/dust-core-1.1.1.js',
     'vendor/dustjs-helpers-1.1.0.js',
     'vendor/sammy-0.7.1.js',
@@ -35,7 +34,7 @@ const public_dir   = path.join(__dirname, '..', 'public');
 
 // Reads a local Javascript file and returns it in minified form.
 function minifiedJS(filename) {
-    const options = {}
+    const options = { output: { beautify: false } }
     const result = uglify.minify(fs.readFileSync(filename, 'utf-8'), options)
     if (result.error) {
         console.error(`Could not minify file ${filename} with UglifyJs:\n` + result.error)

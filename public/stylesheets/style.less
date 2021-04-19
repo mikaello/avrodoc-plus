@@ -2,10 +2,11 @@
 @import "variables.less";
 
 // Import a subset of Twitter Bootstrap
-@import "bootstrap/reset.less";
+@import "bootstrap/normalize.less";
 @import "bootstrap/mixins.less";
 
 // Base CSS
+@import "bootstrap/variables.less";
 @import "bootstrap/scaffolding.less";
 @import "bootstrap/type.less";
 @import "bootstrap/code.less";
@@ -15,7 +16,8 @@
 // Components: Buttons & Alerts
 @import "bootstrap/buttons.less";
 @import "bootstrap/alerts.less"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
-@import "bootstrap/labels-badges.less";
+@import "bootstrap/labels.less";
+@import "bootstrap/badges.less";
 
 // Components: Popovers
 @import "bootstrap/modals.less";
@@ -119,7 +121,7 @@
   li.selected {
     background: white;
     .box-shadow(0 0 3px #ddd);
-    .border-radius(3px);
+    border-radius: 3px;
   }
 
 

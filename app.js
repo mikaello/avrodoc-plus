@@ -1,11 +1,11 @@
 /*jshint node:true */
 
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var glob = require('glob');
-var fs = require('fs');
-var content = require('./lib/static_content');
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const glob = require('glob');
+const fs = require('fs');
+const content = require('./src/static_content');
 
 var schema_dir = path.resolve(process.cwd(), process.env.SCHEMA_DIR || 'schemata');
 var schemata = [];
@@ -21,14 +21,11 @@ var dust_templates = content.dustTemplates();
 
 var app = express();
 
-app.configure(function () {
-    app.set('port', process.env.PORT || 8124);
-    app.use(express.logger('dev'));
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(require('less-middleware')({ src: __dirname + '/public' }));
-    app.use(express.static(path.join(__dirname, 'public')));
-});
+app.set('port', process.env.PORT ?? 8080);
+app.use(require('morgan')('combined'));
+app.use(require('body-parser').json());
+app.use(require('less-middleware')(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function (req, res) {
     content.topLevelHTML([], {schemata: schemata}, function (err, html) {

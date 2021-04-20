@@ -49,11 +49,7 @@ const extra_less_files = argv['--style'] ? [argv['--style']] : [];
 
 //valid input?
 if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
-<<<<<<< HEAD
-    sys.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less]');
-=======
-    console.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o=my-documentation.html] [-s=my-style.less]');
->>>>>>> origin/fix-deprecated-logging
+    console.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less]');
     process.exit(1);
 }
 avrodoc.createAvroDoc(extra_less_files, inputFiles, outputFile);

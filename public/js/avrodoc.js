@@ -203,8 +203,6 @@ function AvroDoc(input_schemata) {
         }
     });
 
-    $("#search-schemas").on("keydown", function(){ console.log("hauhauha")});
-
     schemata_to_load = in_progress;
 
     if (in_progress === 0) {
@@ -216,7 +214,6 @@ function AvroDoc(input_schemata) {
 
 function search(text, showNamespace) {
     text = text.toLowerCase()
-    console.log("Calling search", text, showNamespace);
     var schemas = $(".schema").map(function(index, e){
         var el = $(e);
         return {name: el.data("schema"), element: el, namespaceElement: el.parent()};

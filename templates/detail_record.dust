@@ -16,7 +16,7 @@
                 <td class="type">{>inline_type:type/}</td>
                 <td class="field">{name}{?order} <span class="label">{order}</span>{/order}</td>
                 <td class="field-doc">{default_str}</td>
-                <td class="field-doc">{doc|md|s}</td>
+                <td class="field-doc">{.doc|md|s}</td>
             </tr>
         {/fields}
         </tbody>

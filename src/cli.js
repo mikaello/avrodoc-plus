@@ -13,32 +13,43 @@
 const avrodoc = require('./avrodoc');
 const fs = require('fs');
 const path = require('path');
-const sys = require('util');
-const argv = require('optimist').alias('o', 'output').alias('i', 'input').alias('s', 'style').argv;
 const debug = require('debug')('avrodoc:cli');
+
+const argv = require('arg')(
+    {
+        '--output': String,
+        '-o': '--output',
+
+        '--input': String,
+        '-i': '--input',
+
+        '--style': String,
+        '-s': '--style',
+    }
+)
 
 let inputFiles = null;
 let outputFile = null;
 
 // Determine list of input files file1.avsc file2.avsc
 if (argv.input) {
-    debug('Collecting all avsc files from root folder ', argv.input);
-    inputFiles = collectInputFiles(argv.input);
-} else if (argv._) {
+    debug('Collecting all avsc files from root folder ', argv['--input']);
+    inputFiles = collectInputFiles(argv['--input']);
+} else if (argv._.length > 0) {
     debug('Using passed arguments as inputfiles...');
     inputFiles = argv._;
 }
 
 // Determine whether an output file is specified
-if (argv.output) {
-    outputFile = argv.output;
+if (argv['--output']) {
+    outputFile = argv['--output'];
 }
 
-const extra_less_files = argv.style ? [argv.style] : [];
+const extra_less_files = argv['--style'] ? [argv['--style']] : [];
 
 //valid input?
 if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
-    sys.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o=my-documentation.html] [-s=my-style.less]');
+    sys.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less]');
     process.exit(1);
 }
 avrodoc.createAvroDoc(extra_less_files, inputFiles, outputFile);

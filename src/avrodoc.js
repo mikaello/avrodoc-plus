@@ -62,7 +62,7 @@ function readJSON(filename) {
     try {
         parsed = JSON.parse(json);
     } catch (e) {
-        sys.error('Not a valid json file: ' + filename);
+        console.error('Not a valid json file: ' + filename);
         process.exit(1);
     }
     return parsed;

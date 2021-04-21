@@ -32,7 +32,7 @@ let inputFiles = null;
 let outputFile = null;
 
 // Determine list of input files file1.avsc file2.avsc
-if (argv.input) {
+if (argv['--input']) {
     debug('Collecting all avsc files from root folder ', argv['--input']);
     inputFiles = collectInputFiles(argv['--input']);
 } else if (argv._.length > 0) {

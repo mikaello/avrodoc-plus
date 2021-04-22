@@ -21,7 +21,7 @@ const client_css = [
 
 /** JS code required in the browser (relative to public/ directory) */
 const client_js = [
-    'vendor/jquery-1.8.2.js',
+    'vendor/jquery-3.6.0.js',
     'vendor/dust-core-2.7.2.js',
     'vendor/dust-helpers-1.7.4.js',
     'vendor/sammy-0.7.6.js',

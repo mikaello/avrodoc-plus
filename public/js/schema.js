@@ -16,13 +16,13 @@
  * @returns
  */
 AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
-  var _public = { filename: filename };
+  let _public = { filename: filename };
 
   // {'namespace.name': {type: 'record', fields: [...]}}
   // containing only types and messages defined in this schema
-  var named_types = {};
+  let named_types = {};
 
-  var primitive_types = [
+  let primitive_types = [
     "null",
     "boolean",
     "int",
@@ -33,7 +33,22 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     "string",
   ];
 
-  var built_in_type_fields = {
+  let logical_types = {
+    decimal: {
+      underlying_type: ["bytes", "fixed"],
+      attributes: ["scale", "precision"],
+    },
+    uuid: { underlying_type: ["string"], attributes: [] },
+    date: { underlying_type: ["int"], attributes: [] },
+    "time-millis": { underlying_type: ["int"], attributes: [] },
+    "time-micros": { underlying_type: ["long"], attributes: [] },
+    "timestamp-millis": { underlying_type: ["long"], attributes: [] },
+    "timestamp-micros": { underlying_type: ["long"], attributes: [] },
+    "local-timestamp-millis": { underlying_type: ["long"], attributes: [] },
+    duration: { underlying_type: ["fixed"], attributes: [] },
+  };
+
+  let built_in_type_fields = {
     record: ["type", "name", "namespace", "doc", "aliases", "fields"],
     error: ["type", "name", "namespace", "doc", "aliases", "fields"],
     message: [
@@ -62,7 +77,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     union: ["type", "types"],
   };
 
-  var avrodoc_custom_attributes = [
+  let avrodoc_custom_attributes = [
     "type",
     "shared",
     "definitions",
@@ -99,7 +114,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
   const isArray = (x) => Object.prototype.toString.call(x) === "[object Array]";
 
   function qualifiedName(schema, namespace) {
-    var type_name;
+    let type_name;
     if (isString(schema)) {
       type_name = schema;
     } else if (isObject(schema) && !isArray(schema)) {
@@ -132,7 +147,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       return schema;
     }
 
-    var annotations = [],
+    let annotations = [],
       ignore_attributes = avrodoc_custom_attributes;
     if (
       schema.type !== null &&
@@ -143,14 +158,14 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       );
     }
 
-    for (var key in schema) {
+    for (let key in schema) {
       // Only include this annotation if it is not a built-in type or something specific to the avrodoc project
       if (
         hasOwnPropertyS(schema, key) &&
         ignore_attributes.indexOf(key) === -1
       ) {
-        var annotation_data = { key: key };
-        var annotation_value = schema[key];
+        let annotation_data = { key: key };
+        let annotation_value = schema[key];
 
         // Check to see if a complex object was provided.
         // In this case, output a pretty-printed JSON blob.
@@ -216,7 +231,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     if (primitive_types.includes(name)) {
       return decorate({ type: name });
     }
-    var type = named_types[qualifiedName(name, namespace)];
+    let type = named_types[qualifiedName(name, namespace)];
     if (type) {
       return type;
     } else {
@@ -276,7 +291,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       }));
     }
 
-    var essence = {
+    let essence = {
       type: schema.type,
       name: qualifiedName(schema, schema.namespace),
     };
@@ -314,7 +329,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     if (a && b && typeof a == "object" && typeof b == "object") {
       if (a.constructor !== b.constructor) return false;
 
-      var length, i, keys;
+      let length, i, keys;
       if (Array.isArray(a)) {
         length = a.length;
         if (length != b.length) return false;
@@ -356,7 +371,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         if (!hasOwnPropertyS(b, keys[i])) return false;
 
       for (i = length; i-- !== 0; ) {
-        var key = keys[i];
+        let key = keys[i];
 
         if (!isEqual(a[key], b[key])) return false;
       }
@@ -391,7 +406,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
 
     if (hasOwnPropertyS(named_types, qualified_name)) {
-      var existing_type = typeEssence(named_types[qualified_name]);
+      let existing_type = typeEssence(named_types[qualified_name]);
       if (!isEqual(new_type, existing_type)) {
         throw (
           "Conflicting definition for type " +
@@ -530,7 +545,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     for (const [messageName, message] of Object.entries(
       protocol.messages ?? {}
     )) {
-      var path = "messages." + messageName;
+      let path = "messages." + messageName;
       message.type = "message";
       message.name = messageName;
       message.namespace = protocol.namespace;

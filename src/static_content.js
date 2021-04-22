@@ -8,12 +8,12 @@ require('dustjs-helpers');
 var less = require('less');
 var _ = require('underscore');
 
-// LESS stylesheets required in the browser (relative to public/ directory)
+/** LESS stylesheets required in the browser (relative to public/ directory) */
 var client_css = [
     'stylesheets/style.less'
 ];
 
-// JS code required in the browser (relative to public/ directory)
+/** JS code required in the browser (relative to public/ directory) */
 var client_js = [
     'vendor/jquery-1.8.2.js',
     'vendor/underscore-1.4.2.js',
@@ -34,7 +34,13 @@ var template_dir = path.join(__dirname, '..', 'templates');
 var public_dir   = path.join(__dirname, '..', 'public');
 
 
-// Reads a local Javascript file and returns it in minified form.
+
+/**
+ * Reads a local Javascript file and returns it in minified form.
+ *
+ * @param {string} filename
+ * @returns {string} minified JS content
+ */
 function minifiedJS(filename) {
     var ast = uglify.parser.parse(fs.readFileSync(filename, 'utf-8'));
     ast = uglify.uglify.ast_mangle(ast);
@@ -42,7 +48,11 @@ function minifiedJS(filename) {
     return uglify.uglify.gen_code(ast);
 }
 
-// Precompiles all templates found in the templates directory, and returns them as a JS string.
+/**
+ * Precompiles all templates found in the templates directory, and returns them as a JS string.
+ *
+ * @returns {string} a string of JavaScript source code
+ */
 function dustTemplates() {
     var compiled = '';
     fs.readdirSync(template_dir).forEach(function (file) {
@@ -60,7 +70,12 @@ function lessFileAs(type) {
     }
 }
 
-// Compiles LESS stylesheets and calls callback(error, minified_css).
+/**
+ * Compiles LESS stylesheets and calls callback(error, minified_css).
+ *
+ * @param {string[]} extra_less_files
+ * @param {function(string?,string)} callback arg0=error and arg1=minified_css
+ */
 function stylesheets(extra_less_files, callback) {
     var compiled = '', to_do = 0;
     client_css.map(lessFileAs("internal")).concat(extra_less_files.map(lessFileAs("external"))).forEach(function (file) {
@@ -89,8 +104,13 @@ function stylesheets(extra_less_files, callback) {
     }
 }
 
-// Calls callback(error, html) with HTML containing URL references to all JS and CSS required by the
-// browser.
+/**
+ * Calls callback(error, html) with HTML containing URL references to all JS
+ * and CSS required by the browser.
+ *
+ * @param {string[]} extra_less_files
+ * @param {function(string?,string)} callback arg0=error and arg1=HTML
+ */
 function remoteContent(extra_less_files, callback) {
     var html = [];
     client_css.concat(extra_less_files).forEach(function (file) {
@@ -104,7 +124,12 @@ function remoteContent(extra_less_files, callback) {
     callback(null, html.join('\n'));
 }
 
-// Returns HTML containing all JS and CSS required by the browser inline.
+/**
+ * Returns HTML containing all JS and CSS required by the browser inline.
+ *
+ * @param {string[]} extra_less_files
+ * @param {function(string?,string)} callback arg0=error and arg1=HTML
+ */
 function inlineContent(extra_less_files, callback) {
     stylesheets(extra_less_files, function (err, css) {
         if (err) {

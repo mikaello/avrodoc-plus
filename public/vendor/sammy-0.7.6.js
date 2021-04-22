@@ -1,19 +1,19 @@
 // name: sammy
-// version: 0.7.1
+// version: 0.7.6
 
 // Sammy.js / http://sammyjs.org
 
-(function($, window) {
-  (function(factory){
-    // Support module loading scenarios
-    if (typeof define === 'function' && define.amd){
-      // AMD Anonymous Module
-      define(['jquery'], factory);
-    } else {
-      // No module loader (plain <script> tag) - put directly in global namespace
-      $.sammy = window.Sammy = factory($);
-    }
-  })(function($){
+(function(factory){
+  // Support module loading scenarios
+  if (typeof define === 'function' && define.amd){
+    // AMD Anonymous Module
+    define(['jquery'], factory);
+  } else {
+    // No module loader (plain <script> tag) - put directly in global namespace
+    jQuery.sammy = window.Sammy = factory(jQuery);
+  }
+})(function($){
+
   var Sammy,
       PATH_REPLACER = "([^\/]+)",
       PATH_NAME_MATCHER = /:([\w\d]+)/g,
@@ -30,7 +30,9 @@
         return String(s).replace(/&(?!\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       },
       _routeWrapper = function(verb) {
-        return function(path, callback) { return this.route.apply(this, [verb, path, callback]); };
+        return function() {
+          return this.route.apply(this, [verb].concat(Array.prototype.slice.call(arguments)));
+        };
       },
       _template_cache = {},
       _has_history = !!(window.history && history.pushState),
@@ -84,7 +86,7 @@
     }
   };
 
-  Sammy.VERSION = '0.7.1';
+  Sammy.VERSION = '0.7.6';
 
   // Add to the global logger pool. Takes a function that accepts an
   // unknown number of arguments and should print them or send them somewhere
@@ -105,7 +107,7 @@
   };
 
   if (typeof window.console != 'undefined') {
-    if (_isFunction(window.console.log.apply)) {
+    if (typeof window.console.log === 'function' && _isFunction(window.console.log.apply)) {
       Sammy.addLogger(function() {
         window.console.log.apply(window.console, arguments);
       });
@@ -212,6 +214,20 @@
     }
   });
 
+
+  // Return whether the event targets this window.
+  Sammy.targetIsThisWindow = function targetIsThisWindow(event, tagName) {
+    var targetElement = $(event.target).closest(tagName);
+    if (targetElement.length === 0) { return true; }
+
+    var targetWindow = targetElement.attr('target');
+    if (!targetWindow || targetWindow === window.name || targetWindow === '_self') { return true; }
+    if (targetWindow === '_blank') { return false; }
+    if (targetWindow === 'top' && window === window.top) { return true; }
+    return false;
+  };
+
+
   // The DefaultLocationProxy is the default location proxy for all Sammy applications.
   // A location proxy is a prototype that conforms to a simple interface. The purpose
   // of a location proxy is to notify the Sammy.Application its bound to when the location
@@ -262,6 +278,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         if (proxy.is_native === false && !non_native) {
           proxy.is_native = true;
           window.clearInterval(lp._interval);
+          lp._interval = null;
         }
         app.trigger('location-changed');
       });
@@ -271,14 +288,25 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
           app.trigger('location-changed');
         });
         // bind to link clicks that have routes
-        $('a').live('click.history-' + this.app.eventNamespace(), function(e) {
+        $(document).delegate('a', 'click.history-' + this.app.eventNamespace(), function (e) {
           if (e.isDefaultPrevented() || e.metaKey || e.ctrlKey) {
             return;
           }
-          var full_path = lp.fullPath(this);
-          if (this.hostname == window.location.hostname &&
+          var full_path = lp.fullPath(this),
+            // Get anchor's host name in a cross browser compatible way.
+            // IE looses hostname property when setting href in JS
+            // with a relative URL, e.g. a.setAttribute('href',"/whatever").
+            // Circumvent this problem by creating a new link with given URL and
+            // querying that for a hostname.
+            hostname = this.hostname ? this.hostname : function (a) {
+              var l = document.createElement("a");
+              l.href = a.href;
+              return l.hostname;
+            }(this);
+
+          if (hostname == window.location.hostname &&
               app.lookupRoute('get', full_path) &&
-              this.target !== '_blank') {
+              Sammy.targetIsThisWindow(e, 'a')) {
             e.preventDefault();
             proxy.setLocation(full_path);
             return false;
@@ -295,10 +323,11 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     unbind: function() {
       $(window).unbind('hashchange.' + this.app.eventNamespace());
       $(window).unbind('popstate.' + this.app.eventNamespace());
-      $('a').die('click.history-' + this.app.eventNamespace());
+      $(document).undelegate('a', 'click.history-' + this.app.eventNamespace());
       Sammy.DefaultLocationProxy._bindings--;
       if (Sammy.DefaultLocationProxy._bindings <= 0) {
         window.clearInterval(Sammy.DefaultLocationProxy._interval);
+        Sammy.DefaultLocationProxy._interval = null;
       }
     },
 
@@ -523,7 +552,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       }
     },
 
-  // provide log() override for inside an app that includes the relevant application element_selector
+    // provide log() override for inside an app that includes the relevant application element_selector
     log: function() {
       Sammy.log.apply(Sammy, Array.prototype.concat.apply([this.element_selector],arguments));
     },
@@ -546,14 +575,14 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //    It is also possible to pass a string as the callback, which is looked up as the name
     //    of a method on the application.
     //
-    route: function(verb, path, callback) {
-      var app = this, param_names = [], add_route, path_match;
+    route: function(verb, path) {
+      var app = this, param_names = [], add_route, path_match, callback = Array.prototype.slice.call(arguments,2);
 
       // if the method signature is just (path, callback)
       // assume the verb is 'any'
-      if (!callback && _isFunction(path)) {
+      if (callback.length === 0 && _isFunction(path)) {
+        callback = [path];
         path = verb;
-        callback = path;
         verb = 'any';
       }
 
@@ -574,10 +603,12 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         // replace with the path replacement
         path = new RegExp(path.replace(PATH_NAME_MATCHER, PATH_REPLACER) + "$");
       }
-      // lookup callback
-      if (typeof callback == 'string') {
-        callback = app[callback];
-      }
+      // lookup callbacks
+      $.each(callback,function(i,cb){
+        if (typeof(cb) === 'string') {
+          callback[i] = app[cb];
+        }
+      });
 
       add_route = function(with_verb) {
         var r = {verb: with_verb, path: path, callback: callback, param_names: param_names};
@@ -799,6 +830,64 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       return this;
     },
 
+    // Adds a onComplete function to the application. onComplete functions are executed
+    // at the end of a chain of route callbacks, if they call next(). Unlike after,
+    // which is called as soon as the route is complete, onComplete is like a final next()
+    // for all routes, and is thus run asynchronously
+    //
+    // ### Example
+    //
+    //      app.get('/chain',function(context,next) {
+    //          console.log('chain1');
+    //          next();
+    //      },function(context,next) {
+    //          console.log('chain2');
+    //          next();
+    //      });
+    //
+    //      app.get('/link',function(context,next) {
+    //          console.log('link1');
+    //          next();
+    //      },function(context,next) {
+    //          console.log('link2');
+    //          next();
+    //      });
+    //
+    //      app.onComplete(function() {
+    //          console.log("Running finally");
+    //      });
+    //
+    // If you go to '/chain', you will get the following messages:
+    //
+    //      chain1
+    //      chain2
+    //      Running onComplete
+    //
+    //
+    // If you go to /link, you will get the following messages:
+    //
+    //      link1
+    //      link2
+    //      Running onComplete
+    //
+    //
+    // It really comes to play when doing asynchronous:
+    //
+    //      app.get('/chain',function(context,next) {
+    //        $.get('/my/url',function() {
+    //          console.log('chain1');
+    //          next();
+    //        });
+    //      },function(context,next) {
+    //        console.log('chain2');
+    //        next();
+    //      });
+    //
+    onComplete: function(callback) {
+      this._onComplete = callback;
+      return this;
+    },
+
     // Returns `true` if the current application is running.
     isRunning: function() {
       return this._running;
@@ -906,6 +995,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
 
       // bind to submit to capture post/put/delete routes
       this.bind('submit', function(e) {
+        if ( !Sammy.targetIsThisWindow(e, 'form') ) { return true; }
         var returned = app._checkFormSubmission($(e.target).closest('form'));
         return (returned === false) ? e.preventDefault() : false;
       });
@@ -937,6 +1027,13 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         });
       });
       this._running = false;
+      return this;
+    },
+
+    // Not only runs `unbind` but also destroys the app reference.
+    destroy: function() {
+      this.unload();
+      delete Sammy.apps[this.element_selector];
       return this;
     },
 
@@ -1015,7 +1112,10 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
           path_params,
           final_returned;
 
-      this.log('runRoute', [verb, path].join(' '));
+      if (this.debug) {
+        this.log('runRoute', [verb, path].join(' '));
+      }
+
       this.trigger('run-route', {verb: verb, path: path, params: params});
       if (typeof params == 'undefined') { params = {}; }
 
@@ -1047,10 +1147,13 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         arounds = this.arounds.slice(0);
         befores = this.befores.slice(0);
         // set the callback args to the context + contents of the splat
-        callback_args = [context].concat(params.splat);
+        callback_args = [context];
+        if (params.splat) {
+          callback_args = callback_args.concat(params.splat);
+        }
         // wrap the route up with the before filters
         wrapped_route = function() {
-          var returned;
+          var returned, i, nextRoute;
           while (befores.length > 0) {
             before = befores.shift();
             // check the options
@@ -1061,7 +1164,23 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
           }
           app.last_route = route;
           context.trigger('event-context-before', {context: context});
-          returned = route.callback.apply(context, callback_args);
+          // run multiple callbacks
+          if (typeof(route.callback) === "function") {
+            route.callback = [route.callback];
+          }
+          if (route.callback && route.callback.length) {
+            i = -1;
+            nextRoute = function() {
+              i++;
+              if (route.callback[i]) {
+                returned = route.callback[i].apply(context,callback_args);
+              } else if (app._onComplete && typeof(app._onComplete === "function")) {
+                app._onComplete(context);
+              }
+            };
+            callback_args.push(nextRoute);
+            nextRoute();
+          }
           context.trigger('event-context-after', {context: context});
           return returned;
         };
@@ -1109,6 +1228,10 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //     // match all except a path
     //     app.contextMatchesOptions(context, {except: {path:'#/otherpath'}}); //=> true
     //     app.contextMatchesOptions(context, {except: {path:'#/mypath'}}); //=> false
+    //     // match all except a verb and a path
+    //     app.contextMatchesOptions(context, {except: {path:'#/otherpath', verb:'post'}}); //=> true
+    //     app.contextMatchesOptions(context, {except: {path:'#/mypath', verb:'post'}}); //=> true
+    //     app.contextMatchesOptions(context, {except: {path:'#/mypath', verb:'get'}}); //=> false
     //     // match multiple paths
     //     app.contextMatchesOptions(context, {path: ['#/mypath', '#/otherpath']}); //=> true
     //     app.contextMatchesOptions(context, {path: ['#/otherpath', '#/thirdpath']}); //=> false
@@ -1118,6 +1241,9 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //     // match all except multiple paths
     //     app.contextMatchesOptions(context, {except: {path: ['#/mypath', '#/otherpath']}}); //=> false
     //     app.contextMatchesOptions(context, {except: {path: ['#/otherpath', '#/thirdpath']}}); //=> true
+    //     // match all except multiple paths and verbs
+    //     app.contextMatchesOptions(context, {except: {path: ['#/mypath', '#/otherpath'], verb: ['get', 'post']}}); //=> false
+    //     app.contextMatchesOptions(context, {except: {path: ['#/otherpath', '#/thirdpath'], verb: ['get', 'post']}}); //=> true
     //
     contextMatchesOptions: function(context, match_options, positive) {
       var options = match_options;
@@ -1225,7 +1351,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
 
     // clear the templateCache
     clearTemplateCache: function() {
-      return _template_cache = {};
+      return (_template_cache = {});
     },
 
     // This throws a '404 Not Found' error by invoking `error()`.
@@ -1272,7 +1398,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       $_method = $form.find('input[name="_method"]');
       if ($_method.length > 0) { verb = $_method.val(); }
       if (!verb) { verb = $form[0].getAttribute('method'); }
-      if (!verb || verb == '') { verb = 'get'; }
+      if (!verb || verb === '') { verb = 'get'; }
       return $.trim(verb.toString().toLowerCase());
     },
 
@@ -1282,7 +1408,11 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       $form = $(form);
       path  = $form.attr('action') || '';
       verb  = this._getFormVerb($form);
-      this.log('_checkFormSubmission', $form, path, verb);
+
+      if (this.debug) {
+        this.log('_checkFormSubmission', $form, path, verb);
+      }
+
       if (verb === 'get') {
         params = this._serializeFormParams($form);
         if (params !== '') { path += '?' + params; }
@@ -1517,7 +1647,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
         if (callback) { this.then(callback); }
         if (typeof location === 'string') {
           // it's a path
-          is_json      = (location.match(/\.json$/) || options.json);
+          is_json      = (location.match(/\.json(\?|$)/) || options.json);
           should_cache = is_json ? options.cache === true : options.cache !== false;
           context.next_engine = context.event_context.engineFor(location);
           delete options.cache;
@@ -1712,13 +1842,21 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
           if (callback) {
             $.each(data, function(i, value) {
               var idata = {}, engine = this.next_engine || location;
-              name ? (idata[name] = value) : (idata = value);
+              if (name) {
+                idata[name] = value;
+              } else {
+                idata = value;
+              }
               callback(value, rctx.event_context.interpolate(content, idata, engine));
             });
           } else {
             return this.collect(data, function(i, value) {
               var idata = {}, engine = this.next_engine || location;
-              name ? (idata[name] = value) : (idata = value);
+              if (name) {
+                idata[name] = value;
+              } else {
+                idata = value;
+              }
               return this.event_context.interpolate(content, idata, engine);
             }, true);
           }
@@ -1848,7 +1986,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
       if (_isFunction(engine)) { return engine; }
       // lookup engine name by path extension
       engine = (engine || context.app.template_engine).toString();
-      if ((engine_match = engine.match(/\.([^\.\?\#]+)$/))) {
+      if ((engine_match = engine.match(/\.([^\.\?\#]+)(\?|$)/))) {
         engine = engine_match[1];
       }
       // set the engine to the default template engine if no match is found
@@ -1887,7 +2025,14 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
 
     // Create and return a `Sammy.RenderContext` calling `renderEach()` on it.
     // Loads the template and interpolates the data for each item,
-    // however does not actual place it in the DOM.
+    // however does not actually place it in the DOM.
+    //
+    // `name` is an optional parameter (if it is an array, it is used as `data`,
+    // and the third parameter used as `callback`, if set).
+    //
+    // If `data` is not provided, content from the previous step in the chain
+    // (if it is an array) is used, and `name` is used as the key for each
+    // element of the array (useful for referencing in template).
     //
     // ### Example
     //
@@ -1896,6 +2041,10 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     //      // sets the `content` to <div class="name">quirkey</div><div class="name">endor</div>
     //      renderEach('mytemplate.mustache', [{name: 'quirkey'}, {name: 'endor'}]).appendTo('ul');
     //      // appends the rendered content to $('ul')
+    //
+    //      // names.json: ["quirkey", "endor"]
+    //      this.load('names.json').renderEach('mytemplate.mustache', 'name').appendTo('ul');
+    //      // uses the template to render each item in the JSON array
     //
     renderEach: function(location, name, data, callback) {
       return new Sammy.RenderContext(this).renderEach(location, name, data, callback);
@@ -1906,6 +2055,11 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     // preloading/caching the templates.
     load: function(location, options, callback) {
       return new Sammy.RenderContext(this).load(location, options, callback);
+    },
+
+    // create a new `Sammy.RenderContext` calling `loadPartials()` with `partials`.
+    loadPartials: function(partials) {
+      return new Sammy.RenderContext(this).loadPartials(partials);
     },
 
     // `render()` the `location` with `data` and then `swap()` the
@@ -2000,4 +2154,3 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
 
   return Sammy;
 });
-})(jQuery, window);

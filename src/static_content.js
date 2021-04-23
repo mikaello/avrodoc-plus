@@ -1,11 +1,17 @@
 /*jshint node:true */
 
-const uglify = require('uglify-js');
-const fs = require('fs');
-const path = require('path');
-const dust = require('dustjs-linkedin');
-require('dustjs-helpers');
-const less = require('less');
+import uglify from 'uglify-js'
+import fs from 'fs'
+import { promisify } from 'util'
+
+import path from 'path'
+import dust from 'dustjs-linkedin'
+import 'dustjs-helpers'
+import less from 'less'
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // LESS stylesheets required in the browser (relative to public/ directory)
 const client_css = [
@@ -26,7 +32,7 @@ const client_js = [
 ];
 
 // Minimal HTML document that holds it all together
-const client_html = dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8'));
+const client_html = promisify(dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8')))
 
 const template_dir = path.join(__dirname, '..', 'templates');
 const public_dir   = path.join(__dirname, '..', 'public');
@@ -129,26 +135,28 @@ function inlineContent(extra_less_files, callback) {
     });
 }
 
-function topLevelHTML(extra_less_files, options, callback) {
-    (options.inline ? inlineContent : remoteContent)(extra_less_files, function (err, content) {
-        if (err) {
-            callback(err);
-            return;
-        }
+function topLevelHTML(extra_less_files, options) {
+    return new Promise((resolve, reject) => {
+        (options.inline ? inlineContent : remoteContent)(extra_less_files, function (err, content) {
+            if (err) {
+                return reject(err);
+            }
 
-        const context = {
-            title: 'Avrodoc',
-            content: content,
-            schemata: '[]',
-            ...options,
-        }
+            const context = {
+                title: 'Avrodoc',
+                content: content,
+                schemata: '[]',
+                ...options,
+            }
 
-        if (typeof(context.schemata) !== 'string') {
-            context.schemata = JSON.stringify(context.schemata);
-        }
-        client_html(context, callback);
-    });
+            if (typeof(context.schemata) !== 'string') {
+                context.schemata = JSON.stringify(context.schemata);
+            }
+            return client_html(context)
+               .then(html => resolve(html))
+               .catch(err => reject(err))
+        });
+    })
 }
 
-exports.dustTemplates = dustTemplates;
-exports.topLevelHTML = topLevelHTML;
+export { dustTemplates, topLevelHTML };

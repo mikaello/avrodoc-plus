@@ -1,11 +1,18 @@
 /*jshint node:true */
 
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const glob = require('glob');
-const fs = require('fs');
-const content = require('./src/static_content');
+import express from 'express'
+import morgan from 'morgan'
+import bodyParser from 'body-parser'
+import lessMiddleware from 'less-middleware'
+import http from 'http'
+import path from 'path'
+import glob from 'glob'
+import fs from 'fs'
+import { dustTemplates, topLevelHTML } from './src/static_content.js'
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const schema_dir = path.resolve(process.cwd(), process.env.SCHEMA_DIR ?? 'schemata');
 const schemata = [];
@@ -17,20 +24,19 @@ glob('**/*.avsc', {cwd: schema_dir}, function (err, files) {
 });
 
 // Precompile dust templates at app startup, and then serve them out of memory
-const dust_templates = content.dustTemplates();
+const dust_templates = dustTemplates();
 
 const app = express();
 
 app.set('port', process.env.PORT ?? 8080);
-app.use(require('morgan')('combined'));
-app.use(require('body-parser').json());
-app.use(require('less-middleware')(__dirname + '/public'));
+app.use(morgan('combined'));
+app.use(express.json());
+app.use(lessMiddleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', function (req, res) {
-    content.topLevelHTML([], {schemata: schemata}, function (err, html) {
-        res.set('Content-Type', 'text/html').send(html);
-    });
+app.get('/', async function (req, res) {
+    const html = await topLevelHTML([], {schemata: schemata});
+    res.set('Content-Type', 'text/html').send(html);
 });
 
 app.get('/dust-templates.js', function (req, res) {

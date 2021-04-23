@@ -7,8 +7,8 @@ const glob = require('glob');
 const fs = require('fs');
 const content = require('./src/static_content');
 
-var schema_dir = path.resolve(process.cwd(), process.env.SCHEMA_DIR || 'schemata');
-var schemata = [];
+const schema_dir = path.resolve(process.cwd(), process.env.SCHEMA_DIR ?? 'schemata');
+const schemata = [];
 glob('**/*.avsc', {cwd: schema_dir}, function (err, files) {
     if (err) throw err;
     files.sort().forEach(function (file) {
@@ -17,9 +17,9 @@ glob('**/*.avsc', {cwd: schema_dir}, function (err, files) {
 });
 
 // Precompile dust templates at app startup, and then serve them out of memory
-var dust_templates = content.dustTemplates();
+const dust_templates = content.dustTemplates();
 
-var app = express();
+const app = express();
 
 app.set('port', process.env.PORT ?? 8080);
 app.use(require('morgan')('combined'));

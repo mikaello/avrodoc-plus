@@ -46,11 +46,15 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         'is_double', 'is_union', 'is_primitive', 'attributes'
     ];
 
+    const isString = (x)  => Object.prototype.toString.call(x) === "[object String]"
+    const isObject = (x)  => Object.prototype.toString.call(x) === "[object Object]"
+    const isArray = (x)  => Object.prototype.toString.call(x) === "[object Array]"
+
     function qualifiedName(schema, namespace) {
-        var type_name, _schema = _(schema);
-        if (_schema.isString()) {
+        var type_name;
+        if (isString(schema)) {
             type_name = schema;
-        } else if (_schema.isObject() && !_schema.isArray()) {
+        } else if (isObject(schema) && !isArray(schema)) {
             namespace = schema.namespace || namespace;
             type_name = schema.name || schema.protocol || schema.type;
         }
@@ -59,7 +63,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             throw 'unable to determine type name from schema ' + JSON.stringify(schema) + ' in namespace ' + namespace;
         } else if (type_name.indexOf('.') >= 0) {
             return type_name;
-        } else if (_(primitive_types).contains(type_name)) {
+        } else if (primitive_types.includes(type_name)) {
             return type_name;
         } else if (namespace) {
             return namespace + '.' + type_name;
@@ -118,7 +122,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         schema.qualified_name = qualifiedName(schema);
         schema = decorateCustomAttributes(schema);
 
-        if (_(primitive_types).contains(schema.type)) {
+        if (primitive_types.includes(schema.type)) {
             schema.is_primitive = true;
         } else {
             schema.link = [
@@ -141,7 +145,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     // name refers to (or throws an exception if the name cannot be resolved). For named types, the
     // same (shared) object is returned whenever the same name is requested.
     function lookupNamedType(name, namespace, path) {
-        if (_(primitive_types).contains(name)) {
+        if (primitive_types.includes(name)) {
             return decorate({type: name});
         }
         var type = named_types[qualifiedName(name, namespace)];
@@ -156,10 +160,11 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     // the qualified name of that type. We recurse through unnamed complex types (array, map, union)
     // but named types are replaced by their name.
     function extractTypeName(schema, namespace) {
-        var _schema = _(schema);
-        if (_schema.isString()) {
+        if (isString(schema)) {
             return schema;
-        } else if (_schema.isObject() && !_schema.isArray()) {
+        } else if (isArray(schema)) {
+            return schema.map((type) => extractTypeName(type, namespace));
+        } else if (isObject(schema)) {
             if (schema.type === 'record' || schema.type === 'enum' || schema.type === 'fixed' || schema.type === 'error') {
                 return qualifiedName(schema, namespace);
             } else if (schema.type === 'array') {
@@ -167,18 +172,12 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             } else if (schema.type === 'map') {
                 return {type: 'map', values: extractTypeName(schema.values, namespace)};
             } else if (schema.type === 'union') {
-                return _(schema.types).map(function (type) {
-                    return extractTypeName(type, namespace);
-                });
-            } else if (_(primitive_types).contains(schema.type)) {
+                return schema.types.map((type) => extractTypeName(type, namespace));
+            } else if (primitive_types.includes(schema.type)) {
                 return schema.type;
             } else {
                 throw 'extractTypeName: unsupported Avro schema type: ' + JSON.stringify(schema.type);
             }
-        } else if (_schema.isArray()) {
-            return _schema.map(function (type) {
-                return extractTypeName(type, namespace);
-            });
         } else {
             throw 'extractTypeName: unexpected schema: ' + JSON.stringify(schema);
         }
@@ -189,9 +188,9 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     // This is useful for equality comparison of types.
     function typeEssence(schema) {
         function fieldsWithTypeNames(fields) {
-            return _(fields).map(function (field) {
-                return {name: field.name, type: extractTypeName(field.type, schema.namespace)};
-            });
+            return (fields).map((field) => 
+                ({name: field.name, type: extractTypeName(field.type, schema.namespace)})
+            );
         }
 
         var essence = {type: schema.type, name: qualifiedName(schema, schema.namespace)};
@@ -204,20 +203,84 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         } else if (schema.type === 'message') {
             essence.request = fieldsWithTypeNames(schema.request || []);
             essence.response = extractTypeName(schema.response, schema.namespace);
-            essence.errors = _(schema.errors || []).map(function (error) {
-                return extractTypeName(error, schema.namespace);
-            });
+            essence.errors = (schema.errors || []).map((error) =>
+                extractTypeName(error, schema.namespace)
+            );
         } else if (schema.type === 'protocol') {
             essence = {protocol: qualifiedName(schema, schema.namespace)};
-            essence.types = _(schema.types || []).map(typeEssence);
-            essence.messages = _(schema.messages || {}).reduce(function (memo, message, messageName) {
-                memo[messageName] = typeEssence(message);
-                return memo;
-            }, {});
+            essence.types = (schema.types ?? []).map(typeEssence);
+            essence.messages = Object.fromEntries(
+                Object.entries(schema.messages ?? {})
+                    .map(([messageName, message]) => ([messageName, typeEssence(message)]))
+                );
         } else {
             throw 'typeEssence() only supports named types, not ' + schema.type;
         }
         return essence;
+    }
+
+    /** Credit: https://github.com/epoberezkin/fast-deep-equal */
+    function isEqual (a,b) {
+        if (a === b) return true;
+
+        if (a && b && typeof a == 'object' && typeof b == 'object') {
+            if (a.constructor !== b.constructor) return false;
+
+            var length, i, keys;
+            if (Array.isArray(a)) {
+                length = a.length;
+                if (length != b.length) return false;
+                for (i = length; i-- !== 0;)
+                    if (!isEqual(a[i], b[i])) return false;
+                return true;
+            }
+
+            if ((a instanceof Map) && (b instanceof Map)) {
+                if (a.size !== b.size) return false;
+                for (i of a.entries())
+                    if (!b.has(i[0])) return false;
+                for (i of a.entries())
+                    if (!isEqual(i[1], b.get(i[0]))) return false;
+                return true;
+            }
+
+            if ((a instanceof Set) && (b instanceof Set)) {
+                if (a.size !== b.size) return false;
+                for (i of a.entries())
+                    if (!b.has(i[0])) return false;
+                return true;
+            }
+            if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
+            length = a.length;
+            if (length != b.length) return false;
+                for (i = length; i-- !== 0;)
+                    if (a[i] !== b[i]) return false;
+                return true;
+            }
+
+
+            if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+            if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+            if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+            keys = Object.keys(a);
+            length = keys.length;
+            if (length !== Object.keys(b).length) return false;
+
+            for (i = length; i-- !== 0;)
+                if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+            for (i = length; i-- !== 0;) {
+                var key = keys[i];
+
+                if (!isEqual(a[key], b[key])) return false;
+            }
+
+            return true;
+        }
+
+        // true if both NaN, false otherwise
+        return a!==a && b!==b;
     }
 
     // Takes a named type (record, enum, fixed, message or protocol) and adds it to the maps of name
@@ -230,21 +293,21 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     // same qualified name, because different schema files are independent. The sharing of
     // equivalent types is only for conciceness of display.
     function defineNamedType(schema, path) {
-        var qualified_name = qualifiedName(schema, schema.namespace);
-        var new_type = typeEssence(schema);
-        var shared_schema = null;
+        const qualified_name = qualifiedName(schema, schema.namespace);
+        const new_type = typeEssence(schema);
+        let shared_schema = null;
 
-        if (_(shared_types).has(qualified_name)) {
-            shared_schema = _(shared_types[qualified_name]).find(function (shared_schema) {
-                return _(new_type).isEqual(typeEssence(shared_schema));
-            });
+        if (shared_types.hasOwnProperty(qualified_name)) {
+            shared_schema = shared_types[qualified_name].find((shared_schema) => 
+                isEqual(new_type, typeEssence(shared_schema))
+            );
         } else {
             shared_types[qualified_name] = [];
         }
 
-        if (_(named_types).has(qualified_name)) {
+        if (named_types.hasOwnProperty(qualified_name)) {
             var existing_type = typeEssence(named_types[qualified_name]);
-            if (!_(new_type).isEqual(existing_type)) {
+            if (!isEqual(new_type, existing_type)) {
                 throw 'Conflicting definition for type ' + qualified_name + ' at ' + path + ': ' +
                         JSON.stringify(existing_type) + ' != ' + JSON.stringify(new_type);
             }
@@ -252,7 +315,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             // Type has not yet been defined in this schema file
             named_types[qualified_name] = schema;
             if (!shared_schema) {
-                shared_schema = _(schema).clone(); // shallow clone
+                shared_schema = {...schema}; // shallow clone
                 shared_types[qualified_name].push(shared_schema);
             }
 
@@ -268,25 +331,24 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     // Parse a plain schema (with a record type at the top level, and any other types defined in
     // nested structures on the record's fields).
     function parseSchema(schema, namespace, path) {
-        var _schema = _(schema);
-        if (_schema.isNull() || _schema.isUndefined()) {
+        if (schema == null) {
             throw 'Missing schema type at ' + path;
-        } else if (_schema.isString()) {
+        } else if (isString(schema)) {
             return lookupNamedType(schema, namespace, path);
-        } else if (_schema.isObject() && !_schema.isArray()) {
+        } else if (isObject(schema) && !isArray(schema)) {
             if (schema.type === 'record' || schema.type === 'error') {
-                if (!_(schema.fields).isArray()) {
+                if (!isArray(schema.fields)) {
                     throw 'Unexpected value ' + JSON.stringify(schema.fields) + ' for ' + schema.type + ' fields at ' + path;
                 }
                 schema.namespace = schema.namespace || namespace;
                 defineNamedType(schema, path);
-                _(schema.fields).each(function (field) {
+                schema.fields.forEach((field) => {
                     field.type = parseSchema(field.type, schema.namespace, joinPath(path, field.name));
                     field.default_str = JSON.stringify(field['default'], null, ' ');
                 });
                 return decorate(schema);
             } else if (schema.type === 'enum') {
-                if (!_(schema.symbols).isArray()) {
+                if (!isArray(schema.symbols)) {
                     throw 'Unexpected value ' + JSON.stringify(schema.symbols) + ' for enum symbols at ' + path;
                 }
                 schema.namespace = schema.namespace || namespace;
@@ -305,22 +367,22 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             } else if (schema.type === 'map') {
                 schema.values = parseSchema(schema.values, namespace, joinPath(path, 'values'));
                 return decorate(schema);
-            } else if (_(primitive_types).contains(schema.type)) {
+            } else if (primitive_types.includes(schema.type)) {
                 return decorate(schema);
             } else {
                 throw 'Unsupported Avro schema type "' + schema.type + '" at ' + path;
             }
-        } else if (_schema.isArray()) {
-            if (_schema.isEmpty()) {
+        } else if (isArray(schema)) {
+            if (schema.length === 0) {
                 throw 'Unions must have at least one branch type at ' + path;
             }
             return decorate({
                 type: 'union',
-                types: _schema.map(function (branch_type) {
-                    if (_(branch_type).isArray()) {
+                types: schema.map((branch_type) => {
+                    if (isArray(branch_type)) {
                         throw 'Unions must not be nested at ' + path;
                     }
-                    var type_name = _(branch_type).isObject() ? (branch_type.name || branch_type.type) : branch_type;
+                    const type_name = isObject(branch_type) ? (branch_type.name || branch_type.type) : branch_type;
                     return parseSchema(branch_type, namespace, joinPath(path, type_name));
                 })
             });
@@ -335,18 +397,18 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         protocol.type = 'protocol';
         protocol.name = protocol.protocol;
 
-        protocol.types = _(protocol.types || []).map(function (type) {
-            return parseSchema(type, protocol.namespace, 'types');
-        });
+        protocol.types = (protocol.types ?? []).map((type) => 
+            parseSchema(type, protocol.namespace, 'types')
+        );
 
-        _(protocol.messages || {}).each(function (message, messageName) {
+        for (const [messageName, message] of Object.entries(protocol.messages ?? {})) {
             var path = 'messages.' + messageName;
             message.type = 'message';
             message.name = messageName;
             message.namespace = protocol.namespace;
             message.protocol_name = qualifiedName(protocol.name, protocol.namespace);
 
-            _(message.request || []).each(function (param) {
+            (message.request ?? []).forEach(function(param) { 
                 param.type = parseSchema(param.type, protocol.namespace, joinPath(path, 'request.' + param.name));
                 param.default_str = JSON.stringify(param['default'], null, ' ');
             });
@@ -357,15 +419,15 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             if (message.response && message.response.type === 'null') {
                 message.response = [];
             }
-            message.errors = _(message.errors || []).map(function (error) {
-                return parseSchema(error, protocol.namespace, joinPath(path, 'errors'));
-            });
+            message.errors = (message.errors ?? []).map((error) => 
+                parseSchema(error, protocol.namespace, joinPath(path, 'errors'))
+            );
 
             defineNamedType(message, path);
             decorate(message);
-        });
+        };
 
-        protocol.sorted_messages = _(_(protocol.messages || {}).values()).sortBy('name');
+        protocol.sorted_messages = Object.values(protocol.messages ?? {}).sort(stringCompareBy('name'));
         defineNamedType(protocol);
 
         return decorate(protocol);
@@ -376,7 +438,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         schema_json = JSON.parse(schema_json);
     }
 
-    if (_(schema_json).isObject() && schema_json.protocol) {
+    if (isObject(schema_json) && schema_json.protocol) {
         _public.root_type = parseProtocol(schema_json);
     } else {
         _public.root_type = parseSchema(schema_json);
@@ -385,11 +447,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     _public.root_type.is_root_type = true;
     _public.named_types = named_types;
 
-    _public.sorted_types = _(named_types).values().sort(function (type1, type2) {
-        if (type1.name < type2.name) return -1;
-        if (type1.name > type2.name) return +1;
-        return 0;
-    });
+    _public.sorted_types = Object.values(named_types).sort(stringCompareBy("name"));
 
     return _public;
 };

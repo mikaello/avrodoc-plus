@@ -1,22 +1,20 @@
 /*jshint node:true */
 
-var uglify = require('uglify-js');
-var fs = require('fs');
-var path = require('path');
-var dust = require('dustjs-linkedin');
+const uglify = require('uglify-js');
+const fs = require('fs');
+const path = require('path');
+const dust = require('dustjs-linkedin');
 require('dustjs-helpers');
-var less = require('less');
-var _ = require('underscore');
+const less = require('less');
 
 // LESS stylesheets required in the browser (relative to public/ directory)
-var client_css = [
+const client_css = [
     'stylesheets/style.less'
 ];
 
 // JS code required in the browser (relative to public/ directory)
-var client_js = [
+const client_js = [
     'vendor/jquery-1.8.2.js',
-    'vendor/underscore-1.4.2.js',
     'vendor/dust-core-1.1.1.js',
     'vendor/dustjs-helpers-1.1.0.js',
     'vendor/sammy-0.7.1.js',
@@ -28,26 +26,29 @@ var client_js = [
 ];
 
 // Minimal HTML document that holds it all together
-var client_html = dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8'));
+const client_html = dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8'));
 
-var template_dir = path.join(__dirname, '..', 'templates');
-var public_dir   = path.join(__dirname, '..', 'public');
+const template_dir = path.join(__dirname, '..', 'templates');
+const public_dir   = path.join(__dirname, '..', 'public');
 
 
 // Reads a local Javascript file and returns it in minified form.
 function minifiedJS(filename) {
-    var ast = uglify.parser.parse(fs.readFileSync(filename, 'utf-8'));
-    ast = uglify.uglify.ast_mangle(ast);
-    ast = uglify.uglify.ast_squeeze(ast);
-    return uglify.uglify.gen_code(ast);
+    const options = { output: { beautify: false } }
+    const result = uglify.minify(fs.readFileSync(filename, 'utf-8'), options)
+    if (result.error) {
+        console.error(`Could not minify file ${filename} with UglifyJs:\n` + result.error)
+        return ""
+    }
+    return result.code
 }
 
 // Precompiles all templates found in the templates directory, and returns them as a JS string.
 function dustTemplates() {
-    var compiled = '';
+    let compiled = '';
     fs.readdirSync(template_dir).forEach(function (file) {
         if (file.match(/\.dust$/)) {
-            var template = fs.readFileSync(path.join(template_dir, file), 'utf-8');
+            const template = fs.readFileSync(path.join(template_dir, file), 'utf-8');
             compiled += dust.compile(template, file.replace(/\.dust$/, ''));
         }
     });
@@ -62,12 +63,12 @@ function lessFileAs(type) {
 
 // Compiles LESS stylesheets and calls callback(error, minified_css).
 function stylesheets(extra_less_files, callback) {
-    var compiled = '', to_do = 0;
+    let compiled = '', to_do = 0;
     client_css.map(lessFileAs("internal")).concat(extra_less_files.map(lessFileAs("external"))).forEach(function (file) {
         if (file.name.match(/\.less$/)) {
             to_do++;
-            var style = file.type === "internal" ? fs.readFileSync(path.join(public_dir, file.name), 'utf-8') : fs.readFileSync(file.name, 'utf-8');
-            var parser = new(less.Parser)({
+            const style = file.type === "internal" ? fs.readFileSync(path.join(public_dir, file.name), 'utf-8') : fs.readFileSync(file.name, 'utf-8');
+            const parser = new(less.Parser)({
                 paths: file.type === "internal" ? [path.join(public_dir, 'stylesheets')] : "",
                 filename: file.name
             });
@@ -92,9 +93,9 @@ function stylesheets(extra_less_files, callback) {
 // Calls callback(error, html) with HTML containing URL references to all JS and CSS required by the
 // browser.
 function remoteContent(extra_less_files, callback) {
-    var html = [];
+    const html = [];
     client_css.concat(extra_less_files).forEach(function (file) {
-        var css_file = file.replace(/\.less$/, '.css');
+        const css_file = file.replace(/\.less$/, '.css');
         html.push('<link rel="stylesheet" type="text/css" href="/' + css_file + '"/>');
     });
     client_js.forEach(function (file) {
@@ -112,7 +113,7 @@ function inlineContent(extra_less_files, callback) {
             return;
         }
 
-        var html = [];
+        const html = [];
         html.push('<style type="text/css">');
         html.push(css);
         html.push('</style>');
@@ -135,11 +136,12 @@ function topLevelHTML(extra_less_files, options, callback) {
             return;
         }
 
-        var context = _({
+        const context = {
             title: 'Avrodoc',
             content: content,
-            schemata: '[]'
-        }).extend(options || {});
+            schemata: '[]',
+            ...options,
+        }
 
         if (typeof(context.schemata) !== 'string') {
             context.schemata = JSON.stringify(context.schemata);

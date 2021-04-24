@@ -21,8 +21,8 @@ const client_css = [
 /** JS code required in the browser (relative to public/ directory) */
 const client_js = [
     'vendor/jquery-1.8.2.js',
-    'vendor/dust-core-1.1.1.js',
-    'vendor/dustjs-helpers-1.1.0.js',
+    'vendor/dust-core-2.7.2.js',
+    'vendor/dust-helpers-1.7.4.js',
     'vendor/sammy-0.7.1.js',
     'vendor/bootstrap-tooltip.js',
     'vendor/bootstrap-popover.js',
@@ -34,7 +34,7 @@ const client_js = [
 /**
  * Returns a promise that resolves to minimal HTML document that holds it all together
  */
-const client_html = promisify(dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8'), "Avrodoc"))
+const client_html = promisify(dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8')))
 
 const template_dir = path.join(__dirname, '..', 'templates');
 const public_dir   = path.join(__dirname, '..', 'public');

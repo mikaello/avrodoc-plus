@@ -125,7 +125,13 @@
                 "type": "enum",
                 "name": "ToDoStatus",
                 "doc": "* `HIDDEN`: not currently visible, e.g. because it becomes actionable in future\n* `ACTIONABLE`: appears in the current to-do list\n* `DONE`: marked as done, but still appears in the list\n* `ARCHIVED`: marked as done and no longer visible\n* `DELETED`: not done and removed from list (preserved for undo purposes)",
-                "symbols": ["HIDDEN", "ACTIONABLE", "DONE", "ARCHIVED", "DELETED"]
+                "symbols": [
+                  "HIDDEN",
+                  "ACTIONABLE",
+                  "DONE",
+                  "ARCHIVED",
+                  "DELETED"
+                ]
               }
             },
             {

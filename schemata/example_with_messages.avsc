@@ -1,135 +1,166 @@
 {
-  "protocol" : "ExampleProtocol",
-  "namespace" : "com.example.service",
-  "doc" : "This is a protocol description for a fictitious network service.",
-  "types" : [ {
-      "type" : "enum",
-      "name" : "DependencyType",
-      "symbols" : [ "REQUIRED", "OPTIONAL" ]
-    }, {
-    "type" : "record",
-    "name" : "DependencyDetail",
-    "namespace" : "com.example.service",
-    "doc" : "Details about status of a dependency.",
-    "fields" : [ {
-      "name" : "name",
-      "type" : [ "null", "string" ],
-      "doc" : "A short name of the service who's status is being reported",
-      "default" : null
-    }, {
-      "name" : "descendingField",
-      "type" : "string",
-      "doc" : "A descending sort order field",
-      "order" : "descending",
-      "default" : "Default value"
-    }, {
-      "name" : "ignoredField",
-      "type" : "string",
-      "doc" : "An ignored order sort field",
-      "order" : "ignore"
-    }, {
-      "name" : "status",
-      "type" : [ "null", "string" ],
-      "doc" : "A string representing the operational status for this service",
-      "default" : null
-    }, {
-      "name" : "dependencyType",
-      "type" : "DependencyType",
-      "doc" : "Indicates what type of dependency this refers to"
-    }, {
-      "name" : "timestamp",
-      "type" : [ "null", "string" ],
-      "doc" : "A timestamp showing the time at which this particular dependency was compiled.",
-      "default" : null
-    } ],
-    "enumerationType": "com.example.service.DependencyType"
-  }, {
-    "type" : "enum",
-    "name" : "DependencyType",
-    "symbols" : [ "REQUIRED", "OPTIONAL" ]
-  }, {
-    "type" : "record",
-    "name" : "ResponseDetail",
-    "namespace" : "com.example.service",
-    "doc" : "Details about the outcome of the request.",
-    "fields" : [ {
-      "name" : "subCode",
-      "type" : [ "int", "null" ],
-      "doc" : "A secondary response code with greater precision.",
-      "default" : 0
-    }, {
-      "name" : "message",
-      "type" : [ "string", "null" ],
-      "doc" : "A short message describing the response status code (see the strings listing with the response codes).",
-      "default" : ""
-    } ]
-  }, {
-    "type" : "error",
-    "name" : "CustomException",
-    "namespace" : "com.example.service",
-    "doc" : "A exception that should be for unexpected errors and/or exceptions.",
-    "fields" : [ {
-      "name" : "errorCode",
-      "type" : "int",
-      "doc" : "An error code defined by common.ResponseCode constant"
-    }, {
-      "name" : "msg",
-      "type" : [ "null", "string" ],
-      "doc" : "A short message string such as Error, Success, Exception, etc.",
-      "default" : null
-    }, {
-      "name" : "detail",
-      "type" : [ "null", "string" ],
-      "doc" : "A detailed message string",
-      "default" : null
-    } ]
-  }, {
-    "type" : "record",
-    "name" : "PingResponse",
-    "doc" : "Response from ping request.",
-    "fields" : [ {
-      "name" : "serviceStatus",
-      "type" : [ "null", "string" ],
-      "doc" : "The string `OK` if the service is currently up and running fully. Otherwise the string contains a diagnostic message describing the current error state.",
-      "default" : null
-    }, {
-      "name" : "responseCode",
-      "type" : [ "int", "null" ],
-      "doc" : "The status code indicating success, failure and other response statuses.",
-      "default" : 0
-    }, {
-      "name" : "responseDetail",
-      "type" : [ "null", "com.example.service.ResponseDetail" ],
-      "doc" : "Details about the outcome of the request. Set to `null` if the request had `outputDetail == false`.",
-      "default" : null
-    }, {
-      "name" : "dependencies",
-      "type" : [ "null", {
-        "type" : "array",
-        "items" : "com.example.service.DependencyDetail"
-      } ],
-      "doc" : "List of details about all dependencies for this service.",
-      "default" : null
-    } ]
-  } ],
-  "messages" : {
-    "ping" : {
-      "doc" : "Indicates whether this service is available to respond to requests.",
-      "request" : [ {
-        "name" : "outputDetail",
-        "type" : "boolean",
-        "doc" : "`true` if the response should contain additional details in the `responseDetail` field.",
-        "default" : "false"
-      } ],
-      "response" : "PingResponse",
-      "errors" : ["CustomException"],
-      "messageAttribute": {"addedBy": "inome, inc", "date": "01 May 2013"}
+  "protocol": "ExampleProtocol",
+  "namespace": "com.example.service",
+  "doc": "This is a protocol description for a fictitious network service.",
+  "types": [
+    {
+      "type": "enum",
+      "name": "DependencyType",
+      "symbols": ["REQUIRED", "OPTIONAL"]
     },
-    "logTime" : {
-      "doc" : "Inserts a timestamp into the log file indicating that this service is still alive.",
-      "request" : [ ],
-      "response" : "null",
-      "one-way" : true
+    {
+      "type": "record",
+      "name": "DependencyDetail",
+      "namespace": "com.example.service",
+      "doc": "Details about status of a dependency.",
+      "fields": [
+        {
+          "name": "name",
+          "type": ["null", "string"],
+          "doc": "A short name of the service who's status is being reported",
+          "default": null
+        },
+        {
+          "name": "descendingField",
+          "type": "string",
+          "doc": "A descending sort order field",
+          "order": "descending",
+          "default": "Default value"
+        },
+        {
+          "name": "ignoredField",
+          "type": "string",
+          "doc": "An ignored order sort field",
+          "order": "ignore"
+        },
+        {
+          "name": "status",
+          "type": ["null", "string"],
+          "doc": "A string representing the operational status for this service",
+          "default": null
+        },
+        {
+          "name": "dependencyType",
+          "type": "DependencyType",
+          "doc": "Indicates what type of dependency this refers to"
+        },
+        {
+          "name": "timestamp",
+          "type": ["null", "string"],
+          "doc": "A timestamp showing the time at which this particular dependency was compiled.",
+          "default": null
+        }
+      ],
+      "enumerationType": "com.example.service.DependencyType"
+    },
+    {
+      "type": "enum",
+      "name": "DependencyType",
+      "symbols": ["REQUIRED", "OPTIONAL"]
+    },
+    {
+      "type": "record",
+      "name": "ResponseDetail",
+      "namespace": "com.example.service",
+      "doc": "Details about the outcome of the request.",
+      "fields": [
+        {
+          "name": "subCode",
+          "type": ["int", "null"],
+          "doc": "A secondary response code with greater precision.",
+          "default": 0
+        },
+        {
+          "name": "message",
+          "type": ["string", "null"],
+          "doc": "A short message describing the response status code (see the strings listing with the response codes).",
+          "default": ""
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "CustomException",
+      "namespace": "com.example.service",
+      "doc": "A exception that should be for unexpected errors and/or exceptions.",
+      "fields": [
+        {
+          "name": "errorCode",
+          "type": "int",
+          "doc": "An error code defined by common.ResponseCode constant"
+        },
+        {
+          "name": "msg",
+          "type": ["null", "string"],
+          "doc": "A short message string such as Error, Success, Exception, etc.",
+          "default": null
+        },
+        {
+          "name": "detail",
+          "type": ["null", "string"],
+          "doc": "A detailed message string",
+          "default": null
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "PingResponse",
+      "doc": "Response from ping request.",
+      "fields": [
+        {
+          "name": "serviceStatus",
+          "type": ["null", "string"],
+          "doc": "The string `OK` if the service is currently up and running fully. Otherwise the string contains a diagnostic message describing the current error state.",
+          "default": null
+        },
+        {
+          "name": "responseCode",
+          "type": ["int", "null"],
+          "doc": "The status code indicating success, failure and other response statuses.",
+          "default": 0
+        },
+        {
+          "name": "responseDetail",
+          "type": ["null", "com.example.service.ResponseDetail"],
+          "doc": "Details about the outcome of the request. Set to `null` if the request had `outputDetail == false`.",
+          "default": null
+        },
+        {
+          "name": "dependencies",
+          "type": [
+            "null",
+            {
+              "type": "array",
+              "items": "com.example.service.DependencyDetail"
+            }
+          ],
+          "doc": "List of details about all dependencies for this service.",
+          "default": null
+        }
+      ]
+    }
+  ],
+  "messages": {
+    "ping": {
+      "doc": "Indicates whether this service is available to respond to requests.",
+      "request": [
+        {
+          "name": "outputDetail",
+          "type": "boolean",
+          "doc": "`true` if the response should contain additional details in the `responseDetail` field.",
+          "default": "false"
+        }
+      ],
+      "response": "PingResponse",
+      "errors": ["CustomException"],
+      "messageAttribute": { "addedBy": "inome, inc", "date": "01 May 2013" }
+    },
+    "logTime": {
+      "doc": "Inserts a timestamp into the log file indicating that this service is still alive.",
+      "request": [],
+      "response": "null",
+      "one-way": true
     }
   }
 }

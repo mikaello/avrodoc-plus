@@ -3,6 +3,8 @@
 docs
 yarn-error.log
 
+# generated file by running 'app.js'
+public/stylesheets/style.css
 
 
 # Created by https://www.gitignore.io/api/node,visualstudiocode

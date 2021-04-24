@@ -1,6 +1,5 @@
 /*jshint node:true */
 
-import uglify from 'uglify-js'
 import fs from 'fs'
 import { promisify } from 'util'
 

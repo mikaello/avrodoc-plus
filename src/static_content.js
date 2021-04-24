@@ -8,6 +8,7 @@ import path from 'path'
 import dust from 'dustjs-linkedin'
 import 'dustjs-helpers'
 import less from 'less'
+import { transformSync } from 'esbuild'
 
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -46,10 +47,11 @@ const public_dir   = path.join(__dirname, '..', 'public');
  * @returns {string} minified JS content
  */
 function minifiedJS(filename) {
-    const options = { output: { beautify: false } }
-    const result = uglify.minify(fs.readFileSync(filename, 'utf-8'), options)
+    const filecontent = fs.readFileSync(filename, 'utf-8');
+    const result = transformSync(filecontent, { minify: true })
+
     if (result.error) {
-        console.error(`Could not minify file ${filename} with UglifyJs:\n` + result.error)
+        console.error(`Could not minify file ${filename} with ESBuild:\n` + result.error)
         return ""
     }
     return result.code
@@ -150,9 +152,7 @@ function inlineContent(extra_less_files, callback) {
         html.push('</style>');
         client_js.forEach(function (file) {
             html.push('<script type="text/javascript">');
-            console.time("minify " + file)
-            html.push(minifiedJS(path.join(public_dir, file))); // TIME CONSUMING
-            console.timeEnd("minify " + file)
+            html.push(minifiedJS(path.join(public_dir, file)));
             html.push('</script>');
         });
         html.push('<script type="text/javascript">');

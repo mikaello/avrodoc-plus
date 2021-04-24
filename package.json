@@ -15,11 +15,11 @@
     "debug": "^4.0.1",
     "dustjs-helpers": "^1.7.4",
     "dustjs-linkedin": "^2.7.5",
-    "less": "^1",
-    "uglify-js": "^3.13.4"
+    "less": "^1"
   },
   "devDependencies": {
     "body-parser": "^1.19.0",
+    "esbuild": "^0.11.14",
     "express": "^4.17.1",
     "glob": "^7.1.6",
     "jest": "^26.6.3",

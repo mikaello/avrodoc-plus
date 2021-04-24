@@ -6,8 +6,8 @@
   "type": "module",
   "bin": "./bin/avrodoc-plus.js",
   "scripts": {
-    "start": "node src/cli",
-    "server": "node app",
+    "start": "node src/cli.js",
+    "server": "node app.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest src/"
   },
   "dependencies": {

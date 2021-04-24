@@ -1,11 +1,11 @@
-/*jslint browser:true, jquery:true, unused:false */
-/*global AvroDoc:true, _:false, dust:false, markdown:false, Sammy:false */
+/* global dust:false, markdown:false, Sammy:false */
 
 // If foo contains markdown, {foo|md|s} renders it to HTML in a Dust template
 dust.filters.md = function (value) {
   return markdown.toHTML(value);
 };
 
+// eslint-disable-next-line
 function AvroDoc(input_schemata) {
   var _public = {};
   var list_pane = $("#list-pane"),
@@ -118,7 +118,7 @@ function AvroDoc(input_schemata) {
         shared_type.is_fixed
       ) {
         const namespace = shared_type.namespace || "";
-        if (!namespaces.hasOwnProperty(namespace)) {
+        if (!hasOwnProperty(namespaces, namespace)) {
           namespaces[namespace] = { namespace, types: [] };
         }
         namespaces[namespace].types.push(shared_type);
@@ -286,9 +286,24 @@ $(function () {
   }, 1000);
 });
 
-/** Case insensitive string compare */
+/**
+ * Case insensitive string compare
+ *
+ * @param {string} property to campare by
+ * @returns {function(object, object): boolean} objects to have a property compared
+ */
 const stringCompareBy = (property) => (a, b) => {
   const aProp = a[property] ?? "";
   const bProp = b[property] ?? "";
   return aProp.localeCompare(bProp);
 };
+
+/**
+ * Checks if property exists on object
+ *
+ * @param {object} object
+ * @param {string} property
+ * @returns {boolean}
+ */
+const hasOwnProperty = (object, property) =>
+  Object.prototype.hasOwnProperty.call(object, property);

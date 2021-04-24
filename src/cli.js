@@ -1,5 +1,3 @@
-/*jshint node:true */
-
 /**
  * CLI usage for avrodoc-plus
  * Usage:
@@ -55,7 +53,7 @@ if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
   );
   process.exit(1);
 }
-await createAvroDoc(extra_less_files, inputFiles, outputFile);
+createAvroDoc(extra_less_files, inputFiles, outputFile);
 
 //private stuff
 

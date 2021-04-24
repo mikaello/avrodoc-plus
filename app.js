@@ -1,8 +1,5 @@
-/*jshint node:true */
-
 import express from "express";
 import morgan from "morgan";
-import bodyParser from "body-parser";
 import lessMiddleware from "less-middleware";
 import http from "http";
 import path from "path";
@@ -46,7 +43,7 @@ app.get("/dust-templates.js", function (req, res) {
   res.set("Content-Type", "text/javascript").send(dust_templates);
 });
 
-app.get(/^\/schemata\/(\w[\w.\-]*(?:\/\w[\w.\-]*)*)$/, function (req, res) {
+app.get(/^\/schemata\/(\w[\w.-]*(?:\/\w[\w.-]*)*)$/, function (req, res) {
   fs.readFile(
     path.join(schema_dir, req.params[0]),
     "utf-8",

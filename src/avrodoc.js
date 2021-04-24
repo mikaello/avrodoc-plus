@@ -24,15 +24,11 @@ async function createAvroDoc(extra_less_files, inputfiles, outputfile) {
       filename: filename,
     };
   });
-  try {
-    const html = await topLevelHTML(extra_less_files, {
-      inline: true,
-      schemata: schemata,
-    });
-    return await writeAvroDoc(outputfile, html);
-  } catch (err) {
-    throw err;
-  }
+  const html = await topLevelHTML(extra_less_files, {
+    inline: true,
+    schemata: schemata,
+  });
+  return await writeAvroDoc(outputfile, html);
 }
 
 // private stuf

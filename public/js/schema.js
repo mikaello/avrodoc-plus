@@ -1,4 +1,4 @@
-/*global AvroDoc:false, _:false */
+/* global AvroDoc:false */
 
 /**
  *  Interprets the contents of one Avro Schema (.avsc) file and transforms it into structures
@@ -136,7 +136,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       ignore_attributes = avrodoc_custom_attributes;
     if (
       schema.type !== null &&
-      built_in_type_fields.hasOwnProperty(schema.type)
+      hasOwnProperty(built_in_type_fields, schema.type)
     ) {
       ignore_attributes = ignore_attributes.concat(
         built_in_type_fields[schema.type]
@@ -145,7 +145,10 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
 
     for (var key in schema) {
       // Only include this annotation if it is not a built-in type or something specific to the avrodoc project
-      if (schema.hasOwnProperty(key) && ignore_attributes.indexOf(key) === -1) {
+      if (
+        hasOwnProperty(schema, key) &&
+        ignore_attributes.indexOf(key) === -1
+      ) {
         var annotation_data = { key: key };
         var annotation_value = schema[key];
 
@@ -379,7 +382,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     const new_type = typeEssence(schema);
     let shared_schema = null;
 
-    if (shared_types.hasOwnProperty(qualified_name)) {
+    if (hasOwnProperty(shared_types, qualified_name)) {
       shared_schema = shared_types[qualified_name].find((shared_schema) =>
         isEqual(new_type, typeEssence(shared_schema))
       );
@@ -387,7 +390,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       shared_types[qualified_name] = [];
     }
 
-    if (named_types.hasOwnProperty(qualified_name)) {
+    if (hasOwnProperty(named_types, qualified_name)) {
       var existing_type = typeEssence(named_types[qualified_name]);
       if (!isEqual(new_type, existing_type)) {
         throw (
@@ -587,3 +590,29 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
 
   return _public;
 };
+
+/**
+ * TODO: should be imported from avrodoc.js
+ *
+ * Case insensitive string compare
+ *
+ * @param {string} property to campare by
+ * @returns {function(object, object): boolean} objects to have a property compared
+ */
+const stringCompareByS = (property) => (a, b) => {
+  const aProp = a[property] ?? "";
+  const bProp = b[property] ?? "";
+  return aProp.localeCompare(bProp);
+};
+
+/**
+ * TODO: should be imported from avrodoc.js
+ *
+ * Checks if property exists on object
+ *
+ * @param {object} object
+ * @param {string} property
+ * @returns {boolean}
+ */
+const hasOwnPropertyS = (object, property) =>
+  Object.prototype.hasOwnProperty.call(object, property);

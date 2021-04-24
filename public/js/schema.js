@@ -1,21 +1,20 @@
 /*global AvroDoc:false, _:false */
 
-// Interprets the contents of one Avro Schema (.avsc) file and transforms it into structures
-// suitable for rendering.
-//
-// avrodoc: The main AvroDoc instance.
-//
-// shared_types: An object of the form
-//      {'namespace.name': [{type: 'record', fields: [...]}, {type: 'record', fields: [...]}, ...], ...}
-//    This object is mutated as the schema is parsed; we add the types defined in this schema to the
-//    structure. Different schema files may define the same type differently, hence the array of
-//    types for each qualified name. However, where two different schema files agree on the
-//    definition of a type, we can share the parsed type between the different files.
-//
-// schema_json: The .avsc file, parsed into a structure of JavaScript objects.
-//
-// filename: The name of the file from which the schema was loaded, if available.
-//
+/**
+ *  Interprets the contents of one Avro Schema (.avsc) file and transforms it into structures
+ *  suitable for rendering.
+ *
+ * @param {*} avrodoc The main AvroDoc instance.
+ * @param {*} shared_types An object of the form
+ *   `{'namespace.name': [{type: 'record', fields: [...]}, {type: 'record', fields: [...]}, ...], ...}`
+ *   This object is mutated as the schema is parsed; we add the types defined in this schema to the
+ *   structure. Different schema files may define the same type differently, hence the array of
+ *   types for each qualified name. However, where two different schema files agree on the
+ *   definition of a type, we can share the parsed type between the different files.
+ * @param {string} schema_json The .avsc file, parsed into a structure of JavaScript objects.
+ * @param {?string} filename The name of the file from which the schema was loaded, if available.
+ * @returns
+ */
 AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     var _public = {filename: filename};
 

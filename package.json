@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "author": "mikaello https://github.com/mikaello",
   "type": "module",
-  "bin": "./bin/avrodoc-plus",
+  "bin": "./bin/avrodoc-plus.js",
   "scripts": {
     "start": "node src/cli",
     "server": "node app",

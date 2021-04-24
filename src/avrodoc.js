@@ -2,7 +2,7 @@
  * Main avrodoc(-plus) module
  */
 
-import { topLevelHTML } from './static_content';
+import { topLevelHTML } from './static_content.js';
 import fs from 'fs'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'

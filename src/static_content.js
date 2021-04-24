@@ -31,13 +31,13 @@ const client_js = [
     'js/schema.js'
 ];
 
-// Minimal HTML document that holds it all together
-const client_html = promisify(dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8')))
+/**
+ * Returns a promise that resolves to minimal HTML document that holds it all together
+ */
+const client_html = promisify(dust.compileFn(fs.readFileSync(path.join(__dirname, 'top_level.dust'), 'utf-8'), "Avrodoc"))
 
 const template_dir = path.join(__dirname, '..', 'templates');
 const public_dir   = path.join(__dirname, '..', 'public');
-
-
 
 /**
  * Reads a local Javascript file and returns it in minified form.
@@ -150,7 +150,9 @@ function inlineContent(extra_less_files, callback) {
         html.push('</style>');
         client_js.forEach(function (file) {
             html.push('<script type="text/javascript">');
-            html.push(minifiedJS(path.join(public_dir, file)));
+            console.time("minify " + file)
+            html.push(minifiedJS(path.join(public_dir, file))); // TIME CONSUMING
+            console.timeEnd("minify " + file)
             html.push('</script>');
         });
         html.push('<script type="text/javascript">');
@@ -160,6 +162,13 @@ function inlineContent(extra_less_files, callback) {
     });
 }
 
+/**
+ * Generate HTML and CSS
+ *
+ * @param {string[]} extra_less_files
+ * @param {Object} options - inline function for LESS and context options for DustJs
+ * @returns {Promise<string>}
+ */
 function topLevelHTML(extra_less_files, options) {
     return new Promise((resolve, reject) => {
         (options.inline ? inlineContent : remoteContent)(extra_less_files, function (err, content) {

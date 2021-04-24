@@ -10,12 +10,15 @@
  * avrodoc-plus schemata/user.avsc schemata/account.avsc -o userdoc.html
  */
 
-const avrodoc = require('./avrodoc');
-const fs = require('fs');
-const path = require('path');
-const debug = require('debug')('avrodoc:cli');
+import { createAvroDoc } from './avrodoc.js';
+import fs from 'fs';
+import path from 'path';
+import debugFn from 'debug';
+import arg from 'arg';
 
-const argv = require('arg')(
+const debug = debugFn('avrodoc:cli');
+
+const argv = arg(
     {
         '--output': String,
         '-o': '--output',
@@ -52,7 +55,7 @@ if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
     console.error('Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less]');
     process.exit(1);
 }
-avrodoc.createAvroDoc(extra_less_files, inputFiles, outputFile);
+await createAvroDoc(extra_less_files, inputFiles, outputFile);
 
 
 //private stuff

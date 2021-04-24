@@ -136,7 +136,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       ignore_attributes = avrodoc_custom_attributes;
     if (
       schema.type !== null &&
-      hasOwnProperty(built_in_type_fields, schema.type)
+      hasOwnPropertyS(built_in_type_fields, schema.type)
     ) {
       ignore_attributes = ignore_attributes.concat(
         built_in_type_fields[schema.type]
@@ -146,7 +146,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     for (var key in schema) {
       // Only include this annotation if it is not a built-in type or something specific to the avrodoc project
       if (
-        hasOwnProperty(schema, key) &&
+        hasOwnPropertyS(schema, key) &&
         ignore_attributes.indexOf(key) === -1
       ) {
         var annotation_data = { key: key };
@@ -353,7 +353,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       if (length !== Object.keys(b).length) return false;
 
       for (i = length; i-- !== 0; )
-        if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+        if (!hasOwnPropertyS(b, keys[i])) return false;
 
       for (i = length; i-- !== 0; ) {
         var key = keys[i];
@@ -382,7 +382,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     const new_type = typeEssence(schema);
     let shared_schema = null;
 
-    if (hasOwnProperty(shared_types, qualified_name)) {
+    if (hasOwnPropertyS(shared_types, qualified_name)) {
       shared_schema = shared_types[qualified_name].find((shared_schema) =>
         isEqual(new_type, typeEssence(shared_schema))
       );
@@ -390,7 +390,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       shared_types[qualified_name] = [];
     }
 
-    if (hasOwnProperty(named_types, qualified_name)) {
+    if (hasOwnPropertyS(named_types, qualified_name)) {
       var existing_type = typeEssence(named_types[qualified_name]);
       if (!isEqual(new_type, existing_type)) {
         throw (
@@ -564,7 +564,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
 
     protocol.sorted_messages = Object.values(protocol.messages ?? {}).sort(
-      stringCompareBy("name")
+      stringCompareByS("name")
     );
     defineNamedType(protocol);
 
@@ -585,7 +585,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
   _public.named_types = named_types;
 
   _public.sorted_types = Object.values(named_types).sort(
-    stringCompareBy("name")
+    stringCompareByS("name")
   );
 
   return _public;

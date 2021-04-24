@@ -12,7 +12,7 @@ deploy:
     script: mkdir html && node src/cli.js -i schemata -o html/index.html
     edge: true
   - provider: pages:git # Deploy GitHub pages
-    token: $GITHUB_API_TOKEN
+    token: $GITHUB_API_TOKEN # in travis repo settings
     edge: true # opt in to dpl v2
     local_dir: html
     run:

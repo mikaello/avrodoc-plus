@@ -21,11 +21,12 @@ npx @mikaello/avrodoc-plus -i source -o out.html
 
 - -i _sourcefolder_  
   Pass in a source folder that will recursively parsed and crawled for avsc files
-
 - -o _outputfile_  
   The file where the generated doc should be written to
 - -s _external stylesheet less file_  
   Your own less file, used to override specific style of your generated page
+- --ignore-invalid  
+  Ignore avsc files that can not be parsed as JSON (instead of quiting)
 
 ### Enhancements
 

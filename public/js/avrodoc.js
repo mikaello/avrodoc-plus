@@ -56,6 +56,8 @@ function AvroDoc(input_schemata) {
         content: function () {
           return popover.content;
         },
+        html: true,
+        sanitize: false,
         delay: { show: 200, hide: 50 },
         template:
           '<div class="popover avrodoc-named-type"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><div></div></div></div></div>',

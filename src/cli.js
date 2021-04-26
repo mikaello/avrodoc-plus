@@ -25,10 +25,13 @@ const argv = arg({
 
   "--style": String,
   "-s": "--style",
+
+  "--ignore-invalid": Boolean,
 });
 
 let inputFiles = null;
 let outputFile = null;
+let ignoreInvalidSchemas = false;
 
 // Determine list of input files file1.avsc file2.avsc
 if (argv["--input"]) {
@@ -46,14 +49,18 @@ if (argv["--output"]) {
 
 const extra_less_files = argv["--style"] ? [argv["--style"]] : [];
 
+if (argv["--ignore-invalid"]) {
+  ignoreInvalidSchemas = true;
+}
+
 //valid input?
 if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
   console.error(
-    "Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less]"
+    "Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less] [--ignore-invalid]"
   );
   process.exit(1);
 }
-createAvroDoc(extra_less_files, inputFiles, outputFile);
+createAvroDoc(extra_less_files, inputFiles, outputFile, ignoreInvalidSchemas);
 
 //private stuff
 

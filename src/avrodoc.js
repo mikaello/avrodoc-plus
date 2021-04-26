@@ -16,17 +16,23 @@ const avrodocDebug = debug("avrodoc:avrodoc");
  * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed and eventually added to the avrodoc
  * @param {string} outputfile the html file that should be written
  */
-async function createAvroDoc(extra_less_files, inputfiles, outputfile) {
+async function createAvroDoc(
+  extra_less_files,
+  inputfiles,
+  outputfile,
+  ignoreInvalid
+) {
   avrodocDebug(`Creating ${outputfile} from `, inputfiles);
-  let schemata = inputfiles.map(function (filename) {
-    return {
-      json: readJSON(filename),
-      filename: filename,
-    };
-  });
+  let schemata = inputfiles
+    .map((filename) => {
+      const json = readJSON(filename, ignoreInvalid);
+      return json != null ? { json, filename } : null;
+    })
+    .filter((s) => s != null);
+
   const html = await topLevelHTML(extra_less_files, {
     inline: true,
-    schemata: schemata,
+    schemata,
   });
   return await writeAvroDoc(outputfile, html);
 }
@@ -50,16 +56,20 @@ async function writeAvroDoc(output, html) {
 /**
  * Reads in the given file and parses as json
  * @param {string} filename to be read
+ * @param {boolean} ignoreInvalid should we ignore invalid JSON files
  * @returns {object} with parsed AVRO
  */
-function readJSON(filename) {
+function readJSON(filename, ignoreInvalid) {
   let json, parsed;
   avrodocDebug("Parsing ", filename);
   json = fs.readFileSync(path.resolve(process.cwd(), filename), "utf-8");
   try {
     parsed = JSON.parse(json);
   } catch (e) {
-    console.error("Not a valid json file: " + filename);
+    console.error("Not a valid JSON file: " + filename);
+    if (ignoreInvalid) {
+      return;
+    }
     process.exit(1);
   }
   return parsed;

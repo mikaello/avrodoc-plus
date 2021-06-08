@@ -1,5 +1,7 @@
 /* global AvroDoc:false */
 
+import { stringCompareBy, hasOwnProperty } from "./avrodoc.js";
+
 /**
  *  Interprets the contents of one Avro Schema (.avsc) file and transforms it into structures
  *  suitable for rendering.
@@ -136,7 +138,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       ignore_attributes = avrodoc_custom_attributes;
     if (
       schema.type !== null &&
-      hasOwnPropertyS(built_in_type_fields, schema.type)
+      hasOwnProperty(built_in_type_fields, schema.type)
     ) {
       ignore_attributes = ignore_attributes.concat(
         built_in_type_fields[schema.type]
@@ -146,7 +148,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     for (var key in schema) {
       // Only include this annotation if it is not a built-in type or something specific to the avrodoc project
       if (
-        hasOwnPropertyS(schema, key) &&
+        hasOwnProperty(schema, key) &&
         ignore_attributes.indexOf(key) === -1
       ) {
         var annotation_data = { key: key };
@@ -353,7 +355,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       if (length !== Object.keys(b).length) return false;
 
       for (i = length; i-- !== 0; )
-        if (!hasOwnPropertyS(b, keys[i])) return false;
+        if (!hasOwnProperty(b, keys[i])) return false;
 
       for (i = length; i-- !== 0; ) {
         var key = keys[i];
@@ -382,7 +384,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     const new_type = typeEssence(schema);
     let shared_schema = null;
 
-    if (hasOwnPropertyS(shared_types, qualified_name)) {
+    if (hasOwnProperty(shared_types, qualified_name)) {
       shared_schema = shared_types[qualified_name].find((shared_schema) =>
         isEqual(new_type, typeEssence(shared_schema))
       );
@@ -390,7 +392,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       shared_types[qualified_name] = [];
     }
 
-    if (hasOwnPropertyS(named_types, qualified_name)) {
+    if (hasOwnProperty(named_types, qualified_name)) {
       var existing_type = typeEssence(named_types[qualified_name]);
       if (!isEqual(new_type, existing_type)) {
         throw (
@@ -564,7 +566,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
 
     protocol.sorted_messages = Object.values(protocol.messages ?? {}).sort(
-      stringCompareByS("name")
+      stringCompareBy("name")
     );
     defineNamedType(protocol);
 
@@ -585,34 +587,8 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
   _public.named_types = named_types;
 
   _public.sorted_types = Object.values(named_types).sort(
-    stringCompareByS("name")
+    stringCompareBy("name")
   );
 
   return _public;
 };
-
-/**
- * TODO: should be imported from avrodoc.js
- *
- * Case insensitive string compare
- *
- * @param {string} property to campare by
- * @returns {function(object, object): boolean} objects to have a property compared
- */
-const stringCompareByS = (property) => (a, b) => {
-  const aProp = a[property] ?? "";
-  const bProp = b[property] ?? "";
-  return aProp.localeCompare(bProp);
-};
-
-/**
- * TODO: should be imported from avrodoc.js
- *
- * Checks if property exists on object
- *
- * @param {object} object
- * @param {string} property
- * @returns {boolean}
- */
-const hasOwnPropertyS = (object, property) =>
-  Object.prototype.hasOwnProperty.call(object, property);

@@ -291,10 +291,10 @@ $(function () {
 /**
  * Case insensitive string compare
  *
- * @param {string} property to campare by
+ * @param {string} property to compare by
  * @returns {function(object, object): boolean} objects to have a property compared
  */
-const stringCompareBy = (property) => (a, b) => {
+export const stringCompareBy = (property) => (a, b) => {
   const aProp = a[property] ?? "";
   const bProp = b[property] ?? "";
   return aProp.localeCompare(bProp);
@@ -307,5 +307,5 @@ const stringCompareBy = (property) => (a, b) => {
  * @param {string} property
  * @returns {boolean}
  */
-const hasOwnProperty = (object, property) =>
+export const hasOwnProperty = (object, property) =>
   Object.prototype.hasOwnProperty.call(object, property);

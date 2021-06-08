@@ -294,7 +294,7 @@ $(function () {
  * @param {string} property to compare by
  * @returns {function(object, object): boolean} objects to have a property compared
  */
-export const stringCompareBy = (property) => (a, b) => {
+const stringCompareBy = (property) => (a, b) => {
   const aProp = a[property] ?? "";
   const bProp = b[property] ?? "";
   return aProp.localeCompare(bProp);
@@ -307,5 +307,7 @@ export const stringCompareBy = (property) => (a, b) => {
  * @param {string} property
  * @returns {boolean}
  */
-export const hasOwnProperty = (object, property) =>
+const hasOwnProperty = (object, property) =>
   Object.prototype.hasOwnProperty.call(object, property);
+
+export { stringCompareBy, hasOwnProperty };

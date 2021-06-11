@@ -12,7 +12,7 @@
  *   types for each qualified name. However, where two different schema files agree on the
  *   definition of a type, we can share the parsed type between the different files.
  * @param {string} schema_json The .avsc file, parsed into a structure of JavaScript objects.
- * @param {?string} filename The name of the file from which the schema was loaded, if available.
+ * @param {string?} filename The name of the file from which the schema was loaded, if available.
  * @returns
  */
 AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
@@ -98,6 +98,11 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     Object.prototype.toString.call(x) === "[object Object]";
   const isArray = (x) => Object.prototype.toString.call(x) === "[object Array]";
 
+  /**
+   * @param {string | [] | object} schema
+   * @param {string} namespace
+   * @returns {string} qualified type name
+   */
   function qualifiedName(schema, namespace) {
     var type_name;
     if (isString(schema)) {
@@ -205,13 +210,25 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return schema;
   }
 
+  /**
+   * @param {string?} parent
+   * @param {string} child
+   * @returns {string} parent and child joined
+   */
   function joinPath(parent, child) {
     return parent ? [parent, child].join(".") : child;
   }
 
-  // Given a type name and the current namespace, returns an object representing the type that the
-  // name refers to (or throws an exception if the name cannot be resolved). For named types, the
-  // same (shared) object is returned whenever the same name is requested.
+  /**
+   * Given a type name and the current namespace, returns an object representing
+   * the type that the name refers to (or throws an exception if the name cannot
+   * be resolved). For named types, the same (shared) object is returned
+   * whenever the same name is requested.
+   * @param {string} name a named type (e.g. `boolean`, `Foo` or `com.example.Foo`)
+   * @param {string} namespace e.g. `com.example.service`
+   * @param {string} path name of the field
+   * @return {object} schema type
+   */
   function lookupNamedType(name, namespace, path) {
     if (primitive_types.includes(name)) {
       return decorate({ type: name });
@@ -224,9 +241,16 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
   }
 
-  // Given an object representing a type (as returned by lookupNamedType, for example), returns
-  // the qualified name of that type. We recurse through unnamed complex types (array, map, union)
-  // but named types are replaced by their name.
+  /**
+   * Given an object representing a type (as returned by lookupNamedType, for
+   * example), returns the qualified name of that type. We recurse through
+   * unnamed complex types (array, map, union) but named types are replaced by
+   * their name.
+   *
+   * @param {string | [] | object} schema
+   * @param {string} namespace
+   * @returns {string | [] | object}
+   */
   function extractTypeName(schema, namespace) {
     if (isString(schema)) {
       return schema;
@@ -265,10 +289,32 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
   }
 
-  // Given a JSON object representing a named type (record, enum, fixed, message or protocol),
-  // returns a new object containing only fields that are essential to the definition of the type.
-  // This is useful for equality comparison of types.
+  /**
+   * Given a JSON object representing a named type (record, enum, fixed, message
+   * or protocol), returns a new object containing only fields that are essential
+   * to the definition of the type. This is useful for equality comparison of
+   * types.
+   *
+   * @param {*} schema
+   * @returns {{
+   *   type: string,
+   *   name: string,
+   *   fields?: {type: string, name: string}[],
+   *   symbols?: any,
+   *   size?: any,
+   *   request?: any,
+   *   response?: any,
+   *   errors?: any[],
+   *   protocol?: string,
+   *   types?: any[],
+   *   messages?: any,
+   * }}
+   */
   function typeEssence(schema) {
+    /**
+     * @param {object[]} fields
+     * @returns {{name: string, type: string}[]}
+     */
     function fieldsWithTypeNames(fields) {
       return fields.map((field) => ({
         name: field.name,
@@ -368,15 +414,22 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return a !== a && b !== b;
   }
 
-  // Takes a named type (record, enum, fixed, message or protocol) and adds it to the maps of name
-  // to type. If a type with the same qualified name and the same definition is already defined in
-  // another schema file, that existing definition is reused. If the qualified name is not yet
-  // defined, or the existing definitions differ from this type, a new definition is registered.
-  //
-  // Note that within one schema file, a qualified name may only map to one particular definition.
-  // However, it is acceptable for different schema files to have conflicting definitions for the
-  // same qualified name, because different schema files are independent. The sharing of
-  // equivalent types is only for conciceness of display.
+  /**
+   * Takes a named type (record, enum, fixed, message or protocol) and adds it to
+   * the maps of name to type. If a type with the same qualified name and the
+   * same definition is already defined in another schema file, that existing
+   * definition is reused. If the qualified name is not yet defined, or the
+   * existing definitions differ from this type, a new definition is registered.
+   *
+   * Note that within one schema file, a qualified name may only map to one
+   * particular definition. However, it is acceptable for different schema files to
+   * have conflicting definitions for the same qualified name, because different
+   * schema files are independent. The sharing of equivalent types is only for
+   * conciceness of display.
+   *
+   * @param {object} schema
+   * @param {string?} path
+   */
   function defineNamedType(schema, path) {
     const qualified_name = qualifiedName(schema, schema.namespace);
     const new_type = typeEssence(schema);
@@ -596,7 +649,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
  *
  * Case insensitive string compare
  *
- * @param {string} property to campare by
+ * @param {string} property to compare by
  * @returns {function(object, object): boolean} objects to have a property compared
  */
 const stringCompareByS = (property) => (a, b) => {

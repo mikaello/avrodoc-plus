@@ -233,12 +233,28 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     if (primitive_types.includes(name)) {
       return decorate({ type: name });
     }
-    var type = named_types[qualifiedName(name, namespace)];
+
+    const qualifiedNameStr = qualifiedName(name, namespace);
+    const type = named_types[qualifiedNameStr];
     if (type) {
       return type;
-    } else {
-      throw "Unknown type name " + JSON.stringify(name) + " at " + path;
+    } else if (hasOwnPropertyS(shared_types, qualifiedNameStr)) {
+      const sharedType = shared_types[qualifiedNameStr].find(
+        (sharedSchema) => sharedSchema.qualified_name === name
+      );
+
+      if (sharedType) {
+        return sharedType;
+      } else {
+        // TODO: Should also support arbitrary ordering of Avro schemas (currently
+        // this only works if the schema to be referred is parsed first)
+        throw `Shared schema ${qualifiedNameStr} does not have type ${JSON.stringify(
+          name
+        )}, referred to at ${path}`;
+      }
     }
+
+    throw "Unknown type name " + JSON.stringify(name) + " at " + path;
   }
 
   /**

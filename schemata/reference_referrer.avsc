@@ -1,0 +1,18 @@
+{
+  "name": "TheReferrer",
+  "doc": "A complex object referencing object from another schemata",
+  "namespace": "com.example_referrer",
+  "type": "record",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "the name of the referrer object"
+    },
+    {
+      "name": "externalObject",
+      "type": "com.example_referent.ToBeReferred",
+      "doc": "An object from another schemata"
+    }
+  ]
+}

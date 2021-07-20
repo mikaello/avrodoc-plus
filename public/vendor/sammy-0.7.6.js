@@ -272,6 +272,7 @@ $.extend(Sammy.DefaultLocationProxy.prototype , {
     // bind the proxy events to the current app.
     bind: function() {
       var proxy = this, app = this.app, lp = Sammy.DefaultLocationProxy;
+      // May use ES6: https://stackoverflow.com/a/54157536/5550386
       $(window).bind('hashchange.' + this.app.eventNamespace(), function(e, non_native) {
         // if we receive a native hash change event, set the proxy accordingly
         // and stop polling

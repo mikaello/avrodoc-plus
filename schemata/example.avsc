@@ -22,7 +22,10 @@
     {
       "name": "signupDate",
       "doc": "Timestamp (milliseconds since epoch) when the user signed up",
-      "type": "long"
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
     },
     {
       "name": "emailAddresses",

@@ -1,13 +1,17 @@
 {
   "type": "record",
   "name": "User",
+  "aliases": ["Customer", "Client"],
   "namespace": "com.example.avro",
   "doc": "This is a user record in a fictitious to-do-list management app. It supports arbitrary grouping and nesting of items, and allows you to add items by email or by tweeting.\n\nNote this app doesn't actually exist. The schema is just a demo for [Avrodoc](https://github.com/mikaello/avrodoc-plus)!",
   "fields": [
     {
       "name": "id",
       "doc": "System-assigned numeric user ID. Cannot be changed by the user.",
-      "type": "int"
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
     },
     {
       "name": "username",
@@ -51,12 +55,21 @@
             {
               "name": "dateAdded",
               "doc": "Timestamp (milliseconds since epoch) when the email address was added to the account.",
-              "type": "long"
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
             },
             {
               "name": "dateBounced",
-              "doc": "Timestamp (milliseconds since epoch) when an email sent to this address last bounced. Reset to null when the address no longer bounces.",
-              "type": ["null", "long"]
+              "doc": "Date (days since epoch) when an email sent to this address last bounced. Reset to null when the address no longer bounces.",
+              "type": [
+                "null",
+                {
+                  "type": "int",
+                  "logicalType": "date"
+                }
+              ]
             }
           ]
         }
@@ -105,7 +118,10 @@
             {
               "name": "dateAuthorized",
               "doc": "Timestamp (milliseconds since epoch) when the user last authorized this Twitter account",
-              "type": "long"
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
             }
           ]
         }
@@ -150,7 +166,13 @@
             {
               "name": "snoozeDate",
               "doc": "Timestamp (milliseconds since epoch) at which the item should go from `HIDDEN` to `ACTIONABLE` status",
-              "type": ["null", "long"]
+              "type": [
+                "null",
+                {
+                  "type": "long",
+                  "logicalType": "timestamp-millis"
+                }
+              ]
             },
             {
               "name": "subItems",

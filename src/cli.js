@@ -17,6 +17,9 @@ import arg from "arg";
 const debug = debugFn("avrodoc:cli");
 
 const argv = arg({
+  "--help": Boolean,
+  "-h": "--help",
+
   "--output": String,
   "-o": "--output",
 
@@ -31,42 +34,68 @@ const argv = arg({
   "--ignore-invalid": Boolean,
 });
 
-let inputFiles = null;
-let outputFile = null;
-let ignoreInvalidSchemas = false;
+const usage = `USAGE:
+    avrodoc [FLAGS] [OPTIONS] [AVRO FILES...]
 
-// Determine list of input files file1.avsc file2.avsc
+FLAGS:
+        --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quiting)
+
+OPTIONS:
+    -i, --input <folder>     Pass in a source folder that will recursively parsed and crawled for avsc files
+    -o, --output <file>      The file where the generated doc should be written to
+        --title <title>      The title that will be used in the generated HTML page, deafults to "Avrodoc".
+    -s, --style <file>       Your own less file, used to override specific style of your generated page
+
+ARGS:
+    <AVRO FILES>...          If not --input is given, you can specify individual AVRO files here
+
+EXAMPLES:
+    avrodoc --ignore-invalid --input ./schemas --output avrodoc.html --title "My First Avrodoc"
+
+    avrodoc --output avro.html --style my-styles.less avro_schema1.avsc avro_schema2.avsc avro_schema3.avsc
+`;
+
+if (
+  argv["--help"] ||
+  (argv._.length === 0 && Object.entries(argv).length === 1) // no params
+) {
+  console.log(usage);
+  process.exit(0);
+}
+
+let inputFiles = [];
+
 if (argv["--input"]) {
   debug("Collecting all avsc files from root folder ", argv["--input"]);
-  inputFiles = collectInputFiles(argv["--input"]);
-} else if (argv._.length > 0) {
+  inputFiles = inputFiles.concat(collectInputFiles(argv["--input"]));
+}
+
+if (argv._.length > 0) {
   debug("Using passed arguments as inputfiles...");
-  inputFiles = argv._;
+  inputFiles = inputFiles.concat(argv._);
 }
 
-// Determine whether an output file is specified
-if (argv["--output"]) {
-  outputFile = argv["--output"];
-}
-
-const extra_less_files = argv["--style"] ? [argv["--style"]] : [];
-
-if (argv["--ignore-invalid"]) {
-  ignoreInvalidSchemas = true;
-}
+const outputFile = argv["--output"];
 const pageTitle = argv["--title"];
+const extraLessFile = argv["--style"];
+const ignoreInvalidSchemas = Boolean(argv["--ignore-invalid"]);
 
 //valid input?
-if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
+if (inputFiles.length === 0) {
   console.error(
-    "Usage: avrodoc [-i rootfolder] [my-schema.avsc [another-schema.avsc...]] [-o my-documentation.html] [-s my-style.less] [--ignore-invalid]"
+    'Missing input schemata, either specify a folder with "--input" or individual AVRO files. Specify "--help" to see usage.'
+  );
+  process.exit(1);
+} else if (outputFile == null) {
+  console.error(
+    'Missing output file, specify with "--output" where the resulting HTML should go. Specify "--help" to see usage.'
   );
   process.exit(1);
 }
 
 createAvroDoc(
   pageTitle,
-  extra_less_files,
+  extraLessFile ? [extraLessFile] : [],
   inputFiles,
   outputFile,
   ignoreInvalidSchemas

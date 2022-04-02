@@ -3,7 +3,8 @@
 
 @footerHeight: 28px;
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -25,14 +26,4 @@ html, body {
   height: @footerHeight;
   line-height: @footerHeight;
   text-align: right;
-
-  #attribution {
-    display: inline-block;
-    padding: 0 25px 0 12px;
-    .border-top-left-radius(6px);
-    .box-shadow(0 0 10px rgba(0, 0, 0, 0.1));
-    font-size: 11px;
-    color: fade(@textColor, 50%);
-    a { color: fade(@linkColor, 50%); }
-  }
 }

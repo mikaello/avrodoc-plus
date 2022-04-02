@@ -23,18 +23,14 @@
   </head>
 
   <body>
-    <div id="list-pane"></div>
+    <nav id="list-pane"></nav>
     <div id="container">
-      <div id="body">
+      <main id="body">
         <div id="content-pane">
           Loading...
         </div>
-      </div>
-      <div id="footer">
-        <div id="attribution">
-          Hello! This is <a href="https://github.com/mikaello/avrodoc-plus" target="_blank">Avrodoc</a> :)
-        </div>
-      </div>
+      </main>
+      <footer id="footer"></footer>
     </div>
   </body>
 </html>

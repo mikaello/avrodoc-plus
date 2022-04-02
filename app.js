@@ -35,7 +35,9 @@ app.use(lessMiddleware(__dirname + "/public"));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", async function (req, res) {
-  const html = await topLevelHTML([], { schemata: schemata });
+  const html = await topLevelHTML("Server side Avrodoc", [], {
+    schemata: schemata,
+  });
   res.set("Content-Type", "text/html").send(html);
 });
 

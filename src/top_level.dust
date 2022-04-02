@@ -5,7 +5,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>{title}</title>
+    <title>{page_title}</title>
 
     {! iOS Safari treats the position:fixed sidebar very weirdly at non-default zoom levels,
        so just disable zooming for now. It looks good on an iPad, but on an iPhone the text
@@ -17,7 +17,7 @@
 
     <script type="text/javascript">
        jQuery(function () {
-           window.avrodoc = AvroDoc({schemata|s});
+           window.avrodoc = AvroDoc("{page_title|s}", {schemata|s});
        });
     </script>
   </head>

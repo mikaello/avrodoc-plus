@@ -6,8 +6,8 @@ dust.filters.md = function (value) {
 };
 
 // eslint-disable-next-line
-function AvroDoc(input_schemata) {
-  var _public = {};
+function AvroDoc(page_title, input_schemata) {
+  var _public = { page_title: page_title };
   var list_pane = $("#list-pane"),
     content_pane = $("#content-pane");
   var schema_by_name = {};

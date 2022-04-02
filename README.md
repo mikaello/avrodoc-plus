@@ -23,6 +23,8 @@ npx @mikaello/avrodoc-plus -i source -o out.html
   Pass in a source folder that will recursively parsed and crawled for avsc files
 - -o _outputfile_  
   The file where the generated doc should be written to
+- --title _Avrodoc for ACME_  
+  The title that will be used in the generated HTML page, deafults to _Avrodoc_.
 - -s _external stylesheet less file_  
   Your own less file, used to override specific style of your generated page
 - --ignore-invalid  

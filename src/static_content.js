@@ -180,11 +180,12 @@ function inlineContent(extra_less_files, callback) {
 /**
  * Generate HTML and CSS
  *
+ * @param {string} title - main title of the page
  * @param {string[]} extra_less_files
  * @param {Object} options - inline function for LESS and context options for DustJs
  * @returns {Promise<string>}
  */
-function topLevelHTML(extra_less_files, options) {
+function topLevelHTML(title, extra_less_files, options) {
   return new Promise((resolve, reject) => {
     (options.inline ? inlineContent : remoteContent)(
       extra_less_files,
@@ -194,7 +195,7 @@ function topLevelHTML(extra_less_files, options) {
         }
 
         const context = {
-          title: "Avrodoc",
+          title: title ?? "Avrodoc",
           content: content,
           schemata: "[]",
           ...options,

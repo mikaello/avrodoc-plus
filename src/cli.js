@@ -23,6 +23,8 @@ const argv = arg({
   "--input": String,
   "-i": "--input",
 
+  "--title": String,
+
   "--style": String,
   "-s": "--style",
 
@@ -52,6 +54,7 @@ const extra_less_files = argv["--style"] ? [argv["--style"]] : [];
 if (argv["--ignore-invalid"]) {
   ignoreInvalidSchemas = true;
 }
+const pageTitle = argv["--title"];
 
 //valid input?
 if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
@@ -60,7 +63,14 @@ if (!inputFiles || inputFiles.length === 0 || outputFile === null) {
   );
   process.exit(1);
 }
-createAvroDoc(extra_less_files, inputFiles, outputFile, ignoreInvalidSchemas);
+
+createAvroDoc(
+  pageTitle,
+  extra_less_files,
+  inputFiles,
+  outputFile,
+  ignoreInvalidSchemas
+);
 
 //private stuff
 

@@ -11,7 +11,7 @@ describe("test HTML generation", () => {
 
   test("avrodoc creates documentation", async () => {
     await expect(
-      createAvroDoc([], ["./schemata/example.avsc"], testFile)
+      createAvroDoc("Test: Avrodoc", [], ["./schemata/example.avsc"], testFile)
     ).resolves.toBeUndefined();
 
     expect(readFileSync(testFile, "utf-8")).toContain(

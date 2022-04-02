@@ -17,20 +17,31 @@ Or without installation:
 npx @mikaello/avrodoc-plus -i source -o out.html
 ```
 
-### Options
+## Options
 
-- -i _sourcefolder_  
-  Pass in a source folder that will recursively parsed and crawled for avsc files
-- -o _outputfile_  
-  The file where the generated doc should be written to
-- --title _Avrodoc for ACME_  
-  The title that will be used in the generated HTML page, deafults to _Avrodoc_.
-- -s _external stylesheet less file_  
-  Your own less file, used to override specific style of your generated page
-- --ignore-invalid  
-  Ignore avsc files that can not be parsed as JSON (instead of quiting)
+```text
+USAGE:
+    avrodoc [FLAGS] [OPTIONS] [AVRO FILES...]
 
-### Enhancements
+FLAGS:
+        --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quiting)
+
+OPTIONS:
+    -i, --input <folder>     Pass in a source folder that will recursively parsed and crawled for avsc files
+    -o, --output <file>      The file where the generated doc should be written to
+        --title <title>      The title that will be used in the generated HTML page, deafults to "Avrodoc".
+    -s, --style <file>       Your own less file, used to override specific style of your generated page
+
+ARGS:
+    <AVRO FILES>...          If not --input is given, you can specify individual AVRO files here
+
+EXAMPLES:
+    avrodoc --ignore-invalid --input ./schemas --output avrodoc.html --title "My First Avrodoc"
+
+    avrodoc --output avro.html --style my-styles.less avro_schema1.avsc avro_schema2.avsc avro_schema3.avsc
+```
+
+## Enhancements
 
 - support for input folders
 - support of schema/type search (search by namespace and/or schema/type)

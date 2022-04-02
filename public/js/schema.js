@@ -130,8 +130,13 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
   }
 
-  // Check type of object. Get all additional arbitrary attributes on the object
-  // for inclusion in the decorated schema object.
+  /**
+   * Check type of object. Get all additional arbitrary attributes on the object
+   * for inclusion in the decorated schema object.
+   *
+   * @param {object} schema
+   * @return {object} schema
+   */
   function decorateCustomAttributes(schema) {
     if (schema.annotations !== undefined && schema.annotations !== null) {
       return schema;
@@ -182,12 +187,19 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return schema;
   }
 
-  // Takes a node in the schema tree (a JS object) and adds some fields that are useful for
-  // template rendering.
+  /**
+   * Takes a node in the schema tree (a JS object) and adds some fields that are
+   * useful for template rendering.
+   *
+   * @param {object} schema
+   * @return {object} schema
+   */
   function decorate(schema) {
     schema.filename = filename;
     schema["is_" + schema.type] = true;
-    if (schema.is_error) schema.is_record = true;
+    if (schema.is_error) {
+      schema.is_record = true;
+    }
     schema.qualified_name = qualifiedName(schema);
     schema = decorateCustomAttributes(schema);
 

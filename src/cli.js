@@ -35,7 +35,7 @@ const argv = arg({
 });
 
 const usage = `USAGE:
-    avrodoc [FLAGS] [OPTIONS] [AVRO FILES...]
+    avrodoc-plus [FLAGS] [OPTIONS] [AVRO FILES...]
 
 FLAGS:
         --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quiting)

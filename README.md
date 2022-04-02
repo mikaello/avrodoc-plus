@@ -1,5 +1,7 @@
 # avrodoc-plus
 
+[![npm](https://img.shields.io/npm/v/@mikaello/avrodoc-plus.svg?style=flat-square)](https://www.npmjs.com/package/@mikaello/avrodoc-plus)
+
 avrodoc-plus is a documentation tool for [Apache Avro](http://avro.apache.org/) schemas.
 
 This project originates from [ept/avrodoc](https://github.com/ept/avrodoc) -> [ckatzorke/avrodoc-plus](https://github.com/ckatzorke/avrodoc-plus) -> [leosilvadev/avrodoc-plus](https://github.com/leosilvadev/avrodoc-plus), which are all great, but receives no further updates.
@@ -8,6 +10,7 @@ This project originates from [ept/avrodoc](https://github.com/ept/avrodoc) -> [c
 
 ```bash
 npm install --global @mikaello/avrodoc-plus | yarn add global @mikaello/avrodoc-plus
+
 avrodoc-plus -i source -o out.html
 ```
 
@@ -21,7 +24,7 @@ npx @mikaello/avrodoc-plus -i source -o out.html
 
 ```text
 USAGE:
-    avrodoc [FLAGS] [OPTIONS] [AVRO FILES...]
+    avrodoc-plus [FLAGS] [OPTIONS] [AVRO FILES...]
 
 FLAGS:
         --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quiting)
@@ -45,3 +48,4 @@ EXAMPLES:
 
 - support for input folders
 - support of schema/type search (search by namespace and/or schema/type)
+- support for custom page title

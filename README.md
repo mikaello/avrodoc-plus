@@ -1,6 +1,7 @@
 # avrodoc-plus
 
 [![npm](https://img.shields.io/npm/v/@mikaello/avrodoc-plus.svg?style=flat-square)](https://www.npmjs.com/package/@mikaello/avrodoc-plus)
+[![travis](https://app.travis-ci.com/mikaello/avrodoc-plus.svg?branch=master)](https://travis-ci.com/github/mikaello/avrodoc-plus)
 
 avrodoc-plus is a documentation tool for [Apache Avro](http://avro.apache.org/) schemas.
 

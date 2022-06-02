@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "arg": "5.0.1",
-    "debug": "4.0.1",
+    "debug": "4.3.4",
     "dustjs-helpers": "1.7.4",
     "dustjs-linkedin": "2.7.5",
     "esbuild": "0.11.14",

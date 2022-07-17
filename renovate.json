@@ -1,5 +1,20 @@
 {
   "extends": [
     "config:base"
+  ],
+  "schedule": [ "before 3am on Monday" ],
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "esbuild",
+        "jest",
+        "eslint",
+        "eslint-plugin-jest",
+        "eslint-config-prettier",
+        "prettier"
+      ],
+      "automerge": true
+    }
   ]
 }

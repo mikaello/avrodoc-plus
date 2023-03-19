@@ -6,8 +6,6 @@ on:
     branches:
       - main
 
-env:
-  NODE_VERSION: 18.x
 
 jobs:
   build-and-deploy:
@@ -16,12 +14,6 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
-
-      - name: Use Node.js $NODE_VERSION
-        uses: actions/setup-node@v3
-        with:
-          node-version: $NODE_VERSION
-          cache: 'npm'
 
       - name: Install and Build 🔧
         run: |

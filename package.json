@@ -1,7 +1,7 @@
 {
   "name": "@mikaello/avrodoc-plus",
   "description": "Documentation tool for Avro schemas. Forked from https://github.com/leosilvadev/avrodoc-plus.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "mikaello https://github.com/mikaello",
   "type": "module",
   "bin": "./bin/avrodoc-plus.js",

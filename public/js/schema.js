@@ -149,7 +149,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       hasOwnPropertyS(built_in_type_fields, schema.type)
     ) {
       ignore_attributes = ignore_attributes.concat(
-        built_in_type_fields[schema.type]
+        built_in_type_fields[schema.type],
       );
     }
 
@@ -168,7 +168,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
           annotation_data.complex_object = JSON.stringify(
             annotation_value,
             undefined,
-            3
+            3,
           );
         } else if (named_types[annotation_value]) {
           // The value is a known named type. Let's link to it.
@@ -252,7 +252,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       return type;
     } else if (hasOwnPropertyS(shared_types, qualifiedNameStr)) {
       const sharedType = shared_types[qualifiedNameStr].find(
-        (sharedSchema) => sharedSchema.qualified_name === name
+        (sharedSchema) => sharedSchema.qualified_name === name,
       );
 
       if (sharedType) {
@@ -261,7 +261,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         // TODO: Should also support arbitrary ordering of Avro schemas (currently
         // this only works if the schema to be referred is parsed first)
         throw `Shared schema ${qualifiedNameStr} does not have type ${JSON.stringify(
-          name
+          name,
         )}, referred to at ${path}`;
       }
     }
@@ -364,7 +364,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       essence.request = fieldsWithTypeNames(schema.request || []);
       essence.response = extractTypeName(schema.response, schema.namespace);
       essence.errors = (schema.errors || []).map((error) =>
-        extractTypeName(error, schema.namespace)
+        extractTypeName(error, schema.namespace),
       );
     } else if (schema.type === "protocol") {
       essence = { protocol: qualifiedName(schema, schema.namespace) };
@@ -373,7 +373,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         Object.entries(schema.messages ?? {}).map(([messageName, message]) => [
           messageName,
           typeEssence(message),
-        ])
+        ]),
       );
     } else {
       throw "typeEssence() only supports named types, not " + schema.type;
@@ -465,7 +465,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
 
     if (hasOwnPropertyS(shared_types, qualified_name)) {
       shared_schema = shared_types[qualified_name].find((shared_schema) =>
-        isEqual(new_type, typeEssence(shared_schema))
+        isEqual(new_type, typeEssence(shared_schema)),
       );
     } else {
       shared_types[qualified_name] = [];
@@ -527,7 +527,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
           field.type = parseSchema(
             field.type,
             schema.namespace,
-            joinPath(path, field.name)
+            joinPath(path, field.name),
           );
           field.default_str = JSON.stringify(field["default"], null, " ");
         });
@@ -560,14 +560,14 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         schema.items = parseSchema(
           schema.items,
           namespace,
-          joinPath(path, "items")
+          joinPath(path, "items"),
         );
         return decorate(schema);
       } else if (schema.type === "map") {
         schema.values = parseSchema(
           schema.values,
           namespace,
-          joinPath(path, "values")
+          joinPath(path, "values"),
         );
         return decorate(schema);
       } else if (primitive_types.includes(schema.type)) {
@@ -605,11 +605,11 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     protocol.name = protocol.protocol;
 
     protocol.types = (protocol.types ?? []).map((type) =>
-      parseSchema(type, protocol.namespace, "types")
+      parseSchema(type, protocol.namespace, "types"),
     );
 
     for (const [messageName, message] of Object.entries(
-      protocol.messages ?? {}
+      protocol.messages ?? {},
     )) {
       var path = "messages." + messageName;
       message.type = "message";
@@ -621,14 +621,14 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         param.type = parseSchema(
           param.type,
           protocol.namespace,
-          joinPath(path, "request." + param.name)
+          joinPath(path, "request." + param.name),
         );
         param.default_str = JSON.stringify(param["default"], null, " ");
       });
       message.response = parseSchema(
         message.response,
         protocol.namespace,
-        joinPath(path, "response")
+        joinPath(path, "response"),
       );
 
       // Return an empty array in the case that the method returns 'void'.
@@ -637,7 +637,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         message.response = [];
       }
       message.errors = (message.errors ?? []).map((error) =>
-        parseSchema(error, protocol.namespace, joinPath(path, "errors"))
+        parseSchema(error, protocol.namespace, joinPath(path, "errors")),
       );
 
       defineNamedType(message, path);
@@ -645,7 +645,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
 
     protocol.sorted_messages = Object.values(protocol.messages ?? {}).sort(
-      stringCompareByS("name")
+      stringCompareByS("name"),
     );
     defineNamedType(protocol);
 
@@ -666,7 +666,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
   _public.named_types = named_types;
 
   _public.sorted_types = Object.values(named_types).sort(
-    stringCompareByS("name")
+    stringCompareByS("name"),
   );
 
   return _public;

@@ -140,7 +140,7 @@ function AvroDoc(page_title, input_schemata) {
   // Selects all the protocols from all namespaces, and sorts them alphabetically.
   function protocolsSorted() {
     const protocols = Object.values(_public.by_qualified_name).filter(
-      (shared_type) => shared_type.is_protocol
+      (shared_type) => shared_type.is_protocol,
     );
 
     return protocols.sort(stringCompareBy("qualified_name"));
@@ -197,7 +197,7 @@ function AvroDoc(page_title, input_schemata) {
       _public,
       shared_types,
       json,
-      filename
+      filename,
     );
   }
 
@@ -223,7 +223,7 @@ function AvroDoc(page_title, input_schemata) {
               (schemata_to_load - in_progress) +
               " out of " +
               schemata_to_load +
-              " schemata..."
+              " schemata...",
           );
         }
       });

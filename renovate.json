@@ -1,8 +1,6 @@
 {
-  "extends": [
-    "config:base"
-  ],
-  "schedule": [ "before 3am on Monday" ],
+  "extends": ["config:base"],
+  "schedule": ["before 3am on Monday"],
   "platformAutomerge": true,
   "packageRules": [
     {

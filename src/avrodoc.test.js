@@ -11,11 +11,11 @@ describe("test HTML generation", () => {
 
   test("avrodoc creates documentation", async () => {
     await expect(
-      createAvroDoc("Test: Avrodoc", [], ["./schemata/example.avsc"], testFile)
+      createAvroDoc("Test: Avrodoc", [], ["./schemata/example.avsc"], testFile),
     ).resolves.toBeUndefined();
 
     expect(readFileSync(testFile, "utf-8")).toContain(
-      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Test: Avrodoc</title>'
+      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Test: Avrodoc</title>',
     );
   });
 });

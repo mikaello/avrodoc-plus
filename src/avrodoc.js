@@ -22,7 +22,7 @@ async function createAvroDoc(
   extra_less_files,
   inputfiles,
   outputfile,
-  ignoreInvalid
+  ignoreInvalid,
 ) {
   avrodocDebug(`Creating ${outputfile} from `, inputfiles);
   let schemata = inputfiles
@@ -45,7 +45,7 @@ async function writeAvroDoc(output, html) {
   if (output.indexOf("/") > -1) {
     let outFolder = path.resolve(
       process.cwd(),
-      output.substring(0, output.lastIndexOf("/"))
+      output.substring(0, output.lastIndexOf("/")),
     );
     if (!fs.existsSync(outFolder)) {
       await mkdir(outFolder);

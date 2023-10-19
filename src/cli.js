@@ -83,12 +83,12 @@ const ignoreInvalidSchemas = Boolean(argv["--ignore-invalid"]);
 //valid input?
 if (inputFiles.length === 0) {
   console.error(
-    'Missing input schemata, either specify a folder with "--input" or individual AVRO files. Specify "--help" to see usage.'
+    'Missing input schemata, either specify a folder with "--input" or individual AVRO files. Specify "--help" to see usage.',
   );
   process.exit(1);
 } else if (outputFile == null) {
   console.error(
-    'Missing output file, specify with "--output" where the resulting HTML should go. Specify "--help" to see usage.'
+    'Missing output file, specify with "--output" where the resulting HTML should go. Specify "--help" to see usage.',
   );
   process.exit(1);
 }
@@ -98,7 +98,7 @@ createAvroDoc(
   extraLessFile ? [extraLessFile] : [],
   inputFiles,
   outputFile,
-  ignoreInvalidSchemas
+  ignoreInvalidSchemas,
 );
 
 //private stuff

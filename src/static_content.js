@@ -32,8 +32,8 @@ const client_js = [
  */
 const client_html = promisify(
   dust.compileFn(
-    fs.readFileSync(path.join(__dirname, "top_level.dust"), "utf-8")
-  )
+    fs.readFileSync(path.join(__dirname, "top_level.dust"), "utf-8"),
+  ),
 );
 
 const template_dir = path.join(__dirname, "..", "templates");
@@ -51,7 +51,7 @@ function minifiedJS(filename) {
 
   if (result.error) {
     console.error(
-      `Could not minify file ${filename} with ESBuild:\n` + result.error
+      `Could not minify file ${filename} with ESBuild:\n` + result.error,
     );
     return "";
   }
@@ -136,14 +136,14 @@ function remoteContent(extra_less_files, callback) {
   client_css.concat(extra_less_files).forEach(function (file) {
     const css_file = file.replace(/\.less$/, ".css");
     html.push(
-      '<link rel="stylesheet" type="text/css" href="/' + css_file + '"/>'
+      '<link rel="stylesheet" type="text/css" href="/' + css_file + '"/>',
     );
   });
   client_js.forEach(function (file) {
     html.push('<script type="text/javascript" src="/' + file + '"></script>');
   });
   html.push(
-    '<script type="text/javascript" src="/dust-templates.js"></script>'
+    '<script type="text/javascript" src="/dust-templates.js"></script>',
   );
   callback(null, html.join("\n"));
 }
@@ -207,7 +207,7 @@ function topLevelHTML(title, extra_less_files, options) {
         return client_html(context)
           .then((html) => resolve(html))
           .catch((err) => reject(err));
-      }
+      },
     );
   });
 }

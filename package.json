@@ -23,7 +23,7 @@
     "less": "1.7.5"
   },
   "devDependencies": {
-    "eslint": "8.51.0",
+    "eslint": "8.52.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-jest": "27.4.3",
     "express": "4.18.2",

@@ -26,7 +26,7 @@
     "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-jest": "27.9.0",
-    "express": "4.19.1",
+    "express": "4.19.2",
     "glob": "8.1.0",
     "jest": "29.7.0",
     "less-middleware": "2.2.1",

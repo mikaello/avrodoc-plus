@@ -25,7 +25,7 @@
   "devDependencies": {
     "eslint": "9.1.1",
     "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-jest": "28.3.0",
+    "eslint-plugin-jest": "28.5.0",
     "express": "4.19.2",
     "glob": "8.1.0",
     "jest": "29.7.0",

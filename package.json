@@ -9,7 +9,7 @@
     "start": "node src/cli.js",
     "server": "node app.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest src/",
-    "lint": "eslint --ext js,ts,tsx src public/js app.js",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext js,ts,tsx src public/js app.js",
     "test:ci": "npm run check-format && npm run lint && npm run test",
     "check-format": "prettier --check \"**/!(vendor|stylesheets|bootstrap)/(*.ts?(x)|*.js?(x)|*.json|*.css|*.less|*.html|*.md)\"",
     "format": "prettier --write \"**/!(vendor|stylesheets|bootstrap)/(*.ts?(x)|*.js?(x))|*.json|*.css|*.less|*.html|*.md)\""

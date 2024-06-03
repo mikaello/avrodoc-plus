@@ -67,7 +67,7 @@ function readJSON(filename, ignoreInvalid) {
   json = fs.readFileSync(path.resolve(process.cwd(), filename), "utf-8");
   try {
     parsed = JSON.parse(json);
-  } catch (e) {
+  } catch {
     console.error("Not a valid JSON file: " + filename);
     if (ignoreInvalid) {
       return;

@@ -19,7 +19,7 @@
     "debug": "4.4.0",
     "dustjs-helpers": "1.7.4",
     "dustjs-linkedin": "2.7.5",
-    "esbuild": "0.25.0",
+    "esbuild": "0.25.1",
     "less": "1.7.5"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@ import morgan from "morgan";
 import lessMiddleware from "less-middleware";
 import http from "http";
 import path from "path";
-import glob from "glob";
+import { glob } from "glob";
 import fs from "fs";
 import { dustTemplates, topLevelHTML } from "./src/static_content.js";
 
@@ -16,11 +16,9 @@ const schema_dir = path.resolve(
   process.env.SCHEMA_DIR ?? "schemata"
 );
 const schemata = [];
-glob("**/*.avsc", { cwd: schema_dir }, function (err, files) {
-  if (err) throw err;
-  files.sort().forEach(function (file) {
-    schemata.push({ filename: "/schemata/" + file });
-  });
+const files = glob("**/*.avsc", { cwd: schema_dir })
+files.sort().forEach(function (file) {
+  schemata.push({ filename: "/schemata/" + file });
 });
 
 // Precompile dust templates at app startup, and then serve them out of memory

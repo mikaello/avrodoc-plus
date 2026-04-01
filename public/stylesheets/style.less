@@ -44,6 +44,23 @@
   border-right: 1px solid #ddd;
   .box-shadow(0 0 20px #ddd);
 
+  .nav-home {
+    padding: 15px 18px;
+    background: #e8e8e8;
+    border-bottom: 2px solid #ddd;
+
+    a {
+      display: block;
+      text-decoration: none;
+      color: @linkColor;
+      font-size: @baseFontSize + 1px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   h2 {
     font-size: @baseFontSize + 2px;
     line-height: @baseFontSize + 12px;

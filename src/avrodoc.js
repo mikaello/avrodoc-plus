@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * Main avrodoc(-plus) module
  */
@@ -11,11 +12,12 @@ import debug from "debug";
 const avrodocDebug = debug("avrodoc:avrodoc");
 
 /**
- *
  * @param {string} title the main title of the generated Avrodoc page
  * @param {Array<string>} extra_less_files an array with extra less files to be added
  * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed and eventually added to the avrodoc
  * @param {string} outputfile the html file that should be written
+ * @param {boolean} [ignoreInvalid] whether to ignore invalid JSON files
+ * @returns {Promise<void>}
  */
 async function createAvroDoc(
   title,
@@ -41,6 +43,11 @@ async function createAvroDoc(
 
 // private stuf
 
+/**
+ * @param {string} output
+ * @param {string} html
+ * @returns {Promise<void>}
+ */
 async function writeAvroDoc(output, html) {
   if (output.indexOf("/") > -1) {
     let outFolder = path.resolve(
@@ -58,8 +65,8 @@ async function writeAvroDoc(output, html) {
 /**
  * Reads in the given file and parses as json
  * @param {string} filename to be read
- * @param {boolean} ignoreInvalid should we ignore invalid JSON files
- * @returns {object} with parsed AVRO
+ * @param {boolean} [ignoreInvalid] should we ignore invalid JSON files
+ * @returns {any | undefined} parsed AVRO or undefined if invalid and ignoring
  */
 function readJSON(filename, ignoreInvalid) {
   let json, parsed;

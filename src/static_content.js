@@ -1,3 +1,4 @@
+// @ts-check
 import fs from "fs";
 import { promisify } from "util";
 
@@ -49,11 +50,11 @@ function minifiedJS(filename) {
   const filecontent = fs.readFileSync(filename, "utf-8");
   const result = transformSync(filecontent, { minify: true });
 
-  if (result.error) {
+  if (result.warnings && result.warnings.length > 0) {
     console.error(
-      `Could not minify file ${filename} with ESBuild:\n` + result.error,
+      `Warnings when minifying file ${filename} with ESBuild:\n` +
+        result.warnings,
     );
-    return "";
   }
   return result.code;
 }
@@ -74,7 +75,14 @@ function dustTemplates() {
   return compiled;
 }
 
+/**
+ * @param {string} type
+ * @returns {(file: string) => {name: string, type: string}}
+ */
 function lessFileAs(type) {
+  /**
+   * @param {string} file
+   */
   return function (file) {
     return { name: file, type: type };
   };
@@ -84,7 +92,8 @@ function lessFileAs(type) {
  * Compiles LESS stylesheets and calls callback(error, minified_css).
  *
  * @param {string[]} extra_less_files
- * @param {function(string?,string)} callback arg0=error and arg1=minified_css
+ * @param {(err: Error | null, css?: string) => void} callback arg0=error and arg1=minified_css
+ * @returns {void}
  */
 function stylesheets(extra_less_files, callback) {
   let compiled = "",
@@ -106,16 +115,19 @@ function stylesheets(extra_less_files, callback) {
               : "",
           filename: file.name,
         });
-        parser.parse(style, function (err, tree) {
-          if (!err) {
-            compiled += tree.toCSS({ compress: true });
-          }
-          to_do--;
-          if (to_do === 0) {
-            to_do = -1000; // hack to avoid calling callback twice
-            callback(err, compiled);
-          }
-        });
+        parser.parse(
+          style,
+          function (/** @type {Error | null} */ err, /** @type {any} */ tree) {
+            if (!err) {
+              compiled += tree.toCSS({ compress: true });
+            }
+            to_do--;
+            if (to_do === 0) {
+              to_do = -1000; // hack to avoid calling callback twice
+              callback(err, compiled);
+            }
+          },
+        );
       }
     });
 
@@ -129,7 +141,8 @@ function stylesheets(extra_less_files, callback) {
  * and CSS required by the browser.
  *
  * @param {string[]} extra_less_files
- * @param {function(string?,string)} callback arg0=error and arg1=HTML
+ * @param {(err: Error | null, html?: string) => void} callback arg0=error and arg1=HTML
+ * @returns {void}
  */
 function remoteContent(extra_less_files, callback) {
   const html = [];
@@ -152,7 +165,8 @@ function remoteContent(extra_less_files, callback) {
  * Returns HTML containing all JS and CSS required by the browser inline.
  *
  * @param {string[]} extra_less_files
- * @param {function(string?,string)} callback arg0=error and arg1=HTML
+ * @param {(err: Error | null, html?: string) => void} callback arg0=error and arg1=HTML
+ * @returns {void}
  */
 function inlineContent(extra_less_files, callback) {
   stylesheets(extra_less_files, function (err, css) {
@@ -183,6 +197,8 @@ function inlineContent(extra_less_files, callback) {
  * @param {string} title - main title of the page
  * @param {string[]} extra_less_files
  * @param {Object} options - inline function for LESS and context options for DustJs
+ * @param {boolean} [options.inline] - whether to inline CSS and JS
+ * @param {any} [options.schemata] - schema data
  * @returns {Promise<string>}
  */
 function topLevelHTML(title, extra_less_files, options) {
@@ -205,8 +221,8 @@ function topLevelHTML(title, extra_less_files, options) {
           context.schemata = JSON.stringify(context.schemata);
         }
         return client_html(context)
-          .then((html) => resolve(html))
-          .catch((err) => reject(err));
+          .then((/** @type {string} */ html) => resolve(html))
+          .catch((/** @type {Error} */ err) => reject(err));
       },
     );
   });

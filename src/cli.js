@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * CLI usage for avrodoc-plus
  * Usage:
@@ -63,6 +64,7 @@ if (
   process.exit(0);
 }
 
+/** @type {string[]} */
 let inputFiles = [];
 
 if (argv["--input"]) {
@@ -94,7 +96,7 @@ if (inputFiles.length === 0) {
 }
 
 createAvroDoc(
-  pageTitle,
+  pageTitle ?? "Avrodoc",
   extraLessFile ? [extraLessFile] : [],
   inputFiles,
   outputFile,

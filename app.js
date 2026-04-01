@@ -1,3 +1,4 @@
+// @ts-check
 import express from "express";
 import morgan from "morgan";
 import lessMiddleware from "less-middleware";
@@ -15,6 +16,7 @@ const schema_dir = path.resolve(
   process.cwd(),
   process.env.SCHEMA_DIR ?? "schemata"
 );
+/** @type {Array<{filename: string}>} */
 const schemata = [];
 const files = await glob("**/*.avsc", { cwd: schema_dir });
 files.sort().forEach(function (file) {

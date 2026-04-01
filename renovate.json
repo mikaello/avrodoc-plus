@@ -1,18 +1,18 @@
 {
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "schedule": ["before 3am on Monday"],
   "platformAutomerge": true,
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "esbuild",
-        "jest",
-        "eslint",
-        "eslint-plugin-jest",
-        "eslint-config-prettier",
-        "prettier"
-      ],
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": [
+        "/esbuild/",
+        "/jest/",
+        "/eslint/",
+        "/eslint-plugin-jest/",
+        "/eslint-config-prettier/",
+        "/prettier/"
+      ]
     }
   ]
 }

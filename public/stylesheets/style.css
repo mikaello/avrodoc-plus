@@ -1,0 +1,277 @@
+/* -----------------------------------------------
+   Avrodoc layout — overrides on top of Pico CSS
+----------------------------------------------- */
+
+/* ----- Custom properties — light mode defaults ----- */
+:root {
+  --avrodoc-nav-bg: #f3f3f3;
+  --avrodoc-nav-header-bg: #e8e8e8;
+  --avrodoc-nav-section-bg: #f0f0f0;
+  --avrodoc-nav-border: #d0d0d0;
+  --avrodoc-nav-selected-bg: #ffffff;
+  --avrodoc-nav-shadow: rgba(0, 0, 0, 0.10);
+}
+
+/* ----- Dark mode overrides ----- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --avrodoc-nav-bg: #1a1f2e;
+    --avrodoc-nav-header-bg: #111827;
+    --avrodoc-nav-section-bg: #161d2b;
+    --avrodoc-nav-border: #2d3748;
+    --avrodoc-nav-selected-bg: #2d3748;
+    --avrodoc-nav-shadow: rgba(0, 0, 0, 0.40);
+  }
+}
+
+/* Slightly smaller base font to keep everything compact */
+html {
+  font-size: 93%;
+}
+
+/* Remove pico's padding on body > main since we manage layout ourselves */
+body > main {
+  padding: 0;
+}
+
+/* ---- Fixed left sidebar (nav#list-pane) ---- */
+
+/* Reset pico's horizontal flex nav layout */
+nav#list-pane,
+nav#list-pane ul {
+  display: block;
+}
+
+#list-pane {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--avrodoc-nav-bg);
+  border-right: 1px solid var(--avrodoc-nav-border);
+  box-shadow: 0 0 20px var(--avrodoc-nav-shadow);
+  padding: 0;
+}
+
+.nav-home {
+  padding: 10px 14px;
+  background: var(--avrodoc-nav-header-bg);
+  border-bottom: 2px solid var(--avrodoc-nav-border);
+}
+
+.nav-home a {
+  display: block;
+  text-decoration: none;
+}
+
+#list-pane h2 {
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+  padding: 0 14px;
+  margin: 0;
+  background: var(--avrodoc-nav-section-bg);
+  border-top: 1px solid var(--avrodoc-nav-border);
+  border-bottom: 1px solid var(--avrodoc-nav-border);
+}
+
+#list-pane h2:first-child {
+  border-top: 0;
+}
+
+#list-pane ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#list-pane > ul > li {
+  padding: 4px 12px;
+}
+
+/* Nested schema/message items — keep tight */
+#list-pane ul ul li {
+  padding: 0;
+  margin: 0;
+}
+
+#list-pane a {
+  display: block;
+  font-weight: lighter;
+  padding: 2px 0;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#list-pane a:hover {
+  text-decoration: none;
+}
+
+#list-pane a:hover .type-name {
+  text-decoration: underline;
+}
+
+/* Namespace group heading inside sidebar (e.g. "com.example.avro") */
+#list-pane p.namespace {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--pico-muted-color, #6b7280);
+  margin: 4px 0 2px 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Namespace sub-label shown beneath a type-name link */
+#list-pane a span.namespace {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: lighter;
+  color: var(--pico-muted-color, #6b7280);
+  padding-left: 5px;
+}
+
+/* Highlight selected nav item */
+li.selected {
+  background: var(--avrodoc-nav-selected-bg);
+  box-shadow: 0 0 3px var(--avrodoc-nav-border);
+  border-radius: 3px;
+}
+
+/* When multiple schemata, highlight selected schema with accent */
+ul.multiple-schemata > li.selected {
+  background: var(--pico-primary, #1a56db);
+  color: white;
+}
+
+ul.multiple-schemata > li.selected a {
+  color: white;
+}
+
+/* ---- Labels (inline badges) ---- */
+
+.label {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: normal;
+  line-height: 1.4;
+  border-radius: 3px;
+  background: rgba(107, 114, 128, 0.5);
+  color: white;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.label-info {
+  background: rgba(58, 135, 173, 0.5);
+}
+
+/* ---- Main content area ---- */
+
+#content-pane {
+  padding: 11px 25px 50px 295px;
+}
+
+#content-pane h2.namespace {
+  font-size: 0.9rem;
+  color: var(--pico-muted-color, #6b7280);
+  margin: 0;
+}
+
+#content-pane h1.type-name {
+  margin-top: 0;
+}
+
+.type-doc {
+  margin: 1rem 0;
+}
+
+/* ---- Search ---- */
+
+.container-search {
+  padding: 10px;
+  text-align: center;
+}
+
+#search-schemas {
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 4px;
+  width: 90%;
+}
+
+/* ---- Popover for named type details ---- */
+
+.popover {
+  position: absolute;
+  z-index: 1000;
+  background: var(--pico-background-color, #fff);
+  border: 1px solid var(--pico-border-color, #ddd);
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  padding: 0;
+}
+
+.popover .arrow {
+  display: none;
+}
+
+.popover-inner {
+  padding: 0;
+}
+
+.popover.avrodoc-named-type {
+  width: 600px;
+}
+
+.popover-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 8px 14px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  border-bottom: 1px solid var(--pico-border-color, #ddd);
+}
+
+.popover-title .namespace {
+  color: var(--pico-muted-color, #6b7280);
+}
+
+.popover-title .type-name {
+  font-weight: bold;
+}
+
+.popover-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: 85%;
+  padding: 8px 14px;
+  max-height: 400px;
+}
+
+.popover-content table th,
+.popover-content table td {
+  padding: 4px 5px;
+}
+
+/* ---- Print ---- */
+
+@media print {
+  #list-pane {
+    display: none;
+  }
+
+  #content-pane {
+    padding: 0;
+  }
+}

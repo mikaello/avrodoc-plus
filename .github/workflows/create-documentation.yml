@@ -27,3 +27,4 @@ jobs:
         with:
           folder: html
           branch: gh-pages
+          clean-exclude: pr-preview

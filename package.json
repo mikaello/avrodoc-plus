@@ -9,7 +9,7 @@
     "start": "node src/cli.js",
     "server": "node app.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest src/",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext js,ts,tsx src public/js app.js",
+    "lint": "eslint --ext js,ts,tsx src public/js app.js",
     "test:ci": "npm run check-format && npm run lint && npm run test",
     "check-format": "prettier --check \"**/!(vendor|stylesheets|bootstrap)/(*.ts?(x)|*.js?(x)|*.json|*.css|*.less|*.html|*.md)\"",
     "format": "prettier --write \"**/!(vendor|stylesheets|bootstrap)/(*.ts?(x)|*.js?(x))|*.json|*.css|*.less|*.html|*.md)\""
@@ -23,11 +23,13 @@
     "less": "1.7.5"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "eslint": "10.0.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jest": "29.15.0",
     "express": "4.22.1",
     "glob": "8.1.0",
+    "globals": "17.4.0",
     "jest": "30.2.0",
     "less-middleware": "2.2.1",
     "morgan": "1.10.1",

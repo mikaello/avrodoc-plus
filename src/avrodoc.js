@@ -7,9 +7,6 @@ import { topLevelHTML } from "./static_content.js";
 import fs from "fs";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import debug from "debug";
-
-const avrodocDebug = debug("avrodoc:avrodoc");
 
 /**
  * @param {string} title the main title of the generated Avrodoc page
@@ -26,7 +23,7 @@ async function createAvroDoc(
   outputfile,
   ignoreInvalid,
 ) {
-  avrodocDebug(`Creating ${outputfile} from `, inputfiles);
+  console.debug(`Creating ${outputfile} from `, inputfiles);
   let schemata = inputfiles
     .map((filename) => {
       const json = readJSON(filename, ignoreInvalid);
@@ -70,7 +67,7 @@ async function writeAvroDoc(output, html) {
  */
 function readJSON(filename, ignoreInvalid) {
   let json, parsed;
-  avrodocDebug("Parsing ", filename);
+  console.debug("Parsing ", filename);
   json = fs.readFileSync(path.resolve(process.cwd(), filename), "utf-8");
   try {
     parsed = JSON.parse(json);

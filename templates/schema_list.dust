@@ -1,3 +1,9 @@
+<div class="nav-home">
+    <a href="#/" title="Back to main frame">
+        <strong>{page_title}</strong>
+    </a>
+</div>
+
 {?protocols}
     <h2>Protocols</h2>
     <ul class="protocols">

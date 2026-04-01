@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * CLI usage for avrodoc-plus
  * Usage:
@@ -23,6 +24,7 @@ OPTIONS:
     -i, --input <folder>     Pass in a source folder that will recursively parsed and crawled for avsc files
     -o, --output <file>      The file where the generated doc should be written to
         --title <title>      The title that will be used in the generated HTML page, defaults to "Avrodoc".
+    -s, --style <file>       Your own less file, used to override specific style of your generated page
 
 ARGS:
     <AVRO FILES>...          If not --input is given, you can specify individual AVRO files here
@@ -30,7 +32,7 @@ ARGS:
 EXAMPLES:
     avrodoc-plus --ignore-invalid --input ./schemas --output avrodoc.html --title "My First Avrodoc"
 
-    avrodoc-plus --output avro.html avro_schema1.avsc avro_schema2.avsc avro_schema3.avsc
+    avrodoc-plus --output avro.html --style my-styles.less avro_schema1.avsc avro_schema2.avsc avro_schema3.avsc
 `;
 
 const { values: argv, positionals } = parseArgs({
@@ -40,6 +42,7 @@ const { values: argv, positionals } = parseArgs({
     output: { type: "string", short: "o" },
     input: { type: "string", short: "i" },
     title: { type: "string" },
+    style: { type: "string", short: "s" },
     "ignore-invalid": { type: "boolean", default: false },
   },
 });
@@ -53,15 +56,18 @@ if (argv.help || (positionals.length === 0 && !argv.input && !argv.output)) {
 let inputFiles = [];
 
 if (argv.input) {
+  console.debug("Collecting all avsc files from root folder ", argv.input);
   inputFiles = inputFiles.concat(collectInputFiles(argv.input));
 }
 
 if (positionals.length > 0) {
+  console.debug("Using passed arguments as inputfiles...");
   inputFiles = inputFiles.concat(positionals);
 }
 
 const outputFile = argv.output;
 const pageTitle = argv.title;
+const extraLessFile = argv.style;
 const ignoreInvalidSchemas = Boolean(argv["ignore-invalid"]);
 
 if (inputFiles.length === 0) {
@@ -78,6 +84,7 @@ if (inputFiles.length === 0) {
 
 createAvroDoc(
   pageTitle ?? "Avrodoc",
+  extraLessFile ? [extraLessFile] : [],
   inputFiles,
   outputFile,
   ignoreInvalidSchemas,
@@ -93,25 +100,25 @@ createAvroDoc(
 function collectInputFiles(folder) {
   let files = new Array();
   const resolvedFolder = path.resolve(process.cwd(), folder);
-  debug("Input dir: ", folder);
-  debug("Resolved folder: ", resolvedFolder);
+  console.debug("Input dir: ", folder);
+  console.debug("Resolved folder: ", resolvedFolder);
   let dirEntries = fs.readdirSync(resolvedFolder, {
     withFileTypes: true,
   });
-  debug("DirEntries: ", dirEntries);
+  console.debug("DirEntries: ", dirEntries);
   dirEntries.forEach((entry) => {
-    debug("Current entry: ", entry);
+    console.debug("Current entry: ", entry);
     if (entry.isFile()) {
       let file = folder + "/" + entry.name;
-      debug("adding file", file);
+      console.debug("adding file", file);
       if (file.endsWith(".avsc")) {
         files.push(file);
       } else {
-        debug(`Ignoring ${file}, not an avro schema file (.avsc)`);
+        console.debug(`Ignoring ${file}, not an avro schema file (.avsc)`);
       }
     } else if (entry.isDirectory()) {
       let subfolder = folder + "/" + entry.name;
-      debug("Digging into ", subfolder);
+      console.debug("Digging into ", subfolder);
       files.push(...collectInputFiles(subfolder));
     }
   });

@@ -10,12 +10,20 @@ import path from "path";
 
 /**
  * @param {string} title the main title of the generated Avrodoc page
- * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed
+ * @param {Array<string>} extra_less_files an array with extra less files to be added
+ * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed and eventually added to the avrodoc
  * @param {string} outputfile the html file that should be written
  * @param {boolean} [ignoreInvalid] whether to ignore invalid JSON files
  * @returns {Promise<void>}
  */
-async function createAvroDoc(title, inputfiles, outputfile, ignoreInvalid) {
+async function createAvroDoc(
+  title,
+  extra_less_files,
+  inputfiles,
+  outputfile,
+  ignoreInvalid,
+) {
+  console.debug(`Creating ${outputfile} from `, inputfiles);
   let schemata = inputfiles
     .map((filename) => {
       const json = readJSON(filename, ignoreInvalid);
@@ -23,7 +31,7 @@ async function createAvroDoc(title, inputfiles, outputfile, ignoreInvalid) {
     })
     .filter((s) => s != null);
 
-  const html = await topLevelHTML(title, {
+  const html = await topLevelHTML(title, extra_less_files, {
     inline: true,
     schemata,
   });
@@ -59,7 +67,7 @@ async function writeAvroDoc(output, html) {
  */
 function readJSON(filename, ignoreInvalid) {
   let json, parsed;
-  avrodocDebug("Parsing ", filename);
+  console.debug("Parsing ", filename);
   json = fs.readFileSync(path.resolve(process.cwd(), filename), "utf-8");
   try {
     parsed = JSON.parse(json);

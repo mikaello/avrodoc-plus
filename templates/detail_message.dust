@@ -7,6 +7,7 @@
                 <th>Field</th>
                 <th>Default Value</th>
                 <th>Description</th>
+                <th>Annotations</th>
             </tr>
         </thead>
 
@@ -17,6 +18,24 @@
                 <td class="field">{name}</td>
                 <td class="field-doc">{default_str}</td>
                 <td class="field-doc">{doc|md|s}</td>
+                <td class="field-doc">
+                    {?annotations}
+                        <strong>Field:</strong>
+                        <ul>
+                        {#annotations}
+                            <li><code>{key}</code>: {#complex_object}<pre>{.}</pre>{:else}{value}{/complex_object}</li>
+                        {/annotations}
+                        </ul>
+                    {/annotations}
+                    {?type.annotations}
+                        <strong>Type:</strong>
+                        <ul>
+                        {#type.annotations}
+                            <li><code>{key}</code>: {#complex_object}<pre>{.}</pre>{:else}{value}{/complex_object}</li>
+                        {/type.annotations}
+                        </ul>
+                    {/type.annotations}
+                </td>
             </tr>
         {/request}
         </tbody>

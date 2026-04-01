@@ -530,6 +530,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             joinPath(path, field.name),
           );
           field.default_str = JSON.stringify(field["default"], null, " ");
+          decorateCustomAttributes(field);
         });
         return decorate(schema);
       } else if (schema.type === "enum") {
@@ -624,6 +625,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
           joinPath(path, "request." + param.name),
         );
         param.default_str = JSON.stringify(param["default"], null, " ");
+        decorateCustomAttributes(param);
       });
       message.response = parseSchema(
         message.response,

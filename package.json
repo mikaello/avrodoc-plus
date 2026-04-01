@@ -30,7 +30,7 @@
     "express": "4.22.1",
     "glob": "8.1.0",
     "globals": "17.4.0",
-    "jest": "30.2.0",
+    "jest": "30.3.0",
     "less-middleware": "2.2.1",
     "morgan": "1.10.1",
     "prettier": "3.8.1"

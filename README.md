@@ -10,7 +10,7 @@ This project originates from [ept/avrodoc](https://github.com/ept/avrodoc) -> [c
 ## Usage
 
 ```bash
-npm install --global @mikaello/avrodoc-plus | yarn add global @mikaello/avrodoc-plus
+npm install --global @mikaello/avrodoc-plus
 
 avrodoc-plus -i source -o out.html
 ```

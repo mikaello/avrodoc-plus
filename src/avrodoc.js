@@ -7,26 +7,15 @@ import { topLevelHTML } from "./static_content.js";
 import fs from "fs";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import debug from "debug";
-
-const avrodocDebug = debug("avrodoc:avrodoc");
 
 /**
  * @param {string} title the main title of the generated Avrodoc page
- * @param {Array<string>} extra_less_files an array with extra less files to be added
- * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed and eventually added to the avrodoc
+ * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed
  * @param {string} outputfile the html file that should be written
  * @param {boolean} [ignoreInvalid] whether to ignore invalid JSON files
  * @returns {Promise<void>}
  */
-async function createAvroDoc(
-  title,
-  extra_less_files,
-  inputfiles,
-  outputfile,
-  ignoreInvalid,
-) {
-  avrodocDebug(`Creating ${outputfile} from `, inputfiles);
+async function createAvroDoc(title, inputfiles, outputfile, ignoreInvalid) {
   let schemata = inputfiles
     .map((filename) => {
       const json = readJSON(filename, ignoreInvalid);
@@ -34,7 +23,7 @@ async function createAvroDoc(
     })
     .filter((s) => s != null);
 
-  const html = await topLevelHTML(title, extra_less_files, {
+  const html = await topLevelHTML(title, {
     inline: true,
     schemata,
   });

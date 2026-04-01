@@ -19,6 +19,7 @@ jobs:
         run: |
           npm ci
           mkdir html
+          touch html/.nojekyll
           node src/cli.js -i schemata -o html/index.html
           ls -ltur html
 

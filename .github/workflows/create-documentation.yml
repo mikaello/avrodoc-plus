@@ -19,6 +19,7 @@ jobs:
         run: |
           npm ci
           mkdir html
+          touch html/.nojekyll
           node src/cli.js -i schemata -o html/index.html
           ls -ltur html
 
@@ -27,3 +28,4 @@ jobs:
         with:
           folder: html
           branch: gh-pages
+          clean-exclude: pr-preview

@@ -1,0 +1,99 @@
+name: Deploy PR preview 🔍
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  deploy-preview:
+    if: github.event.action != 'closed'
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6.3.0
+        with:
+          node-version: 24.x
+          cache: 'npm'
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          PR_NUMBER=${{ github.event.number }}
+          mkdir -p deploy/pr-preview/pr-${PR_NUMBER}
+          touch deploy/.nojekyll
+          node src/cli.js -i schemata -o deploy/pr-preview/pr-${PR_NUMBER}/index.html
+          ls -lh deploy/pr-preview/pr-${PR_NUMBER}/
+
+      - name: Deploy preview 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: deploy
+          branch: gh-pages
+          clean: false
+
+      - name: Comment PR with preview URL 💬
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const repoOwner = context.repo.owner;
+            const repoName = context.repo.repo;
+            const prNumber = context.issue.number;
+            const previewUrl = `https://${repoOwner}.github.io/${repoName}/pr-preview/pr-${prNumber}/`;
+            const body = [
+              '## Avrodoc Preview 🔍',
+              '',
+              'A live preview of the generated documentation is available at:',
+              `👉 ${previewUrl}`,
+              '',
+              '_This preview is built from the `schemata/` directory and updates on every push to this PR._',
+            ].join('\n');
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.data.find(c => c.body.includes('Avrodoc Preview 🔍'));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+  cleanup-preview:
+    if: github.event.action == 'closed'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          ref: gh-pages
+
+      - name: Remove PR preview 🗑️
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -d "pr-preview/pr-${{ github.event.number }}" ]; then
+            git rm -rf "pr-preview/pr-${{ github.event.number }}"
+            git commit -m "chore: remove PR preview for #${{ github.event.number }}"
+            git push
+          else
+            echo "No preview folder found, nothing to clean up."
+          fi

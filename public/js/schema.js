@@ -188,6 +188,41 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
   }
 
   /**
+   * Builds a flat, filtered list of annotations for display in the field table,
+   * based on an allowlist of annotation keys. Each key is looked up on the field
+   * itself first, then on `field.type` (e.g. for logicalType).
+   *
+   * @param {object} field - a field or protocol-message parameter
+   * @param {string[]} allowedKeys - the keys to include
+   */
+  function buildTableAnnotations(field, allowedKeys) {
+    var result = [];
+    allowedKeys.forEach(function (key) {
+      var source =
+        hasOwnPropertyS(field, key) && field[key] !== undefined
+          ? field
+          : isObject(field.type) &&
+              hasOwnPropertyS(field.type, key) &&
+              field.type[key] !== undefined
+            ? field.type
+            : null;
+      if (!source) return;
+      var val = source[key];
+      var data = { key: key };
+      if (val !== null && typeof val === "object") {
+        data.complex_object = JSON.stringify(val, undefined, 3);
+      } else {
+        data.value = val;
+      }
+      result.push(data);
+    });
+    if (result.length > 0) {
+      return result;
+    }
+    return undefined;
+  }
+
+  /**
    * Takes a node in the schema tree (a JS object) and adds some fields that are
    * useful for template rendering.
    *
@@ -531,6 +566,10 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
           );
           field.default_str = JSON.stringify(field["default"], null, " ");
           decorateCustomAttributes(field);
+          field.table_annotations = buildTableAnnotations(
+            field,
+            avrodoc.annotationFields,
+          );
         });
         return decorate(schema);
       } else if (schema.type === "enum") {
@@ -626,6 +665,10 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         );
         param.default_str = JSON.stringify(param["default"], null, " ");
         decorateCustomAttributes(param);
+        param.table_annotations = buildTableAnnotations(
+          param,
+          avrodoc.annotationFields,
+        );
       });
       message.response = parseSchema(
         message.response,

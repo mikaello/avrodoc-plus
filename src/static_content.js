@@ -199,6 +199,7 @@ function inlineContent(extra_less_files, callback) {
  * @param {Object} options - inline function for LESS and context options for DustJs
  * @param {boolean} [options.inline] - whether to inline CSS and JS
  * @param {any} [options.schemata] - schema data
+ * @param {string[]} [options.annotationFields] - allowlist of annotation keys shown in field tables
  * @returns {Promise<string>}
  */
 function topLevelHTML(title, extra_less_files, options) {
@@ -210,10 +211,17 @@ function topLevelHTML(title, extra_less_files, options) {
           return reject(err);
         }
 
+        /** @type {Record<string, unknown>} */
+        const avrodocOptions = {};
+        if (options.annotationFields) {
+          avrodocOptions.annotationFields = options.annotationFields;
+        }
+
         const context = {
           page_title: title ?? "Avrodoc",
           content: content,
           schemata: "[]",
+          avrodocOptions: JSON.stringify(avrodocOptions),
           ...options,
         };
 

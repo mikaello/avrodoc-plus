@@ -19,22 +19,13 @@
                 <td class="field-doc">{default_str}</td>
                 <td class="field-doc">{.doc|md|s}</td>
                 <td class="field-doc">
-                    {?annotations}
-                        <strong>Field:</strong>
+                    {?table_annotations}
                         <ul>
-                        {#annotations}
+                        {#table_annotations}
                             <li><code>{key}</code>: {#complex_object}<pre>{.}</pre>{:else}{value}{/complex_object}</li>
-                        {/annotations}
+                        {/table_annotations}
                         </ul>
-                    {/annotations}
-                    {?type.annotations}
-                        <strong>Type:</strong>
-                        <ul>
-                        {#type.annotations}
-                            <li><code>{key}</code>: {#complex_object}<pre>{.}</pre>{:else}{value}{/complex_object}</li>
-                        {/type.annotations}
-                        </ul>
-                    {/type.annotations}
+                    {/table_annotations}
                 </td>
             </tr>
         {/fields}

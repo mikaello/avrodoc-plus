@@ -95,7 +95,13 @@ nav#list-pane ul {
 }
 
 #list-pane > ul > li {
-  padding: 5px 12px;
+  padding: 4px 12px;
+}
+
+/* Nested schema/message items — keep tight */
+#list-pane ul ul li {
+  padding: 0;
+  margin: 0;
 }
 
 #list-pane a {
@@ -116,10 +122,22 @@ nav#list-pane ul {
   text-decoration: underline;
 }
 
-/* Namespace text in sidebar */
-#list-pane .namespace {
+/* Namespace group heading inside sidebar (e.g. "com.example.avro") */
+#list-pane p.namespace {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--pico-muted-color, #6b7280);
+  margin: 4px 0 2px 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Namespace sub-label shown beneath a type-name link */
+#list-pane a span.namespace {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: lighter;
   color: var(--pico-muted-color, #6b7280);
   padding-left: 5px;

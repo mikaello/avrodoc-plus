@@ -7,6 +7,33 @@
    Avrodoc layout — overrides on top of Pico CSS
 ----------------------------------------------- */
 
+/* ----- Custom properties — light mode defaults ----- */
+:root {
+  --avrodoc-nav-bg: #f3f3f3;
+  --avrodoc-nav-header-bg: #e8e8e8;
+  --avrodoc-nav-section-bg: #f0f0f0;
+  --avrodoc-nav-border: #d0d0d0;
+  --avrodoc-nav-selected-bg: #ffffff;
+  --avrodoc-nav-shadow: rgba(0, 0, 0, 0.10);
+}
+
+/* ----- Dark mode overrides ----- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --avrodoc-nav-bg: #1a1f2e;
+    --avrodoc-nav-header-bg: #111827;
+    --avrodoc-nav-section-bg: #161d2b;
+    --avrodoc-nav-border: #2d3748;
+    --avrodoc-nav-selected-bg: #2d3748;
+    --avrodoc-nav-shadow: rgba(0, 0, 0, 0.40);
+  }
+}
+
+/* Slightly smaller base font to keep everything compact */
+html {
+  font-size: 93%;
+}
+
 /* Remove pico's padding on body > main since we manage layout ourselves */
 body > main {
   padding: 0;
@@ -26,20 +53,20 @@ nav#list-pane ul {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 230px;
+  width: 280px;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: #f3f3f3;
-  border-right: 1px solid var(--pico-border-color, #ddd);
-  box-shadow: 0 0 20px #ddd;
+  background: var(--avrodoc-nav-bg);
+  border-right: 1px solid var(--avrodoc-nav-border);
+  box-shadow: 0 0 20px var(--avrodoc-nav-shadow);
   padding: 0;
 }
 
 .nav-home {
-  padding: 15px 18px;
-  background: #e8e8e8;
-  border-bottom: 2px solid var(--pico-border-color, #ddd);
+  padding: 10px 14px;
+  background: var(--avrodoc-nav-header-bg);
+  border-bottom: 2px solid var(--avrodoc-nav-border);
 }
 
 .nav-home a {
@@ -48,13 +75,13 @@ nav#list-pane ul {
 }
 
 #list-pane h2 {
-  font-size: 0.9rem;
-  line-height: 2rem;
-  padding: 0 18px;
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+  padding: 0 14px;
   margin: 0;
-  background: #f9f9f9;
-  border-top: 1px solid var(--pico-border-color, #ddd);
-  border-bottom: 1px solid var(--pico-border-color, #ddd);
+  background: var(--avrodoc-nav-section-bg);
+  border-top: 1px solid var(--avrodoc-nav-border);
+  border-bottom: 1px solid var(--avrodoc-nav-border);
 }
 
 #list-pane h2:first-child {
@@ -68,13 +95,13 @@ nav#list-pane ul {
 }
 
 #list-pane > ul > li {
-  padding: 15px 18px;
+  padding: 5px 12px;
 }
 
 #list-pane a {
   display: block;
   font-weight: lighter;
-  padding: 4px 0;
+  padding: 2px 0;
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -92,7 +119,7 @@ nav#list-pane ul {
 /* Namespace text in sidebar */
 #list-pane .namespace {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: lighter;
   color: var(--pico-muted-color, #6b7280);
   padding-left: 5px;
@@ -100,8 +127,8 @@ nav#list-pane ul {
 
 /* Highlight selected nav item */
 li.selected {
-  background: white;
-  box-shadow: 0 0 3px #ddd;
+  background: var(--avrodoc-nav-selected-bg);
+  box-shadow: 0 0 3px var(--avrodoc-nav-border);
   border-radius: 3px;
 }
 
@@ -136,7 +163,7 @@ ul.multiple-schemata > li.selected a {
 /* ---- Main content area ---- */
 
 #content-pane {
-  padding: 11px 25px 50px 260px;
+  padding: 11px 25px 50px 295px;
 }
 
 #content-pane h2.namespace {

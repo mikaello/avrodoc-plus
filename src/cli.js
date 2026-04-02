@@ -21,10 +21,12 @@ FLAGS:
         --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quiting)
 
 OPTIONS:
-    -i, --input <folder>     Pass in a source folder that will recursively parsed and crawled for avsc files
-    -o, --output <file>      The file where the generated doc should be written to
-        --title <title>      The title that will be used in the generated HTML page, defaults to "Avrodoc".
-    -s, --style <file>       Your own less file, used to override specific style of your generated page
+    -i, --input <folder>          Pass in a source folder that will recursively parsed and crawled for avsc files
+    -o, --output <file>           The file where the generated doc should be written to
+        --title <title>           The title that will be used in the generated HTML page, defaults to "Avrodoc".
+    -s, --style <file>            Your own less file, used to override specific style of your generated page
+        --annotation-fields <f>   Comma-separated list of annotation keys to show in field tables.
+                                  Defaults to "logicalType,aliases,order".
 
 ARGS:
     <AVRO FILES>...          If not --input is given, you can specify individual AVRO files here
@@ -44,6 +46,7 @@ const { values: argv, positionals } = parseArgs({
     title: { type: "string" },
     style: { type: "string", short: "s" },
     "ignore-invalid": { type: "boolean", default: false },
+    "annotation-fields": { type: "string" },
   },
 });
 
@@ -69,6 +72,9 @@ const outputFile = argv.output;
 const pageTitle = argv.title;
 const extraLessFile = argv.style;
 const ignoreInvalidSchemas = Boolean(argv["ignore-invalid"]);
+const annotationFields = argv["annotation-fields"]
+  ? argv["annotation-fields"].split(",").map((f) => f.trim())
+  : undefined;
 
 if (inputFiles.length === 0) {
   console.error(
@@ -88,6 +94,7 @@ createAvroDoc(
   inputFiles,
   outputFile,
   ignoreInvalidSchemas,
+  annotationFields,
 );
 
 //private stuff

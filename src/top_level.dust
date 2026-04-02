@@ -17,7 +17,7 @@
 
     <script type="text/javascript">
        jQuery(function () {
-           window.avrodoc = AvroDoc("{page_title|s}", {schemata|s});
+           window.avrodoc = AvroDoc("{page_title|s}", {schemata|s}, {avrodocOptions|s});
        });
     </script>
   </head>

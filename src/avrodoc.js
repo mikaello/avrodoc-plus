@@ -14,6 +14,7 @@ import path from "path";
  * @param {Array<string>} inputfiles an array with resolved filenames to be read and parsed and eventually added to the avrodoc
  * @param {string} outputfile the html file that should be written
  * @param {boolean} [ignoreInvalid] whether to ignore invalid JSON files
+ * @param {string[]} [annotationFields] allowlist of annotation keys to show in field tables
  * @returns {Promise<void>}
  */
 async function createAvroDoc(
@@ -22,6 +23,7 @@ async function createAvroDoc(
   inputfiles,
   outputfile,
   ignoreInvalid,
+  annotationFields,
 ) {
   console.debug(`Creating ${outputfile} from `, inputfiles);
   let schemata = inputfiles
@@ -34,6 +36,7 @@ async function createAvroDoc(
   const html = await topLevelHTML(title, extra_less_files, {
     inline: true,
     schemata,
+    annotationFields,
   });
   return await writeAvroDoc(outputfile, html);
 }

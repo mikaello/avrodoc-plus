@@ -1,7 +1,6 @@
 // @ts-check
 import express from "express";
 import morgan from "morgan";
-import lessMiddleware from "less-middleware";
 import http from "http";
 import path from "path";
 import { glob } from "glob";
@@ -31,7 +30,6 @@ const app = express();
 app.set("port", process.env.PORT ?? 8080);
 app.use(morgan("combined"));
 app.use(express.json());
-app.use(lessMiddleware(__dirname + "/public"));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", async function (req, res) {

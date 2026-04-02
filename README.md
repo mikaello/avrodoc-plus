@@ -27,16 +27,18 @@ USAGE:
     avrodoc-plus [FLAGS] [OPTIONS] [AVRO FILES...]
 
 FLAGS:
-        --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quitting)
+        --ignore-invalid     Ignore avsc files that can not be parsed as JSON (instead of quiting)
 
 OPTIONS:
-    -i, --input <folder>     Pass in a source folder that will be recursively parsed and crawled for avsc files
-    -o, --output <file>      The file where the generated doc should be written to
-        --title <title>      The title that will be used in the generated HTML page, defaults to "Avrodoc".
-    -s, --style <file>       Your own less file, used to override specific style of your generated page
+    -i, --input <folder>          Pass in a source folder that will recursively parsed and crawled for avsc files
+    -o, --output <file>           The file where the generated doc should be written to
+        --title <title>           The title that will be used in the generated HTML page, defaults to "Avrodoc".
+    -s, --style <file>            Your own less file, used to override specific style of your generated page
+        --annotation-fields <f>   Comma-separated list of annotation keys to show in field tables.
+                                  Defaults to "logicalType,aliases,order".
 
 ARGS:
-    <AVRO FILES>...          If no --input is given, you can specify individual AVRO files here
+    <AVRO FILES>...          If not --input is given, you can specify individual AVRO files here
 
 EXAMPLES:
     avrodoc-plus --ignore-invalid --input ./schemas --output avrodoc.html --title "My First Avrodoc"

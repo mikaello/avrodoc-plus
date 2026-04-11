@@ -31,7 +31,8 @@
 
   <body>
     <nav id="list-pane">
-      <button id="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme">🌙</button>
+      {! Icon set by inline script below to avoid flash of wrong icon !}
+      <button id="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme"></button>
     </nav>
     <div id="container">
       <main id="body">
@@ -44,17 +45,44 @@
     <script>
       (function () {
         var btn = document.getElementById('theme-toggle');
-        function updateIcon() {
-          var theme = document.documentElement.getAttribute('data-bs-theme');
-          btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        var html = document.documentElement;
+        var STORAGE_KEY = 'avrodoc-theme';
+
+        function systemPrefersDark() {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
-        updateIcon();
+
+        function currentTheme() {
+          return html.getAttribute('data-bs-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+          html.setAttribute('data-bs-theme', theme);
+          btn.textContent = theme === 'dark' ? '\u2600\ufe0f' : '\uD83C\uDF19';
+          btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+        }
+
+        // Set correct icon immediately (theme was already applied in <head>)
+        applyTheme(currentTheme());
+
         btn.addEventListener('click', function () {
-          var current = document.documentElement.getAttribute('data-bs-theme');
-          var next = current === 'dark' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-bs-theme', next);
-          localStorage.setItem('avrodoc-theme', next);
-          updateIcon();
+          var next = currentTheme() === 'dark' ? 'light' : 'dark';
+          applyTheme(next);
+          // If user picks same as their system default, clear the override so
+          // future OS changes are respected again automatically
+          if ((next === 'dark') === systemPrefersDark()) {
+            localStorage.removeItem(STORAGE_KEY);
+          } else {
+            localStorage.setItem(STORAGE_KEY, next);
+          }
+        });
+
+        // Keep in sync if OS setting changes while the page is open
+        // (only when the user has not manually overridden the theme)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          if (!localStorage.getItem(STORAGE_KEY)) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
         });
       })();
     </script>

@@ -56,7 +56,7 @@ function AvroDoc(page_title, input_schemata, options) {
       // Bootstrap 5 Popover API (no jQuery plugin)
       new bootstrap.Popover(el, {
         trigger: "hover",
-        placement: "auto",
+        placement: "bottom",
         container: "body",
         title: function () {
           return popover.title;
@@ -68,6 +68,18 @@ function AvroDoc(page_title, input_schemata, options) {
         sanitize: false,
         delay: { show: 200, hide: 50 },
         customClass: "avrodoc-named-type",
+        popperConfig: {
+          modifiers: [
+            {
+              name: "flip",
+              options: { fallbackPlacements: ["top", "right", "left"] },
+            },
+            {
+              name: "preventOverflow",
+              options: { altAxis: true, padding: 8 },
+            },
+          ],
+        },
       });
     });
   }

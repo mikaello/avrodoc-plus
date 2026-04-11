@@ -211,13 +211,15 @@ body {
 }
 
 /* =====================================================================
-   Dark mode toggle button (fixed in sidebar header area)
+   Dark mode toggle button — fixed over the sidebar, never overwritten
+   by DustJS rendering
    ===================================================================== */
 
 #theme-toggle {
-  position: absolute;
+  position: fixed;
   top: 10px;
-  right: 10px;
+  right: calc(100% - 220px); /* sits at right edge of the 230px sidebar */
+  z-index: 200;
   background: none;
   border: 1px solid var(--bs-border-color);
   border-radius: 4px;

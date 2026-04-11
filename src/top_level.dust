@@ -8,10 +8,8 @@
     <title>{page_title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    {content|s}
-
     <script>
-      // Apply saved theme before paint to avoid flash
+      // Apply saved/system theme before CSS loads to avoid flash
       (function () {
         var saved = localStorage.getItem('avrodoc-theme');
         if (saved) {
@@ -22,6 +20,8 @@
       })();
     </script>
 
+    {content|s}
+
     <script type="text/javascript">
        jQuery(function () {
            window.avrodoc = AvroDoc("{page_title|s}", {schemata|s}, {avrodocOptions|s});
@@ -30,10 +30,11 @@
   </head>
 
   <body>
-    <nav id="list-pane">
-      {! Icon set by inline script below to avoid flash of wrong icon !}
-      <button id="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme"></button>
-    </nav>
+    <nav id="list-pane"></nav>
+
+    {! Button lives outside #list-pane so DustJS rendering never overwrites it !}
+    <button id="theme-toggle" aria-label="Toggle theme"></button>
+
     <div id="container">
       <main id="body">
         <div id="content-pane">
@@ -58,18 +59,18 @@
 
         function applyTheme(theme) {
           html.setAttribute('data-bs-theme', theme);
-          btn.textContent = theme === 'dark' ? '\u2600\ufe0f' : '\uD83C\uDF19';
+          btn.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
           btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
         }
 
-        // Set correct icon immediately (theme was already applied in <head>)
+        // Set correct icon immediately (theme already applied in <head>)
         applyTheme(currentTheme());
 
         btn.addEventListener('click', function () {
           var next = currentTheme() === 'dark' ? 'light' : 'dark';
           applyTheme(next);
-          // If user picks same as their system default, clear the override so
-          // future OS changes are respected again automatically
+          // Clear override if user picked the same as system default,
+          // so future OS changes are respected automatically again
           if ((next === 'dark') === systemPrefersDark()) {
             localStorage.removeItem(STORAGE_KEY);
           } else {
@@ -77,8 +78,7 @@
           }
         });
 
-        // Keep in sync if OS setting changes while the page is open
-        // (only when the user has not manually overridden the theme)
+        // Sync live when OS setting changes (only if no manual override)
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
           if (!localStorage.getItem(STORAGE_KEY)) {
             applyTheme(e.matches ? 'dark' : 'light');

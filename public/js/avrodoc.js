@@ -53,9 +53,10 @@ function AvroDoc(page_title, input_schemata, options) {
       if (!popover) return;
 
       var el = this;
-      // Bootstrap 5 Popover API (no jQuery plugin)
-      new bootstrap.Popover(el, {
-        trigger: "hover",
+      var hideTimer = null;
+
+      var bsPopover = new bootstrap.Popover(el, {
+        trigger: "manual",
         placement: "bottom",
         container: "body",
         title: function () {
@@ -66,7 +67,6 @@ function AvroDoc(page_title, input_schemata, options) {
         },
         html: true,
         sanitize: false,
-        delay: { show: 200, hide: 50 },
         customClass: "avrodoc-named-type",
         popperConfig: {
           modifiers: [
@@ -80,6 +80,35 @@ function AvroDoc(page_title, input_schemata, options) {
             },
           ],
         },
+      });
+
+      function scheduleHide() {
+        hideTimer = setTimeout(function () {
+          bsPopover.hide();
+        }, 150);
+      }
+
+      function cancelHide() {
+        clearTimeout(hideTimer);
+      }
+
+      el.addEventListener("mouseenter", function () {
+        cancelHide();
+        bsPopover.show();
+      });
+
+      el.addEventListener("mouseleave", scheduleHide);
+
+      /* Once the tip is in the DOM, attach hover to it so moving the mouse
+         into the popover keeps it open. Bootstrap sets aria-describedby on
+         the trigger with the tip's id once shown. */
+      el.addEventListener("shown.bs.popover", function () {
+        var tipId = el.getAttribute("aria-describedby");
+        var tip = tipId && document.getElementById(tipId);
+        if (tip) {
+          tip.addEventListener("mouseenter", cancelHide);
+          tip.addEventListener("mouseleave", scheduleHide);
+        }
       });
     });
   }

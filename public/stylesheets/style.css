@@ -1,0 +1,252 @@
+/* avrodoc-plus layout — overrides Bootstrap 5 defaults */
+
+/* =====================================================================
+   Layout: fixed sidebar + content pane
+   ===================================================================== */
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#list-pane {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 230px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: var(--bs-body-bg);
+  border-right: 1px solid var(--bs-border-color);
+  box-shadow: 0 0 20px var(--bs-border-color);
+}
+
+#list-pane .nav-home {
+  padding: 15px 18px;
+  background-color: var(--bs-secondary-bg);
+  border-bottom: 2px solid var(--bs-border-color);
+}
+
+#list-pane .nav-home a {
+  display: block;
+  text-decoration: none;
+  color: var(--bs-link-color);
+  font-size: 15px;
+}
+
+#list-pane .nav-home a:hover {
+  text-decoration: underline;
+}
+
+#list-pane h2 {
+  font-size: 16px;
+  line-height: 32px;
+  padding: 0 18px;
+  margin: 0;
+  background-color: var(--bs-tertiary-bg);
+  border-top: 1px solid var(--bs-border-color);
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+#list-pane h2:first-child {
+  border-top: 0;
+}
+
+#list-pane ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#list-pane > ul > li {
+  padding: 15px 18px;
+}
+
+#list-pane > ul > li a {
+  display: block;
+  font-weight: 300;
+  padding: 4px 0;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--bs-body-color);
+}
+
+#list-pane > ul > li a:hover {
+  text-decoration: none;
+}
+
+#list-pane > ul > li a:hover .type-name {
+  text-decoration: underline;
+}
+
+/* Namespace label in protocol links */
+#list-pane > ul > li > a .namespace {
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--bs-secondary-color);
+  padding-left: 5px;
+}
+
+/* Message and named type links */
+#list-pane > ul > li > ul > li > a {
+  padding: 4px 6px;
+  font-size: 13px;
+}
+
+/* Selected item highlight */
+#list-pane li.selected {
+  background-color: var(--bs-secondary-bg);
+  box-shadow: 0 0 3px var(--bs-border-color);
+  border-radius: 3px;
+}
+
+/* When multiple schemata: highlight selected schema with primary colour */
+#list-pane > ul.multiple-schemata > li.selected {
+  background-color: var(--bs-primary);
+  color: var(--bs-white);
+}
+
+#list-pane > ul.multiple-schemata > li.selected a {
+  color: var(--bs-white);
+}
+
+#container {
+  margin-left: 230px;
+}
+
+#content-pane {
+  padding: 11px 25px 50px 30px;
+}
+
+#content-pane h2.namespace {
+  font-size: 14px;
+  color: var(--bs-secondary-color);
+  margin: 0;
+}
+
+#content-pane h1.type-name {
+  margin-top: 0;
+}
+
+#content-pane .type-doc {
+  margin: 1rem 0;
+}
+
+#content-pane table {
+  margin-top: 1rem;
+}
+
+/* =====================================================================
+   Popover override: wide popovers for type details
+   ===================================================================== */
+
+.popover.avrodoc-named-type {
+  max-width: 600px;
+  width: 600px;
+}
+
+.popover.avrodoc-named-type .popover-header {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popover.avrodoc-named-type .popover-header .namespace {
+  color: var(--bs-secondary-color);
+}
+
+.popover.avrodoc-named-type .popover-header .type-name {
+  font-weight: bold;
+}
+
+.popover.avrodoc-named-type .popover-body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 400px;
+  -webkit-overflow-scrolling: touch;
+  font-size: 85%;
+}
+
+.popover.avrodoc-named-type .popover-body table th,
+.popover.avrodoc-named-type .popover-body table td {
+  padding: 4px 5px;
+}
+
+/* =====================================================================
+   Search box
+   ===================================================================== */
+
+.container-search {
+  padding: 10px;
+  text-align: center;
+}
+
+#search-schemas {
+  padding: 5px;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid var(--bs-border-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  width: 100%;
+  max-width: 180px;
+}
+
+/* =====================================================================
+   Footer
+   ===================================================================== */
+
+#footer {
+  background-color: var(--bs-secondary-bg);
+  border-top: 1px solid var(--bs-border-color);
+  padding: 10px 25px;
+  font-size: 12px;
+  color: var(--bs-secondary-color);
+  text-align: center;
+}
+
+/* =====================================================================
+   Dark mode toggle button (fixed in sidebar header area)
+   ===================================================================== */
+
+#theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--bs-body-color);
+  line-height: 1.5;
+}
+
+#theme-toggle:hover {
+  background-color: var(--bs-secondary-bg);
+}
+
+/* =====================================================================
+   Print styles
+   ===================================================================== */
+
+@media print {
+  #list-pane,
+  #theme-toggle {
+    display: none;
+  }
+
+  #container {
+    margin-left: 0;
+  }
+
+  #content-pane {
+    padding: 0;
+  }
+}

@@ -1,4 +1,4 @@
-/* global dust:false, markdown:false, Sammy:false */
+/* global dust:false, markdown:false, Sammy:false, bootstrap:false */
 
 // If foo contains markdown, {foo|md|s} renders it to HTML in a Dust template
 dust.filters.md = function (value) {
@@ -52,7 +52,9 @@ function AvroDoc(page_title, input_schemata, options) {
       var popover = schema_popovers[decodeURIComponent(url_segments[3])];
       if (!popover) return;
 
-      $(this).popover({
+      var el = this;
+      // Bootstrap 5 Popover API (no jQuery plugin)
+      new bootstrap.Popover(el, {
         trigger: "hover",
         placement: "bottom",
         title: function () {
@@ -64,8 +66,7 @@ function AvroDoc(page_title, input_schemata, options) {
         html: true,
         sanitize: false,
         delay: { show: 200, hide: 50 },
-        template:
-          '<div class="popover avrodoc-named-type"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><div></div></div></div></div>',
+        customClass: "avrodoc-named-type",
       });
     });
   }
@@ -73,9 +74,14 @@ function AvroDoc(page_title, input_schemata, options) {
   // Renders the named template with the given context and updates the content pane to show the
   // result.
   function renderContentPane(template, context) {
-    // Clean up old content
+    // Clean up old content and dispose any existing Bootstrap popovers
     list_pane.find("li").removeClass("selected");
-    $("body > .popover").remove();
+    content_pane
+      .find('[data-bs-toggle="popover"], a[href^="#/schema/"]')
+      .each(function () {
+        var existingPopover = bootstrap.Popover.getInstance(this);
+        if (existingPopover) existingPopover.dispose();
+      });
     $("body").scrollTop(0);
 
     dust.render(template, context, function (err, html) {

@@ -24,7 +24,7 @@ OPTIONS:
     -i, --input <folder>          Pass in a source folder that will recursively parsed and crawled for avsc files
     -o, --output <file>           The file where the generated doc should be written to
         --title <title>           The title that will be used in the generated HTML page, defaults to "Avrodoc".
-    -s, --style <file>            Your own less file, used to override specific style of your generated page
+    -s, --style <file>            Your own CSS file, used to override specific styles of your generated page
         --annotation-fields <f>   Comma-separated list of annotation keys to show in field tables.
                                   Defaults to "logicalType,aliases,order".
 
@@ -34,7 +34,7 @@ ARGS:
 EXAMPLES:
     avrodoc-plus --ignore-invalid --input ./schemas --output avrodoc.html --title "My First Avrodoc"
 
-    avrodoc-plus --output avro.html --style my-styles.less avro_schema1.avsc avro_schema2.avsc avro_schema3.avsc
+    avrodoc-plus --output avro.html --style my-styles.css avro_schema1.avsc avro_schema2.avsc avro_schema3.avsc
 `;
 
 const { values: argv, positionals } = parseArgs({
@@ -70,7 +70,7 @@ if (positionals.length > 0) {
 
 const outputFile = argv.output;
 const pageTitle = argv.title;
-const extraLessFile = argv.style;
+const extraCssFile = argv.style;
 const ignoreInvalidSchemas = Boolean(argv["ignore-invalid"]);
 const annotationFields = argv["annotation-fields"]
   ? argv["annotation-fields"].split(",").map((f) => f.trim())
@@ -90,7 +90,7 @@ if (inputFiles.length === 0) {
 
 createAvroDoc(
   pageTitle ?? "Avrodoc",
-  extraLessFile ? [extraLessFile] : [],
+  extraCssFile ? [extraCssFile] : [],
   inputFiles,
   outputFile,
   ignoreInvalidSchemas,

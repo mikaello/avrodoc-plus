@@ -5,15 +5,14 @@ import { promisify } from "util";
 import path from "path";
 import dust from "dustjs-linkedin";
 import "dustjs-helpers";
-import less from "less";
 import { transformSync } from "esbuild";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-/** LESS stylesheets required in the browser (relative to public/ directory) */
-const client_css = ["stylesheets/style.less"];
+/** CSS stylesheets required in the browser (relative to public/ directory) */
+const client_css = ["stylesheets/bootstrap.min.css", "stylesheets/style.css"];
 
 /** JS code required in the browser (relative to public/ directory) */
 const client_js = [
@@ -21,8 +20,7 @@ const client_js = [
   "vendor/dust-core-2.7.2.js",
   "vendor/dust-helpers-1.7.4.js",
   "vendor/sammy-0.7.6.js",
-  "vendor/bootstrap-tooltip.js",
-  "vendor/bootstrap-popover.js",
+  "vendor/bootstrap.bundle.min.js",
   "vendor/markdown.js",
   "js/avrodoc.js",
   "js/schema.js",
@@ -76,81 +74,34 @@ function dustTemplates() {
 }
 
 /**
- * @param {string} type
- * @returns {(file: string) => {name: string, type: string}}
- */
-function lessFileAs(type) {
-  /**
-   * @param {string} file
-   */
-  return function (file) {
-    return { name: file, type: type };
-  };
-}
-
-/**
- * Compiles LESS stylesheets and calls callback(error, minified_css).
+ * Reads and concatenates CSS stylesheets (plain CSS, no compilation).
  *
- * @param {string[]} extra_less_files
- * @param {(err: Error | null, css?: string) => void} callback arg0=error and arg1=minified_css
- * @returns {void}
+ * @param {string[]} extra_css_files - absolute paths to additional CSS files
+ * @returns {string} concatenated CSS content
  */
-function stylesheets(extra_less_files, callback) {
-  let compiled = "",
-    to_do = 0;
-  client_css
-    .map(lessFileAs("internal"))
-    .concat(extra_less_files.map(lessFileAs("external")))
-    .forEach(function (file) {
-      if (file.name.match(/\.less$/)) {
-        to_do++;
-        const style =
-          file.type === "internal"
-            ? fs.readFileSync(path.join(public_dir, file.name), "utf-8")
-            : fs.readFileSync(file.name, "utf-8");
-        const parser = new less.Parser({
-          paths:
-            file.type === "internal"
-              ? [path.join(public_dir, "stylesheets")]
-              : "",
-          filename: file.name,
-        });
-        parser.parse(
-          style,
-          function (/** @type {Error | null} */ err, /** @type {any} */ tree) {
-            if (!err) {
-              compiled += tree.toCSS({ compress: true });
-            }
-            to_do--;
-            if (to_do === 0) {
-              to_do = -1000; // hack to avoid calling callback twice
-              callback(err, compiled);
-            }
-          },
-        );
-      }
-    });
-
-  if (to_do === 0) {
-    callback(null, compiled);
+function stylesheets(extra_css_files) {
+  let css = "";
+  for (const file of client_css) {
+    css += fs.readFileSync(path.join(public_dir, file), "utf-8");
   }
+  for (const file of extra_css_files) {
+    css += fs.readFileSync(file, "utf-8");
+  }
+  return css;
 }
 
 /**
  * Calls callback(error, html) with HTML containing URL references to all JS
  * and CSS required by the browser.
  *
- * @param {string[]} extra_less_files
+ * @param {string[]} extra_css_files
  * @param {(err: Error | null, html?: string) => void} callback arg0=error and arg1=HTML
  * @returns {void}
  */
-function remoteContent(extra_less_files, callback) {
+function remoteContent(extra_css_files, callback) {
   const html = [];
-  client_css.concat(extra_less_files).forEach(function (file) {
-    const css_file = file.replace(/\.less$/, ".css");
-    html.push(
-      '<link rel="stylesheet" type="text/css" href="/' + css_file + '"/>',
-    );
+  client_css.concat(extra_css_files).forEach(function (file) {
+    html.push('<link rel="stylesheet" type="text/css" href="/' + file + '"/>');
   });
   client_js.forEach(function (file) {
     html.push('<script type="text/javascript" src="/' + file + '"></script>');
@@ -164,48 +115,43 @@ function remoteContent(extra_less_files, callback) {
 /**
  * Returns HTML containing all JS and CSS required by the browser inline.
  *
- * @param {string[]} extra_less_files
+ * @param {string[]} extra_css_files
  * @param {(err: Error | null, html?: string) => void} callback arg0=error and arg1=HTML
  * @returns {void}
  */
-function inlineContent(extra_less_files, callback) {
-  stylesheets(extra_less_files, function (err, css) {
-    if (err) {
-      callback(err);
-      return;
-    }
+function inlineContent(extra_css_files, callback) {
+  const css = stylesheets(extra_css_files);
 
-    const html = [];
-    html.push('<style type="text/css">');
-    html.push(css);
-    html.push("</style>");
-    client_js.forEach(function (file) {
-      html.push('<script type="text/javascript">');
-      html.push(minifiedJS(path.join(public_dir, file)));
-      html.push("</script>");
-    });
+  const html = [];
+  html.push('<style type="text/css">');
+  html.push(css);
+  html.push("</style>");
+  client_js.forEach(function (file) {
     html.push('<script type="text/javascript">');
-    html.push(dustTemplates());
+    html.push(minifiedJS(path.join(public_dir, file)));
     html.push("</script>");
-    callback(null, html.join("\n"));
   });
+  html.push('<script type="text/javascript">');
+  html.push(dustTemplates());
+  html.push("</script>");
+  callback(null, html.join("\n"));
 }
 
 /**
  * Generate HTML and CSS
  *
  * @param {string} title - main title of the page
- * @param {string[]} extra_less_files
- * @param {Object} options - inline function for LESS and context options for DustJs
+ * @param {string[]} extra_css_files - absolute paths to additional plain CSS files to append
+ * @param {Object} options - context options
  * @param {boolean} [options.inline] - whether to inline CSS and JS
  * @param {any} [options.schemata] - schema data
  * @param {string[]} [options.annotationFields] - allowlist of annotation keys shown in field tables
  * @returns {Promise<string>}
  */
-function topLevelHTML(title, extra_less_files, options) {
+function topLevelHTML(title, extra_css_files, options) {
   return new Promise((resolve, reject) => {
     (options.inline ? inlineContent : remoteContent)(
-      extra_less_files,
+      extra_css_files,
       function (err, content) {
         if (err) {
           return reject(err);

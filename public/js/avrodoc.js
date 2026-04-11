@@ -68,18 +68,6 @@ function AvroDoc(page_title, input_schemata, options) {
         html: true,
         sanitize: false,
         customClass: "avrodoc-named-type",
-        popperConfig: {
-          modifiers: [
-            {
-              name: "flip",
-              options: { fallbackPlacements: ["top", "right", "left"] },
-            },
-            {
-              name: "preventOverflow",
-              options: { altAxis: true, padding: 8 },
-            },
-          ],
-        },
       });
 
       function scheduleHide() {

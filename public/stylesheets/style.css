@@ -167,8 +167,7 @@ body {
 .popover.avrodoc-named-type .popover-body {
   overflow-x: hidden;
   overflow-y: auto;
-  /* 60px ≈ popover header + borders; ensures full popover stays in viewport */
-  max-height: min(400px, calc(80vh - 60px));
+  max-height: 400px;
   -webkit-overflow-scrolling: touch;
   font-size: 85%;
 }

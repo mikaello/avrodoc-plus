@@ -9,7 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script>
-      // Apply saved/system theme before CSS loads to avoid flash
       (function () {
         var saved = localStorage.getItem('avrodoc-theme');
         if (saved) {
@@ -63,14 +62,13 @@
           btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
         }
 
-        // Set correct icon immediately (theme already applied in <head>)
         applyTheme(currentTheme());
 
         btn.addEventListener('click', function () {
           var next = currentTheme() === 'dark' ? 'light' : 'dark';
           applyTheme(next);
-          // Clear override if user picked the same as system default,
-          // so future OS changes are respected automatically again
+          /* Clear override when user picks same as system default,
+             so future OS changes are respected automatically again */
           if ((next === 'dark') === systemPrefersDark()) {
             localStorage.removeItem(STORAGE_KEY);
           } else {
@@ -78,7 +76,7 @@
           }
         });
 
-        // Sync live when OS setting changes (only if no manual override)
+        /* Sync live when OS setting changes (only if no manual override) */
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
           if (!localStorage.getItem(STORAGE_KEY)) {
             applyTheme(e.matches ? 'dark' : 'light');

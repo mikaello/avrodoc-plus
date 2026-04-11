@@ -56,7 +56,8 @@ function AvroDoc(page_title, input_schemata, options) {
       // Bootstrap 5 Popover API (no jQuery plugin)
       new bootstrap.Popover(el, {
         trigger: "hover",
-        placement: "bottom",
+        placement: "auto",
+        container: "body",
         title: function () {
           return popover.title;
         },

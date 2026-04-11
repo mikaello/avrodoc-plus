@@ -89,8 +89,11 @@ function AvroDoc(page_title, input_schemata, options) {
 
       /* Once the tip is in the DOM, attach hover to it so moving the mouse
          into the popover keeps it open. Bootstrap sets aria-describedby on
-         the trigger with the tip's id once shown. */
+         the trigger with the tip's id once shown.
+         Also cancel any pending hide: the popover animating in can briefly
+         overlap the trigger, firing a spurious mouseleave on it. */
       el.addEventListener("shown.bs.popover", function () {
+        cancelHide();
         var tipId = el.getAttribute("aria-describedby");
         var tip = tipId && document.getElementById(tipId);
         if (tip) {

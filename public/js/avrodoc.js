@@ -53,10 +53,16 @@ function AvroDoc(page_title, input_schemata, options) {
       if (!popover) return;
 
       var el = this;
+      var showTimer = null;
       var hideTimer = null;
 
+      /* animation:false makes show/hide instant, eliminating the fade-out
+         race condition where Bootstrap removes the 'show' class immediately
+         on hide() — causing show() called during that transition to restart
+         the animation and produce a blink loop. */
       var bsPopover = new bootstrap.Popover(el, {
         trigger: "manual",
+        animation: false,
         placement: "bottom",
         container: "body",
         title: function () {
@@ -70,11 +76,8 @@ function AvroDoc(page_title, input_schemata, options) {
         customClass: "avrodoc-named-type",
       });
 
-      /* After a mouseleave, wait 150ms then check whether the cursor is
-         still over the trigger or the popover tip before hiding.
-         This avoids stacking event listeners on the tip and eliminates
-         race conditions with Bootstrap's fade animation. */
       function maybeHide() {
+        clearTimeout(showTimer);
         clearTimeout(hideTimer);
         hideTimer = setTimeout(function () {
           var tipId = el.getAttribute("aria-describedby");
@@ -87,7 +90,12 @@ function AvroDoc(page_title, input_schemata, options) {
 
       el.addEventListener("mouseenter", function () {
         clearTimeout(hideTimer);
-        bsPopover.show();
+        clearTimeout(showTimer);
+        /* Small delay before showing so cursor passing through doesn't
+           trigger a flash. */
+        showTimer = setTimeout(function () {
+          bsPopover.show();
+        }, 120);
       });
 
       el.addEventListener("mouseleave", maybeHide);

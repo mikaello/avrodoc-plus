@@ -99,6 +99,20 @@ function AvroDoc(page_title, input_schemata, options) {
       });
 
       el.addEventListener("mouseleave", maybeHide);
+
+      /* Hook the tip's mouseleave once so leaving the popover also triggers
+         maybeHide. With animation:false the tip element is stable and reused,
+         so a single listener added on first show is sufficient. */
+      var tipHooked = false;
+      el.addEventListener("shown.bs.popover", function () {
+        if (tipHooked) return;
+        var tipId = el.getAttribute("aria-describedby");
+        var tip = tipId && document.getElementById(tipId);
+        if (tip) {
+          tipHooked = true;
+          tip.addEventListener("mouseleave", maybeHide);
+        }
+      });
     });
   }
 

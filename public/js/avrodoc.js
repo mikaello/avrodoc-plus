@@ -70,37 +70,27 @@ function AvroDoc(page_title, input_schemata, options) {
         customClass: "avrodoc-named-type",
       });
 
-      function scheduleHide() {
+      /* After a mouseleave, wait 150ms then check whether the cursor is
+         still over the trigger or the popover tip before hiding.
+         This avoids stacking event listeners on the tip and eliminates
+         race conditions with Bootstrap's fade animation. */
+      function maybeHide() {
+        clearTimeout(hideTimer);
         hideTimer = setTimeout(function () {
-          bsPopover.hide();
+          var tipId = el.getAttribute("aria-describedby");
+          var tip = tipId && document.getElementById(tipId);
+          if (!el.matches(":hover") && !(tip && tip.matches(":hover"))) {
+            bsPopover.hide();
+          }
         }, 150);
       }
 
-      function cancelHide() {
-        clearTimeout(hideTimer);
-      }
-
       el.addEventListener("mouseenter", function () {
-        cancelHide();
+        clearTimeout(hideTimer);
         bsPopover.show();
       });
 
-      el.addEventListener("mouseleave", scheduleHide);
-
-      /* Once the tip is in the DOM, attach hover to it so moving the mouse
-         into the popover keeps it open. Bootstrap sets aria-describedby on
-         the trigger with the tip's id once shown.
-         Also cancel any pending hide: the popover animating in can briefly
-         overlap the trigger, firing a spurious mouseleave on it. */
-      el.addEventListener("shown.bs.popover", function () {
-        cancelHide();
-        var tipId = el.getAttribute("aria-describedby");
-        var tip = tipId && document.getElementById(tipId);
-        if (tip) {
-          tip.addEventListener("mouseenter", cancelHide);
-          tip.addEventListener("mouseleave", scheduleHide);
-        }
-      });
+      el.addEventListener("mouseleave", maybeHide);
     });
   }
 

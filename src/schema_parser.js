@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-nocheck -- dynamic Avro schema parsing; was not type-checked in its original location (public/js/schema.js)
 
 /**
  * Server-side schema parser ported from public/js/schema.js

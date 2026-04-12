@@ -30,7 +30,7 @@
     "eslint-plugin-jest": "29.15.2",
     "express": "5.2.1",
     "glob": "13.0.6",
-    "globals": "17.4.0",
+    "globals": "17.5.0",
     "jest": "30.3.0",
     "morgan": "1.10.1",
     "prettier": "3.8.2",

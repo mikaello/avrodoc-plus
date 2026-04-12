@@ -16,9 +16,9 @@
     "format": "prettier --write \"**/!(vendor|stylesheets|bootstrap)/(*.ts?(x)|*.js?(x))|*.json|*.css|*.html|*.md)\""
   },
   "dependencies": {
-    "dustjs-helpers": "1.7.4",
-    "dustjs-linkedin": "3.0.1",
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "marked": "^18.0.0",
+    "nunjucks": "^3.2.4"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -26,6 +26,7 @@
     "@types/morgan": "1.9.10",
     "@types/node": "25.9.5",
     "eslint": "10.8.0",
+    "@types/nunjucks": "^3.2.6",
     "eslint-config-prettier": "10.1.8",
     "express": "5.2.1",
     "glob": "13.0.6",
@@ -35,11 +36,6 @@
     "typescript": "7.0.2"
   },
   "prettier": {},
-  "overrides": {
-    "dustjs-helpers": {
-      "dustjs-linkedin": "$dustjs-linkedin"
-    }
-  },
   "engines": {
     "node": ">=18.x"
   },

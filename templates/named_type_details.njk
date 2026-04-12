@@ -1,0 +1,115 @@
+{% if doc %}<div class="type-doc">{{ doc | markdown | safe }}</div>{% endif %}
+
+{% if is_record %}
+    {% if fields and fields.length > 0 %}
+        <h3>Fields</h3>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr><th>Type</th><th>Field</th><th>Default Value</th><th>Description</th><th>Annotations</th></tr>
+            </thead>
+            <tbody>
+            {% for field in fields %}
+                <tr>
+                    <td class="type">{{ field.type | inlineType | safe }}</td>
+                    <td class="field">{{ field.name }}{% if field.order %} <span class="badge text-bg-secondary">{{ field.order }}</span>{% endif %}</td>
+                    <td class="field-doc">{{ field.default_str }}</td>
+                    <td class="field-doc">{{ field.doc | markdown | safe }}</td>
+                    <td class="field-doc">
+                        {% if field.table_annotations %}
+                            <ul>{% for ann in field.table_annotations %}<li><code>{{ ann.key }}</code>: {% if ann.complex_object %}<pre>{{ ann.complex_object }}</pre>{% else %}{{ ann.value }}{% endif %}</li>{% endfor %}</ul>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>This record has no fields.</p>
+    {% endif %}
+    {% if annotations %}{% include "annotations_list.njk" %}{% endif %}
+{% endif %}
+
+{% if is_enum %}
+    {% if symbols and symbols.length > 0 %}
+        <p>Enum symbols:</p>
+        {% for symbol in symbols %}<code>{{ symbol }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+    {% else %}
+        <p>This enum has no symbols.</p>
+    {% endif %}
+    {% if annotations %}{% include "annotations_list.njk" %}{% endif %}
+{% endif %}
+
+{% if is_fixed %}
+    <p>Fixed-length byte string ({{ size }} bytes)</p>
+{% endif %}
+
+{% if is_protocol %}
+    <h3>Messages</h3>
+    {% if sorted_messages and sorted_messages.length > 0 %}
+        <table class="table table-striped table-hover">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+            {% for msg in sorted_messages %}
+                <tr>
+                    <td class="name"><a href="{{ msg.link }}">{{ msg.name }}</a>{% if msg['one-way'] %} <span class="badge text-bg-secondary">One-Way</span>{% endif %}</td>
+                    <td class="message-doc">{{ msg.doc | markdown | safe }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>This protocol has no messages.</p>
+    {% endif %}
+    {% if annotations %}{% include "annotations_list.njk" %}{% endif %}
+{% endif %}
+
+{% if is_message %}
+    {% if request and request.length > 0 %}
+        <h3>Method Parameters</h3>
+        <table class="table table-striped table-hover">
+            <thead><tr><th>Type</th><th>Field</th><th>Default Value</th><th>Description</th><th>Annotations</th></tr></thead>
+            <tbody>
+            {% for param in request %}
+                <tr>
+                    <td class="type">{{ param.type | inlineType | safe }}</td>
+                    <td class="field">{{ param.name }}</td>
+                    <td class="field-doc">{{ param.default_str }}</td>
+                    <td class="field-doc">{{ param.doc | markdown | safe }}</td>
+                    <td class="field-doc">
+                        {% if param.table_annotations %}
+                            <ul>{% for ann in param.table_annotations %}<li><code>{{ ann.key }}</code>: {% if ann.complex_object %}<pre>{{ ann.complex_object }}</pre>{% else %}{{ ann.value }}{% endif %}</li>{% endfor %}</ul>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if response and response.type %}
+        <h3>Return Type</h3>
+        <table class="table table-striped table-hover">
+            <thead><tr><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td class="type">{{ response | inlineType | safe }}</td>
+                    <td class="field-doc">{{ response.doc | markdown | safe }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {% endif %}
+    {% if errors and errors.length > 0 %}
+        <h3>Errors</h3>
+        <table class="table table-striped table-hover">
+            <thead><tr><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+            {% for error in errors %}
+                <tr>
+                    <td class="type">{{ error | inlineType | safe }}</td>
+                    <td class="field-doc">{{ error.doc | markdown | safe }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if annotations %}{% include "annotations_list.njk" %}{% endif %}
+{% endif %}

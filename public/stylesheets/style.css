@@ -11,6 +11,11 @@ body {
   height: 100%;
 }
 
+/* Bootstrap 5 defaults to 16px; restore the original 14px body text. */
+body {
+  font-size: 14px;
+}
+
 #list-pane {
   position: fixed;
   z-index: 100;

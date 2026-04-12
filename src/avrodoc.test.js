@@ -1,21 +1,27 @@
 import { createAvroDoc } from "./avrodoc.js";
 import { readFileSync, unlinkSync } from "fs";
+import { test, after, describe } from "node:test";
+import assert from "node:assert/strict";
 
 describe("test HTML generation", () => {
-  const testFile = "jestTest.html";
+  const testFile = "nodeTest.html";
 
-  afterAll(() => {
-    // Cleanup
+  after(() => {
     unlinkSync(testFile);
   });
 
   test("avrodoc creates documentation", async () => {
-    await expect(
-      createAvroDoc("Test: Avrodoc", [], ["./schemata/example.avsc"], testFile),
-    ).resolves.toBeUndefined();
+    await createAvroDoc(
+      "Test: Avrodoc",
+      [],
+      ["./schemata/example.avsc"],
+      testFile,
+    );
 
-    expect(readFileSync(testFile, "utf-8")).toContain(
-      '<!DOCTYPE html><html lang="en">',
+    assert.ok(
+      readFileSync(testFile, "utf-8").includes(
+        '<!DOCTYPE html><html lang="en">',
+      ),
     );
   });
 });

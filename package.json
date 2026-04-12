@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "dustjs-helpers": "1.7.4",
-    "dustjs-linkedin": "2.7.5",
+    "dustjs-linkedin": "3.0.0",
     "esbuild": "0.28.0"
   },
   "devDependencies": {

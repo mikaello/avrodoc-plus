@@ -44,6 +44,30 @@ function AvroDoc(page_title, input_schemata, options) {
 
   // Configures all links to types in the current content pane to show popovers on hover.
   function setupPopovers() {
+    /* Shared state across all popover instances — only one popover open at
+       a time. Sharing the timers means mouseenter on a new trigger cancels
+       any pending hide from the previous one (and vice versa). */
+    var showTimer = null;
+    var hideTimer = null;
+    var activePopover = null;
+    var activeTrigger = null;
+    var activeTip = null;
+
+    function scheduleHide() {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () {
+        var trigHovered = activeTrigger && activeTrigger.matches(":hover");
+        var tipHovered = activeTip && activeTip.matches(":hover");
+        if (!trigHovered && !tipHovered && activePopover) {
+          activePopover.hide();
+          activePopover = null;
+          activeTrigger = null;
+          activeTip = null;
+        }
+      }, 150);
+    }
+
     content_pane.find('a[href^="#/schema/"]').each(function () {
       var url_segments = $(this).attr("href").split("/");
       var schema_popovers =
@@ -53,13 +77,9 @@ function AvroDoc(page_title, input_schemata, options) {
       if (!popover) return;
 
       var el = this;
-      var showTimer = null;
-      var hideTimer = null;
 
-      /* animation:false makes show/hide instant, eliminating the fade-out
-         race condition where Bootstrap removes the 'show' class immediately
-         on hide() — causing show() called during that transition to restart
-         the animation and produce a blink loop. */
+      /* animation:false makes show/hide instant — no fade-transition race
+         conditions where calling show() during a hide() blinks the popover. */
       var bsPopover = new bootstrap.Popover(el, {
         trigger: "manual",
         animation: false,
@@ -76,42 +96,36 @@ function AvroDoc(page_title, input_schemata, options) {
         customClass: "avrodoc-named-type",
       });
 
-      function maybeHide() {
-        clearTimeout(showTimer);
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(function () {
-          var tipId = el.getAttribute("aria-describedby");
-          var tip = tipId && document.getElementById(tipId);
-          if (!el.matches(":hover") && !(tip && tip.matches(":hover"))) {
-            bsPopover.hide();
-          }
-        }, 150);
-      }
-
       el.addEventListener("mouseenter", function () {
         clearTimeout(hideTimer);
         clearTimeout(showTimer);
-        /* Small delay before showing so cursor passing through doesn't
+        /* Close any different popover that is currently open. */
+        if (activePopover && activePopover !== bsPopover) {
+          activePopover.hide();
+        }
+        /* Small show-delay so the cursor merely passing through doesn't
            trigger a flash. */
         showTimer = setTimeout(function () {
+          activePopover = bsPopover;
+          activeTrigger = el;
           bsPopover.show();
         }, 120);
       });
 
-      el.addEventListener("mouseleave", maybeHide);
+      el.addEventListener("mouseleave", scheduleHide);
 
-      /* Hook the tip's mouseleave once so leaving the popover also triggers
-         maybeHide. With animation:false the tip element is stable and reused,
-         so a single listener added on first show is sufficient. */
-      var tipHooked = false;
+      /* After first show, hook the tip's mouseleave so moving the mouse
+         directly out of the popover (without returning to the trigger)
+         also schedules a hide. The tip element is stable with animation:false
+         so we only need to attach once. */
       el.addEventListener("shown.bs.popover", function () {
-        if (tipHooked) return;
         var tipId = el.getAttribute("aria-describedby");
         var tip = tipId && document.getElementById(tipId);
-        if (tip) {
-          tipHooked = true;
-          tip.addEventListener("mouseleave", maybeHide);
+        if (tip && !tip._avrodocHooked) {
+          tip._avrodocHooked = true;
+          tip.addEventListener("mouseleave", scheduleHide);
         }
+        activeTip = tip || null;
       });
     });
   }

@@ -1,11 +1,8 @@
-{! This template is not in the templates directory as its rendered on the server,
-   whereas all the others are rendered in the brower. !}
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>{page_title}</title>
+    <title>{{ page_title }}</title>
     <meta name="viewport" content="width=1200">
 
     <script>
@@ -19,25 +16,20 @@
       })();
     </script>
 
-    {content|s}
+    {{ content | safe }}
 
-    <script type="text/javascript">
-       jQuery(function () {
-           window.avrodoc = AvroDoc("{page_title|s}", {schemata|s}, {avrodocOptions|s});
-       });
-    </script>
+    <script id="popover-data" type="application/json">{{ popover_data | safe }}</script>
   </head>
 
   <body>
-    <nav id="list-pane"></nav>
+    <nav id="list-pane">{{ list_pane_html | safe }}</nav>
 
-    {! Button lives outside #list-pane so DustJS rendering never overwrites it !}
     <button id="theme-toggle" aria-label="Toggle theme"></button>
 
     <div id="container">
       <main id="body">
         <div id="content-pane">
-          Loading...
+          {{ sections_html | safe }}
         </div>
       </main>
       <footer id="footer"></footer>
@@ -67,8 +59,6 @@
         btn.addEventListener('click', function () {
           var next = currentTheme() === 'dark' ? 'light' : 'dark';
           applyTheme(next);
-          /* Clear override when user picks same as system default,
-             so future OS changes are respected automatically again */
           if ((next === 'dark') === systemPrefersDark()) {
             localStorage.removeItem(STORAGE_KEY);
           } else {
@@ -76,7 +66,6 @@
           }
         });
 
-        /* Sync live when OS setting changes (only if no manual override) */
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
           if (!localStorage.getItem(STORAGE_KEY)) {
             applyTheme(e.matches ? 'dark' : 'light');

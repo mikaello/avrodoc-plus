@@ -199,6 +199,14 @@ body {
 .container-search {
   padding: 10px;
   text-align: center;
+  /* The showNamespace checkbox+label are float:left — clear them so the
+     container fully wraps them and the ul below starts below this block. */
+  overflow: hidden;
+}
+
+/* Space between the search/namespace controls and the first schema list item. */
+#list-pane ul.types {
+  margin-top: 8px;
 }
 
 #search-schemas {

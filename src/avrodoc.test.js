@@ -18,10 +18,6 @@ describe("test HTML generation", () => {
       testFile,
     );
 
-    assert.ok(
-      readFileSync(testFile, "utf-8").includes(
-        'data-route="#/"',
-      ),
-    );
+    assert.ok(readFileSync(testFile, "utf-8").includes('data-route="#/"'));
   });
 });

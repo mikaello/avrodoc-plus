@@ -2,16 +2,22 @@
    whereas all the others are rendered in the brower. !}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>{page_title}</title>
+    <meta name="viewport" content="width=1200">
 
-    {! iOS Safari treats the position:fixed sidebar very weirdly at non-default zoom levels,
-       so just disable zooming for now. It looks good on an iPad, but on an iPhone the text
-       is unreadably small. Allowing zoom wouldn't help though, because of the weird
-       position:fixed behaviour. If we want to support iPhone that'll need design thinking. !}
-    <meta name="viewport" content="width=1000, user-scalable=no">
+    <script>
+      (function () {
+        var saved = localStorage.getItem('avrodoc-theme');
+        if (saved) {
+          document.documentElement.setAttribute('data-bs-theme', saved);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+      })();
+    </script>
 
     {content|s}
 
@@ -24,6 +30,10 @@
 
   <body>
     <nav id="list-pane"></nav>
+
+    {! Button lives outside #list-pane so DustJS rendering never overwrites it !}
+    <button id="theme-toggle" aria-label="Toggle theme"></button>
+
     <div id="container">
       <main id="body">
         <div id="content-pane">
@@ -32,5 +42,47 @@
       </main>
       <footer id="footer"></footer>
     </div>
+    <script>
+      (function () {
+        var btn = document.getElementById('theme-toggle');
+        var html = document.documentElement;
+        var STORAGE_KEY = 'avrodoc-theme';
+
+        function systemPrefersDark() {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function currentTheme() {
+          return html.getAttribute('data-bs-theme') || 'light';
+        }
+
+        function applyTheme(theme) {
+          html.setAttribute('data-bs-theme', theme);
+          btn.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+          btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+        }
+
+        applyTheme(currentTheme());
+
+        btn.addEventListener('click', function () {
+          var next = currentTheme() === 'dark' ? 'light' : 'dark';
+          applyTheme(next);
+          /* Clear override when user picks same as system default,
+             so future OS changes are respected automatically again */
+          if ((next === 'dark') === systemPrefersDark()) {
+            localStorage.removeItem(STORAGE_KEY);
+          } else {
+            localStorage.setItem(STORAGE_KEY, next);
+          }
+        });
+
+        /* Sync live when OS setting changes (only if no manual override) */
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+          if (!localStorage.getItem(STORAGE_KEY)) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

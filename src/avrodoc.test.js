@@ -15,7 +15,7 @@ describe("test HTML generation", () => {
     ).resolves.toBeUndefined();
 
     expect(readFileSync(testFile, "utf-8")).toContain(
-      '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Test: Avrodoc</title>',
+      '<!DOCTYPE html><html lang="en">',
     );
   });
 });

@@ -1,4 +1,4 @@
-/* global dust:false, markdown:false, Sammy:false */
+/* global dust:false, markdown:false, Sammy:false, bootstrap:false */
 
 // If foo contains markdown, {foo|md|s} renders it to HTML in a Dust template
 dust.filters.md = function (value) {
@@ -44,6 +44,30 @@ function AvroDoc(page_title, input_schemata, options) {
 
   // Configures all links to types in the current content pane to show popovers on hover.
   function setupPopovers() {
+    /* Shared state across all popover instances — only one popover open at
+       a time. Sharing the timers means mouseenter on a new trigger cancels
+       any pending hide from the previous one (and vice versa). */
+    var showTimer = null;
+    var hideTimer = null;
+    var activePopover = null;
+    var activeTrigger = null;
+    var activeTip = null;
+
+    function scheduleHide() {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () {
+        var trigHovered = activeTrigger && activeTrigger.matches(":hover");
+        var tipHovered = activeTip && activeTip.matches(":hover");
+        if (!trigHovered && !tipHovered && activePopover) {
+          activePopover.hide();
+          activePopover = null;
+          activeTrigger = null;
+          activeTip = null;
+        }
+      }, 150);
+    }
+
     content_pane.find('a[href^="#/schema/"]').each(function () {
       var url_segments = $(this).attr("href").split("/");
       var schema_popovers =
@@ -52,9 +76,15 @@ function AvroDoc(page_title, input_schemata, options) {
       var popover = schema_popovers[decodeURIComponent(url_segments[3])];
       if (!popover) return;
 
-      $(this).popover({
-        trigger: "hover",
+      var el = this;
+
+      /* animation:false makes show/hide instant — no fade-transition race
+         conditions where calling show() during a hide() blinks the popover. */
+      var bsPopover = new bootstrap.Popover(el, {
+        trigger: "manual",
+        animation: false,
         placement: "bottom",
+        container: "body",
         title: function () {
           return popover.title;
         },
@@ -63,9 +93,39 @@ function AvroDoc(page_title, input_schemata, options) {
         },
         html: true,
         sanitize: false,
-        delay: { show: 200, hide: 50 },
-        template:
-          '<div class="popover avrodoc-named-type"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><div></div></div></div></div>',
+        customClass: "avrodoc-named-type",
+      });
+
+      el.addEventListener("mouseenter", function () {
+        clearTimeout(hideTimer);
+        clearTimeout(showTimer);
+        /* Close any different popover that is currently open. */
+        if (activePopover && activePopover !== bsPopover) {
+          activePopover.hide();
+        }
+        /* Small show-delay so the cursor merely passing through doesn't
+           trigger a flash. */
+        showTimer = setTimeout(function () {
+          activePopover = bsPopover;
+          activeTrigger = el;
+          bsPopover.show();
+        }, 120);
+      });
+
+      el.addEventListener("mouseleave", scheduleHide);
+
+      /* After first show, hook the tip's mouseleave so moving the mouse
+         directly out of the popover (without returning to the trigger)
+         also schedules a hide. The tip element is stable with animation:false
+         so we only need to attach once. */
+      el.addEventListener("shown.bs.popover", function () {
+        var tipId = el.getAttribute("aria-describedby");
+        var tip = tipId && document.getElementById(tipId);
+        if (tip && !tip._avrodocHooked) {
+          tip._avrodocHooked = true;
+          tip.addEventListener("mouseleave", scheduleHide);
+        }
+        activeTip = tip || null;
       });
     });
   }
@@ -73,9 +133,14 @@ function AvroDoc(page_title, input_schemata, options) {
   // Renders the named template with the given context and updates the content pane to show the
   // result.
   function renderContentPane(template, context) {
-    // Clean up old content
+    // Clean up old content and dispose any existing Bootstrap popovers
     list_pane.find("li").removeClass("selected");
-    $("body > .popover").remove();
+    content_pane
+      .find('[data-bs-toggle="popover"], a[href^="#/schema/"]')
+      .each(function () {
+        var existingPopover = bootstrap.Popover.getInstance(this);
+        if (existingPopover) existingPopover.dispose();
+      });
     $("body").scrollTop(0);
 
     dust.render(template, context, function (err, html) {

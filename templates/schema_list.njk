@@ -1,0 +1,63 @@
+<div class="nav-home">
+    <a href="#/" title="Back to main frame">
+        <strong>{{ page_title }}</strong>
+    </a>
+</div>
+
+{% if protocols and protocols.length > 0 %}
+    <h2>Protocols</h2>
+    <ul class="protocols">
+        {% for protocol in protocols %}
+            <li>
+                <a href="{{ protocol.shared_link }}" title="{{ protocol.qualified_name }}">
+                    <span class="type-name">{{ protocol.name }}</span>
+                    <span class="namespace">{{ protocol.namespace }}</span>
+                </a>
+
+                <ul>
+                    {% for msg in protocol.sorted_messages %}
+                        <li>
+                            <a href="{{ msg.shared_link }}" title="{{ msg.name }} message of protocol {{ msg.protocol_name }}">
+                                <span class="type-name">{{ msg.name }}</span>
+                                {% if msg['one-way'] %} <span class="badge text-bg-secondary">One-Way</span> {% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h2>Types</h2>
+<div class="container-search">
+    <div>
+        <span>Search for your schema</span>
+    </div>
+    <input id="search-schemas">
+    <div style="text-align: left;">
+        <input id="showNamespace" type="checkbox" style="float: left; margin-left: 20px;" checked="checked">
+        <label style="font-size: 0.8em; float: left; margin-left: 5px;" for="showNamespace">Show the whole namespace that contains a matching Schema</label>
+    </div>
+</div>
+<ul class="types">
+    {% for ns in namespaces %}
+        <li data-namespace="{{ ns.namespace }}" data-schemas="{% for type in ns.types %}{{ type.name }}{% if not loop.last %},{% endif %}{% endfor %}">
+            <p class="namespace">{{ ns.namespace }}</p>
+            {% if ns.types %}
+                {% for type in ns.types %}
+                    <ul class="schema" data-schema="{{ type.name }}">
+                        <li>
+                            <a href="{{ type.shared_link }}" title="{{ type.qualified_name }}">
+                                <span class="type-name">{{ type.name }}</span>
+                                {% if type.is_enum %} <span class="badge text-bg-secondary">Enum</span> {% endif %}
+                                {% if type.is_root_type %} <span class="badge text-bg-info">Root</span> {% endif %}
+                                {% if type.is_error %} <span class="badge text-bg-secondary">Error</span> {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

@@ -21,7 +21,7 @@ describe("test HTML generation", () => {
 
     assert.ok(
       readFileSync(testFile, "utf-8").includes(
-        '<!DOCTYPE html><html lang="en">',
+        'data-route="#/"',
       ),
     );
   });

@@ -1,0 +1,37 @@
+{% if namespace %}<h2 class="namespace">{{ namespace }}</h2>{% endif %}
+<h1 class="type-name">{{ name }}</h1>
+
+{% if versions %}
+    {% for version in versions %}
+        {% if version.definitions %}
+            <p>Defined in:</p>
+            <ul>
+                {% for def in version.definitions %}<li>{{ def.filename }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+        {% set doc = version.doc %}
+        {% set is_record = version.is_record %}
+        {% set is_enum = version.is_enum %}
+        {% set is_fixed = version.is_fixed %}
+        {% set is_protocol = version.is_protocol %}
+        {% set is_message = version.is_message %}
+        {% set fields = version.fields %}
+        {% set symbols = version.symbols %}
+        {% set size = version.size %}
+        {% set sorted_messages = version.sorted_messages %}
+        {% set request = version.request %}
+        {% set response = version.response %}
+        {% set errors = version.errors %}
+        {% set annotations = version.annotations %}
+        {% set order = version.order %}
+        {% include "named_type_details.njk" %}
+    {% endfor %}
+{% else %}
+    {% if definitions %}
+        <p>Defined in:</p>
+        <ul>
+            {% for def in definitions %}<li>{{ def.filename }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+    {% include "named_type_details.njk" %}
+{% endif %}

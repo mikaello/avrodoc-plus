@@ -33,7 +33,7 @@
     "globals": "17.4.0",
     "jest": "30.3.0",
     "morgan": "1.10.1",
-    "prettier": "3.8.1",
+    "prettier": "3.8.2",
     "typescript": "6.0.2"
   },
   "prettier": {},

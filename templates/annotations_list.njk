@@ -1,0 +1,23 @@
+<h3>Annotations</h3>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Annotation</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for ann in annotations %}
+        <tr>
+            <td class="type">{{ ann.key }}</td>
+            {% if ann.linked_type %}
+                <td class="field-doc">{{ ann.linked_type | inlineType | safe }}</td>
+            {% elif ann.complex_object %}
+                <td class="field-doc"><pre>{{ ann.complex_object }}</pre></td>
+            {% else %}
+                <td class="field-doc">{{ ann.value }}</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

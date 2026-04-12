@@ -6,10 +6,13 @@ function AvroDoc() {
 }
 
 (function () {
-    var popoverDataEl = document.getElementById('popover-data');
     var popoverData = {};
-    if (popoverDataEl) {
-        try { popoverData = JSON.parse(popoverDataEl.textContent || '{}'); } catch { /* ignore */ }
+
+    function loadPopoverData() {
+        var el = document.getElementById('popover-data');
+        if (el) {
+            try { popoverData = JSON.parse(el.textContent || '{}'); } catch { /* ignore */ }
+        }
     }
 
     var showTimer = null;
@@ -124,6 +127,7 @@ function AvroDoc() {
     window.addEventListener('hashchange', handleRoute);
 
     document.addEventListener('DOMContentLoaded', function () {
+        loadPopoverData();
         handleRoute();
         setupSearch();
     });

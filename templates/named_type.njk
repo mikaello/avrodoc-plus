@@ -1,6 +1,7 @@
 {% if namespace %}<h2 class="namespace">{{ namespace }}</h2>{% endif %}
 <h1 class="type-name">{{ name }}</h1>
 
+<div class="type-details">
 {% if versions %}
     {% for version in versions %}
         {% if version.definitions %}
@@ -35,3 +36,4 @@
     {% endif %}
     {% include "named_type_details.njk" %}
 {% endif %}
+</div>

@@ -23,6 +23,17 @@ describe("test HTML generation", () => {
   });
 });
 
+describe("bare primitive type schema", () => {
+  test("resolves a schema file whose entire content is a bare primitive string", () => {
+    // A valid Avro schema can be just a primitive type name string like "boolean".
+    // readJSON returns the JS string 'boolean' after JSON.parse; parseAvroSchema
+    // must not call JSON.parse again on it.
+    assert.doesNotThrow(() => {
+      buildAvroDocContext([{ filename: "bare_primitive.avsc", json: "boolean" }]);
+    });
+  });
+});
+
 describe("cross-file type reference ordering", () => {
   test("resolves type references when referencing file sorts before defining file", () => {
     // cross_ref_a_referrer.avsc references com.example.crossref.ZLogLevel

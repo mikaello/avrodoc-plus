@@ -6,19 +6,6 @@ function AvroDoc() {
 }
 
 (function () {
-  var popoverData = {};
-
-  function loadPopoverData() {
-    var el = document.getElementById("popover-data");
-    if (el) {
-      try {
-        popoverData = JSON.parse(el.textContent || "{}");
-      } catch {
-        /* ignore */
-      }
-    }
-  }
-
   var showTimer = null;
   var hideTimer = null;
   var activePopover = null;
@@ -58,23 +45,25 @@ function AvroDoc() {
         if (bootstrap.Popover.getInstance(el)) return;
 
         var href = el.getAttribute("href") || "";
-        var urlSegments = href.split("/");
-        if (urlSegments.length < 4) return;
-        var schemaPopovers = popoverData[decodeURIComponent(urlSegments[2])];
-        if (!schemaPopovers) return;
-        var popover = schemaPopovers[decodeURIComponent(urlSegments[3])];
-        if (!popover) return;
+        var section = findSection(href);
+        if (!section) return;
+
+        var nsEl = section.querySelector("h2.namespace");
+        var nameEl = section.querySelector("h1.type-name");
+        var titleHtml = "";
+        if (nsEl) titleHtml += '<span class="namespace">' + nsEl.innerHTML + ".</span>";
+        if (nameEl) titleHtml += '<span class="type-name">' + nameEl.innerHTML + "</span>";
+
+        var detailsEl = section.querySelector(".type-details");
 
         var bsPopover = new bootstrap.Popover(el, {
           trigger: "manual",
           animation: false,
           placement: "bottom",
           container: "body",
-          title: function () {
-            return popover.title;
-          },
+          title: titleHtml,
           content: function () {
-            return popover.content;
+            return detailsEl ? detailsEl.innerHTML : section.innerHTML;
           },
           html: true,
           sanitize: false,
@@ -175,7 +164,6 @@ function AvroDoc() {
   });
 
   document.addEventListener("DOMContentLoaded", function () {
-    loadPopoverData();
     handleRoute();
     setupSearch();
   });

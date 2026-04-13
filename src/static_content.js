@@ -204,28 +204,6 @@ function renderSections(ctx) {
 }
 
 /**
- * Build the popover data JSON string (pre-rendered title+content for each named type).
- * @param {{ schema_by_name: Record<string, any> }} ctx
- * @returns {string}
- */
-function buildPopoverData(ctx) {
-  /** @type {Record<string, Record<string, {title: string, content: string}>>} */
-  const popoverData = {};
-
-  for (const [filename, schema] of Object.entries(ctx.schema_by_name)) {
-    popoverData[filename] = {};
-    for (const [qualified_name, type] of Object.entries(schema.named_types)) {
-      const title = nunjucksEnv.render("popover_title.njk", type).trim();
-      const content = nunjucksEnv.render("named_type_details.njk", type);
-      popoverData[filename][qualified_name] = { title, content };
-    }
-  }
-
-  // Escape </script> sequences to prevent breaking inline JSON script tags
-  return JSON.stringify(popoverData).replace(/<\//g, "<\\/");
-}
-
-/**
  * Generate HTML and CSS
  *
  * @param {string} title - main title of the page
@@ -255,14 +233,12 @@ async function topLevelHTML(title, extra_css_files, options) {
 
   const list_pane_html = renderListPane(ctx);
   const sections_html = renderSections(ctx);
-  const popover_data = buildPopoverData(ctx);
 
   return nunjucksEnv.render("top_level.njk", {
     page_title,
     content,
     list_pane_html,
     sections_html,
-    popover_data,
   });
 }
 

@@ -1,0 +1,7 @@
+{
+  "type": "enum",
+  "name": "ZLogLevel",
+  "namespace": "com.example.crossref",
+  "doc": "Enum defined in a file that sorts after the file referencing it",
+  "symbols": ["DEBUG", "INFO", "WARN", "ERROR"]
+}

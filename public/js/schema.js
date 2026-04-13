@@ -697,10 +697,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return decorate(protocol);
   }
 
-  if (typeof schema_json === "string") {
-    schema_json = JSON.parse(schema_json);
-  }
-
   if (isObject(schema_json) && schema_json.protocol) {
     _public.root_type = parseProtocol(schema_json);
   } else {

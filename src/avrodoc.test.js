@@ -73,8 +73,6 @@ describe("bare primitive type schema", () => {
         testFile,
       ),
     );
-    assert.ok(
-      readFileSync(testFile, "utf-8").includes("bare_primitive.avsc"),
-    );
+    assert.ok(readFileSync(testFile, "utf-8").includes("bare_primitive.avsc"));
   });
 });

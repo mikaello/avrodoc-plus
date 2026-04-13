@@ -1,4 +1,5 @@
 import { createAvroDoc } from "./avrodoc.js";
+import { buildAvroDocContext } from "./schema_parser.js";
 import { readFileSync, unlinkSync } from "fs";
 import { test, after, describe } from "node:test";
 import assert from "node:assert/strict";
@@ -19,5 +20,27 @@ describe("test HTML generation", () => {
     );
 
     assert.ok(readFileSync(testFile, "utf-8").includes('data-route="#/"'));
+  });
+});
+
+describe("cross-file type reference ordering", () => {
+  test("resolves type references when referencing file sorts before defining file", () => {
+    // cross_ref_a_referrer.avsc references com.example.crossref.ZLogLevel
+    // cross_ref_z_types.avsc defines ZLogLevel
+    // alphabetical order puts the referrer first — this must still work
+    const referrerJson = JSON.parse(
+      readFileSync("./schemata/cross_ref_a_referrer.avsc", "utf-8"),
+    );
+    const definesJson = JSON.parse(
+      readFileSync("./schemata/cross_ref_z_types.avsc", "utf-8"),
+    );
+
+    // Pass schemata in the problematic order (referrer first, definition second)
+    assert.doesNotThrow(() => {
+      buildAvroDocContext([
+        { filename: "cross_ref_a_referrer.avsc", json: referrerJson },
+        { filename: "cross_ref_z_types.avsc", json: definesJson },
+      ]);
+    }, "should resolve cross-file type reference regardless of input order");
   });
 });

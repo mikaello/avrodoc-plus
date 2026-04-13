@@ -476,6 +476,35 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
             
         </li>
     
+        <li data-namespace="com.example.crossref" data-schemas="Referrer,ZLogLevel">
+            <p class="namespace">com.example.crossref</p>
+            
+                
+                    <ul class="schema" data-schema="Referrer">
+                        <li>
+                            <a href="#/schema/com.example.crossref.Referrer" title="com.example.crossref.Referrer">
+                                <span class="type-name">Referrer</span>
+                                
+                                
+                                
+                            </a>
+                        </li>
+                    </ul>
+                
+                    <ul class="schema" data-schema="ZLogLevel">
+                        <li>
+                            <a href="#/schema/com.example.crossref.ZLogLevel" title="com.example.crossref.ZLogLevel">
+                                <span class="type-name">ZLogLevel</span>
+                                 <span class="badge text-bg-secondary">Enum</span> 
+                                
+                                
+                            </a>
+                        </li>
+                    </ul>
+                
+            
+        </li>
+    
         <li data-namespace="com.example.service" data-schemas="CustomException,DependencyDetail,DependencyType,PingResponse,ResponseDetail">
             <p class="namespace">com.example.service</p>
             
@@ -561,6 +590,19 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
     <tbody>
     
         <tr>
+            <td class="type">boolean</td>
+            <td class="filename">schemata/bare_primitive.avsc</td>
+            <td class="root-type-doc"></td>
+        </tr>
+    
+        <tr>
+            <td class="type"><a href="#/schema/schemata%2Fcross_ref_z_types.avsc/com.example.crossref.ZLogLevel">ZLogLevel</a></td>
+            <td class="filename">schemata/cross_ref_z_types.avsc</td>
+            <td class="root-type-doc"><p>Enum defined in a file that sorts after the file referencing it</p>
+</td>
+        </tr>
+    
+        <tr>
             <td class="type"><a href="#/schema/schemata%2Fexample.avsc/com.example.avro.User">User</a></td>
             <td class="filename">schemata/example.avsc</td>
             <td class="root-type-doc"><p>This is a user record in a fictitious to-do-list management app. It supports arbitrary grouping and nesting of items, and allows you to add items by email or by tweeting.</p>
@@ -583,6 +625,13 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
         </tr>
     
         <tr>
+            <td class="type"><a href="#/schema/schemata%2Fcross_ref_a_referrer.avsc/com.example.crossref.Referrer">Referrer</a></td>
+            <td class="filename">schemata/cross_ref_a_referrer.avsc</td>
+            <td class="root-type-doc"><p>Schema that references a type defined in a file that sorts after this one</p>
+</td>
+        </tr>
+    
+        <tr>
             <td class="type"><a href="#/schema/schemata%2Freference_referrer.avsc/com.example_referrer.TheReferrer">TheReferrer</a></td>
             <td class="filename">schemata/reference_referrer.avsc</td>
             <td class="root-type-doc"><p>A complex object referencing object from another schemata</p>
@@ -591,6 +640,36 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
     
     </tbody>
 </table>
+
+</section>
+<section data-route="#/schema/schemata%2Fcross_ref_z_types.avsc/com.example.crossref.ZLogLevel" hidden>
+<h2 class="namespace">com.example.crossref</h2>
+<h1 class="type-name">ZLogLevel</h1>
+
+<div class="type-details">
+
+    
+    <div class="type-doc"><p>Enum defined in a file that sorts after the file referencing it</p>
+</div>
+
+
+
+
+    
+        <p>Enum symbols:</p>
+        <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code>
+    
+    
+
+
+
+
+
+
+
+
+
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.User" hidden>
@@ -1679,6 +1758,65 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
 </div>
 
 </section>
+<section data-route="#/schema/schemata%2Fcross_ref_a_referrer.avsc/com.example.crossref.Referrer" hidden>
+<h2 class="namespace">com.example.crossref</h2>
+<h1 class="type-name">Referrer</h1>
+
+<div class="type-details">
+
+    
+    <div class="type-doc"><p>Schema that references a type defined in a file that sorts after this one</p>
+</div>
+
+
+    
+        <h3>Fields</h3>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr><th>Type</th><th>Field</th><th>Default Value</th><th>Description</th><th>Annotations</th></tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                    <td class="type">string</td>
+                    <td class="field">name</td>
+                    <td class="field-doc"></td>
+                    <td class="field-doc"><p>Name field</p>
+</td>
+                    <td class="field-doc">
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td class="type"><a href="#/schema/schemata%2Fcross_ref_z_types.avsc/com.example.crossref.ZLogLevel">ZLogLevel</a></td>
+                    <td class="field">level</td>
+                    <td class="field-doc"></td>
+                    <td class="field-doc"><p>References a type from cross_ref_z_types.avsc (sorts after this file)</p>
+</td>
+                    <td class="field-doc">
+                        
+                    </td>
+                </tr>
+            
+            </tbody>
+        </table>
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+</section>
 <section data-route="#/schema/schemata%2Freference_referrer.avsc/com.example_referrer.TheReferrer" hidden>
 <h2 class="namespace">com.example_referrer</h2>
 <h1 class="type-name">TheReferrer</h1>
@@ -1734,6 +1872,58 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
 
 
 
+
+</div>
+
+</section>
+<section data-route="#/schema/com.example.crossref.ZLogLevel" hidden>
+<h2 class="namespace">com.example.crossref</h2>
+<h1 class="type-name">ZLogLevel</h1>
+
+<div class="type-details">
+
+    
+        
+            <p>Defined in:</p>
+            <ul>
+                <li>schemata/cross_ref_z_types.avsc</li>
+            </ul>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <div class="type-doc"><p>Enum defined in a file that sorts after the file referencing it</p>
+</div>
+
+
+
+
+    
+        <p>Enum symbols:</p>
+        <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code>
+    
+    
+
+
+
+
+
+
+
+
+    
 
 </div>
 
@@ -3129,6 +3319,87 @@ function AvroDoc(){}(function(){var v=null,m=null,o=null,s=null,l=null;function 
                     <td class="field">history</td>
                     <td class="field-doc"></td>
                     <td class="field-doc"><p>A history field detailing random information about the object</p>
+</td>
+                    <td class="field-doc">
+                        
+                    </td>
+                </tr>
+            
+            </tbody>
+        </table>
+    
+    
+
+
+
+
+
+
+
+
+
+
+    
+
+</div>
+
+</section>
+<section data-route="#/schema/com.example.crossref.Referrer" hidden>
+<h2 class="namespace">com.example.crossref</h2>
+<h1 class="type-name">Referrer</h1>
+
+<div class="type-details">
+
+    
+        
+            <p>Defined in:</p>
+            <ul>
+                <li>schemata/cross_ref_a_referrer.avsc</li>
+            </ul>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <div class="type-doc"><p>Schema that references a type defined in a file that sorts after this one</p>
+</div>
+
+
+    
+        <h3>Fields</h3>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr><th>Type</th><th>Field</th><th>Default Value</th><th>Description</th><th>Annotations</th></tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                    <td class="type">string</td>
+                    <td class="field">name</td>
+                    <td class="field-doc"></td>
+                    <td class="field-doc"><p>Name field</p>
+</td>
+                    <td class="field-doc">
+                        
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td class="type"><a href="#/schema/schemata%2Fcross_ref_z_types.avsc/com.example.crossref.ZLogLevel">ZLogLevel</a></td>
+                    <td class="field">level</td>
+                    <td class="field-doc"></td>
+                    <td class="field-doc"><p>References a type from cross_ref_z_types.avsc (sorts after this file)</p>
 </td>
                     <td class="field-doc">
                         

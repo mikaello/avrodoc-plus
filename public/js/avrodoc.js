@@ -25,6 +25,17 @@ function AvroDoc() {
   var activeTrigger = null;
   var activeTip = null;
 
+  function dismissActivePopover() {
+    clearTimeout(showTimer);
+    clearTimeout(hideTimer);
+    if (activePopover) {
+      activePopover.hide();
+      activePopover = null;
+      activeTrigger = null;
+      activeTip = null;
+    }
+  }
+
   function scheduleHide() {
     clearTimeout(showTimer);
     clearTimeout(hideTimer);
@@ -119,7 +130,7 @@ function AvroDoc() {
     return null;
   }
 
-  function handleRoute() {
+  function handleRoute(savedScrollY) {
     var hash = window.location.hash || "#/";
     var section = findSection(hash);
     if (!section) {
@@ -130,13 +141,38 @@ function AvroDoc() {
       s.hidden = true;
     });
     section.hidden = false;
-    document.body.scrollTop = 0;
-    document.documentElement.scrollTop = 0;
+    if (savedScrollY !== undefined) {
+      window.scrollTo(0, savedScrollY);
+    } else {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
     updateSidebarSelection(hash);
     setupPopovers();
   }
 
-  window.addEventListener("hashchange", handleRoute);
+  var scrollPositions = {};
+  var isBackForward = false;
+
+  window.addEventListener("popstate", function () {
+    isBackForward = true;
+  });
+
+  window.addEventListener("hashchange", function (e) {
+    var oldHash = e.oldURL ? new URL(e.oldURL).hash || "#/" : "#/";
+    scrollPositions[oldHash] =
+      document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+    dismissActivePopover();
+
+    var restoredScroll;
+    if (isBackForward) {
+      restoredScroll = scrollPositions[window.location.hash || "#/"];
+    }
+    isBackForward = false;
+
+    handleRoute(restoredScroll);
+  });
 
   document.addEventListener("DOMContentLoaded", function () {
     loadPopoverData();

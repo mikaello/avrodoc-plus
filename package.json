@@ -1,7 +1,7 @@
 {
   "name": "@mikaello/avrodoc-plus",
   "description": "Documentation tool for Avro schemas. Forked from https://github.com/leosilvadev/avrodoc-plus.",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "author": "mikaello https://github.com/mikaello",
   "type": "module",
   "bin": "./bin/avrodoc-plus.js",
@@ -16,15 +16,16 @@
     "format": "prettier --write \"**/!(vendor|stylesheets|bootstrap)/(*.ts?(x)|*.js?(x))|*.json|*.css|*.html|*.md)\""
   },
   "dependencies": {
-    "dustjs-helpers": "1.7.4",
-    "dustjs-linkedin": "2.7.5",
-    "esbuild": "0.28.0"
+    "esbuild": "0.28.0",
+    "marked": "18.0.0",
+    "nunjucks": "3.2.4"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/express": "5.0.6",
     "@types/morgan": "1.9.10",
     "@types/node": "25.6.0",
+    "@types/nunjucks": "3.2.6",
     "eslint": "10.2.0",
     "eslint-config-prettier": "10.1.8",
     "express": "5.2.1",

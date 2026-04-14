@@ -1,25 +1,18 @@
-/* global AvroDoc:false */
+// @ts-nocheck -- dynamic Avro schema parsing; was not type-checked in its original location (public/js/schema.js)
 
 /**
- *  Interprets the contents of one Avro Schema (.avsc) file and transforms it into structures
- *  suitable for rendering.
+ * Server-side schema parser ported from public/js/schema.js
  *
- * @param {*} avrodoc The main AvroDoc instance.
- * @param {*} shared_types An object of the form
- *   `{'namespace.name': [{type: 'record', fields: [...]}, {type: 'record', fields: [...]}, ...], ...}`
- *   This object is mutated as the schema is parsed; we add the types defined in this schema to the
- *   structure. Different schema files may define the same type differently, hence the array of
- *   types for each qualified name. However, where two different schema files agree on the
- *   definition of a type, we can share the parsed type between the different files.
- * @param {string} schema_json The .avsc file, parsed into a structure of JavaScript objects.
- * @param {string?} filename The name of the file from which the schema was loaded, if available.
- * @returns
+ * @param {{ annotationFields: string[], inputSchemataCount: number }} options
+ * @param {Record<string, any[]>} shared_types  mutated in-place
+ * @param {any} schema_json
+ * @param {string} filename
+ * @returns {{ filename: string, root_type: any, named_types: Record<string, any>, sorted_types: any[] }}
  */
-AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
+function parseAvroSchema(options, shared_types, schema_json, filename) {
   var _public = { filename: filename };
 
   // {'namespace.name': {type: 'record', fields: [...]}}
-  // containing only types and messages defined in this schema
   var named_types = {};
 
   var primitive_types = [
@@ -98,11 +91,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     Object.prototype.toString.call(x) === "[object Object]";
   const isArray = (x) => Object.prototype.toString.call(x) === "[object Array]";
 
-  /**
-   * @param {string | [] | object} schema
-   * @param {string} namespace
-   * @returns {string} qualified type name
-   */
   function qualifiedName(schema, namespace) {
     var type_name;
     if (isString(schema)) {
@@ -111,7 +99,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       namespace = schema.namespace || namespace;
       type_name = schema.name || schema.protocol || schema.type;
     }
-
     if (!type_name) {
       throw (
         "unable to determine type name from schema " +
@@ -130,20 +117,12 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
   }
 
-  /**
-   * Check type of object. Get all additional arbitrary attributes on the object
-   * for inclusion in the decorated schema object.
-   *
-   * @param {object} schema
-   * @return {object} schema
-   */
   function decorateCustomAttributes(schema) {
     if (schema.annotations !== undefined && schema.annotations !== null) {
       return schema;
     }
-
-    var annotations = [],
-      ignore_attributes = avrodoc_custom_attributes;
+    var annotations = [];
+    var ignore_attributes = avrodoc_custom_attributes;
     if (
       schema.type !== null &&
       hasOwnPropertyS(built_in_type_fields, schema.type)
@@ -152,18 +131,13 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         built_in_type_fields[schema.type],
       );
     }
-
     for (var key in schema) {
-      // Only include this annotation if it is not a built-in type or something specific to the avrodoc project
       if (
         hasOwnPropertyS(schema, key) &&
         ignore_attributes.indexOf(key) === -1
       ) {
         var annotation_data = { key: key };
         var annotation_value = schema[key];
-
-        // Check to see if a complex object was provided.
-        // In this case, output a pretty-printed JSON blob.
         if (annotation_value !== null && typeof annotation_value === "object") {
           annotation_data.complex_object = JSON.stringify(
             annotation_value,
@@ -171,13 +145,10 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
             3,
           );
         } else if (named_types[annotation_value]) {
-          // The value is a known named type. Let's link to it.
           annotation_data.linked_type = named_types[annotation_value];
         } else {
-          // Just print the value as a string
           annotation_data.value = annotation_value;
         }
-
         annotations.push(annotation_data);
       }
     }
@@ -187,14 +158,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return schema;
   }
 
-  /**
-   * Builds a flat, filtered list of annotations for display in the field table,
-   * based on an allowlist of annotation keys. Each key is looked up on the field
-   * itself first, then on `field.type` (e.g. for logicalType).
-   *
-   * @param {object} field - a field or protocol-message parameter
-   * @param {string[]} allowedKeys - the keys to include
-   */
   function buildTableAnnotations(field, allowedKeys) {
     var result = [];
     allowedKeys.forEach(function (key) {
@@ -222,13 +185,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return undefined;
   }
 
-  /**
-   * Takes a node in the schema tree (a JS object) and adds some fields that are
-   * useful for template rendering.
-   *
-   * @param {object} schema
-   * @return {object} schema
-   */
   function decorate(schema) {
     schema.filename = filename;
     schema["is_" + schema.type] = true;
@@ -237,7 +193,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
     schema.qualified_name = qualifiedName(schema);
     schema = decorateCustomAttributes(schema);
-
     if (primitive_types.includes(schema.type)) {
       schema.is_primitive = true;
     } else {
@@ -257,30 +212,14 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return schema;
   }
 
-  /**
-   * @param {string?} parent
-   * @param {string} child
-   * @returns {string} parent and child joined
-   */
   function joinPath(parent, child) {
     return parent ? [parent, child].join(".") : child;
   }
 
-  /**
-   * Given a type name and the current namespace, returns an object representing
-   * the type that the name refers to (or throws an exception if the name cannot
-   * be resolved). For named types, the same (shared) object is returned
-   * whenever the same name is requested.
-   * @param {string} name a named type (e.g. `boolean`, `Foo` or `com.example.Foo`)
-   * @param {string} namespace e.g. `com.example.service`
-   * @param {string} path name of the field
-   * @return {object} schema type
-   */
   function lookupNamedType(name, namespace, path) {
     if (primitive_types.includes(name)) {
       return decorate({ type: name });
     }
-
     const qualifiedNameStr = qualifiedName(name, namespace);
     const type = named_types[qualifiedNameStr];
     if (type) {
@@ -289,31 +228,15 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       const sharedType = shared_types[qualifiedNameStr].find(
         (sharedSchema) => sharedSchema.qualified_name === qualifiedNameStr,
       );
-
       if (sharedType) {
         return sharedType;
       } else {
-        // TODO: Should also support arbitrary ordering of Avro schemas (currently
-        // this only works if the schema to be referred is parsed first)
-        throw `Shared schema ${qualifiedNameStr} does not have type ${JSON.stringify(
-          name,
-        )}, referred to at ${path}`;
+        throw `Shared schema ${qualifiedNameStr} does not have type ${JSON.stringify(name)}, referred to at ${path}`;
       }
     }
-
     throw "Unknown type name " + JSON.stringify(name) + " at " + path;
   }
 
-  /**
-   * Given an object representing a type (as returned by lookupNamedType, for
-   * example), returns the qualified name of that type. We recurse through
-   * unnamed complex types (array, map, union) but named types are replaced by
-   * their name.
-   *
-   * @param {string | [] | object} schema
-   * @param {string} namespace
-   * @returns {string | [] | object}
-   */
   function extractTypeName(schema, namespace) {
     if (isString(schema)) {
       return schema;
@@ -352,39 +275,13 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
   }
 
-  /**
-   * Given a JSON object representing a named type (record, enum, fixed, message
-   * or protocol), returns a new object containing only fields that are essential
-   * to the definition of the type. This is useful for equality comparison of
-   * types.
-   *
-   * @param {*} schema
-   * @returns {{
-   *   type: string,
-   *   name: string,
-   *   fields?: {type: string, name: string}[],
-   *   symbols?: any,
-   *   size?: any,
-   *   request?: any,
-   *   response?: any,
-   *   errors?: any[],
-   *   protocol?: string,
-   *   types?: any[],
-   *   messages?: any,
-   * }}
-   */
   function typeEssence(schema) {
-    /**
-     * @param {object[]} fields
-     * @returns {{name: string, type: string}[]}
-     */
     function fieldsWithTypeNames(fields) {
       return fields.map((field) => ({
         name: field.name,
         type: extractTypeName(field.type, schema.namespace),
       }));
     }
-
     var essence = {
       type: schema.type,
       name: qualifiedName(schema, schema.namespace),
@@ -416,13 +313,10 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     return essence;
   }
 
-  /** Credit: https://github.com/epoberezkin/fast-deep-equal */
   function isEqual(a, b) {
     if (a === b) return true;
-
     if (a && b && typeof a == "object" && typeof b == "object") {
       if (a.constructor !== b.constructor) return false;
-
       var length, i, keys;
       if (Array.isArray(a)) {
         length = a.length;
@@ -430,14 +324,12 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         for (i = length; i-- !== 0; ) if (!isEqual(a[i], b[i])) return false;
         return true;
       }
-
       if (a instanceof Map && b instanceof Map) {
         if (a.size !== b.size) return false;
         for (i of a.entries()) if (!b.has(i[0])) return false;
         for (i of a.entries()) if (!isEqual(i[1], b.get(i[0]))) return false;
         return true;
       }
-
       if (a instanceof Set && b instanceof Set) {
         if (a.size !== b.size) return false;
         for (i of a.entries()) if (!b.has(i[0])) return false;
@@ -449,58 +341,34 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         for (i = length; i-- !== 0; ) if (a[i] !== b[i]) return false;
         return true;
       }
-
       if (a.constructor === RegExp)
         return a.source === b.source && a.flags === b.flags;
       if (a.valueOf !== Object.prototype.valueOf)
         return a.valueOf() === b.valueOf();
       if (a.toString !== Object.prototype.toString)
         return a.toString() === b.toString();
-
       keys = Object.keys(a);
       length = keys.length;
       if (length !== Object.keys(b).length) return false;
-
       for (i = length; i-- !== 0; )
         if (!hasOwnPropertyS(b, keys[i])) return false;
-
       for (i = length; i-- !== 0; ) {
         var key = keys[i];
-
         if (!isEqual(a[key], b[key])) return false;
       }
-
       return true;
     }
-
-    // true if both NaN, false otherwise
     return a !== a && b !== b;
   }
 
-  /**
-   * Takes a named type (record, enum, fixed, message or protocol) and adds it to
-   * the maps of name to type. If a type with the same qualified name and the
-   * same definition is already defined in another schema file, that existing
-   * definition is reused. If the qualified name is not yet defined, or the
-   * existing definitions differ from this type, a new definition is registered.
-   *
-   * Note that within one schema file, a qualified name may only map to one
-   * particular definition. However, it is acceptable for different schema files to
-   * have conflicting definitions for the same qualified name, because different
-   * schema files are independent. The sharing of equivalent types is only for
-   * conciceness of display.
-   *
-   * @param {object} schema
-   * @param {string?} path
-   */
   function defineNamedType(schema, path) {
     const qualified_name = qualifiedName(schema, schema.namespace);
     const new_type = typeEssence(schema);
     let shared_schema = null;
 
     if (hasOwnPropertyS(shared_types, qualified_name)) {
-      shared_schema = shared_types[qualified_name].find((shared_schema) =>
-        isEqual(new_type, typeEssence(shared_schema)),
+      shared_schema = shared_types[qualified_name].find((s) =>
+        isEqual(new_type, typeEssence(s)),
       );
     } else {
       shared_types[qualified_name] = [];
@@ -521,15 +389,12 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         );
       }
     } else {
-      // Type has not yet been defined in this schema file
       named_types[qualified_name] = schema;
       if (!shared_schema) {
-        shared_schema = { ...schema }; // shallow clone
+        shared_schema = { ...schema };
         shared_types[qualified_name].push(shared_schema);
       }
-
-      // Only track definitions if we're dealing with multiple input files
-      if (avrodoc.input_schemata.length > 1) {
+      if (options.inputSchemataCount > 1) {
         shared_schema.definitions = shared_schema.definitions || [];
         shared_schema.definitions.push(schema);
       }
@@ -537,8 +402,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     schema.shared = shared_schema;
   }
 
-  // Parse a plain schema (with a record type at the top level, and any other types defined in
-  // nested structures on the record's fields).
   function parseSchema(schema, namespace, path) {
     if (schema == null) {
       throw "Missing schema type at " + path;
@@ -568,7 +431,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
           decorateCustomAttributes(field);
           field.table_annotations = buildTableAnnotations(
             field,
-            avrodoc.annotationFields,
+            options.annotationFields,
           );
         });
         return decorate(schema);
@@ -638,16 +501,12 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
     }
   }
 
-  // Parse an Avro protocol, which has a list of messages (RPC calls) and a list of named types
-  // at the top level.
   function parseProtocol(protocol) {
     protocol.type = "protocol";
     protocol.name = protocol.protocol;
-
     protocol.types = (protocol.types ?? []).map((type) =>
       parseSchema(type, protocol.namespace, "types"),
     );
-
     for (const [messageName, message] of Object.entries(
       protocol.messages ?? {},
     )) {
@@ -656,7 +515,6 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       message.name = messageName;
       message.namespace = protocol.namespace;
       message.protocol_name = qualifiedName(protocol.name, protocol.namespace);
-
       (message.request ?? []).forEach(function (param) {
         param.type = parseSchema(
           param.type,
@@ -667,7 +525,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         decorateCustomAttributes(param);
         param.table_annotations = buildTableAnnotations(
           param,
-          avrodoc.annotationFields,
+          options.annotationFields,
         );
       });
       message.response = parseSchema(
@@ -675,30 +533,20 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
         protocol.namespace,
         joinPath(path, "response"),
       );
-
-      // Return an empty array in the case that the method returns 'void'.
-      // Javadoc specifications do not show return values for a void method
       if (message.response && message.response.type === "null") {
         message.response = [];
       }
       message.errors = (message.errors ?? []).map((error) =>
         parseSchema(error, protocol.namespace, joinPath(path, "errors")),
       );
-
       defineNamedType(message, path);
       decorate(message);
     }
-
     protocol.sorted_messages = Object.values(protocol.messages ?? {}).sort(
       stringCompareByS("name"),
     );
     defineNamedType(protocol);
-
     return decorate(protocol);
-  }
-
-  if (typeof schema_json === "string") {
-    schema_json = JSON.parse(schema_json);
   }
 
   if (isObject(schema_json) && schema_json.protocol) {
@@ -709,36 +557,269 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
 
   _public.root_type.is_root_type = true;
   _public.named_types = named_types;
-
   _public.sorted_types = Object.values(named_types).sort(
     stringCompareByS("name"),
   );
 
   return _public;
-};
+}
+
+const PRIMITIVE_TYPES_SET = new Set([
+  "null",
+  "boolean",
+  "int",
+  "long",
+  "float",
+  "double",
+  "bytes",
+  "string",
+]);
 
 /**
- * TODO: should be imported from avrodoc.js
+ * Lightweight pre-scan of a raw schema JSON to collect:
+ * - `defined`: qualified type names this schema defines (best-effort namespace resolution)
+ * - `referenced`: type name strings referenced by this schema (may be unqualified)
  *
- * Case insensitive string compare
- *
- * @param {string} property to compare by
- * @returns {function(object, object): boolean} objects to have a property compared
+ * @param {any} json
+ * @returns {{ defined: Set<string>, referenced: Set<string> }}
  */
+function extractTypeInfo(json) {
+  const defined = new Set();
+  const referenced = new Set();
+
+  function bestEffortQName(name, namespace) {
+    if (!name) return null;
+    if (name.includes(".")) return name;
+    return namespace ? `${namespace}.${name}` : name;
+  }
+
+  function scanDefined(schema, namespace) {
+    if (!schema || typeof schema !== "object") return;
+    if (Array.isArray(schema)) {
+      schema.forEach((s) => scanDefined(s, namespace));
+      return;
+    }
+    const ns = schema.namespace || namespace;
+    if (
+      schema.type === "record" ||
+      schema.type === "error" ||
+      schema.type === "enum" ||
+      schema.type === "fixed"
+    ) {
+      const qname = bestEffortQName(schema.name, ns);
+      if (qname) defined.add(qname);
+      (schema.fields || []).forEach((f) => scanDefined(f.type, ns));
+    }
+    if (schema.protocol) {
+      (schema.types || []).forEach((t) =>
+        scanDefined(t, schema.namespace || namespace),
+      );
+    }
+  }
+
+  function scanReferenced(schema, namespace) {
+    if (schema == null) return;
+    if (typeof schema === "string") {
+      if (!PRIMITIVE_TYPES_SET.has(schema)) referenced.add(schema);
+      return;
+    }
+    if (Array.isArray(schema)) {
+      schema.forEach((s) => scanReferenced(s, namespace));
+      return;
+    }
+    if (typeof schema === "object") {
+      const ns = schema.namespace || namespace;
+      if (schema.type === "record" || schema.type === "error") {
+        (schema.fields || []).forEach((f) => {
+          scanDefined(f.type, ns);
+          scanReferenced(f.type, ns);
+        });
+      } else if (schema.type === "array") {
+        scanDefined(schema.items, namespace);
+        scanReferenced(schema.items, namespace);
+      } else if (schema.type === "map") {
+        scanDefined(schema.values, namespace);
+        scanReferenced(schema.values, namespace);
+      } else if (schema.protocol) {
+        (schema.types || []).forEach((t) => {
+          scanDefined(t, ns);
+          scanReferenced(t, ns);
+        });
+        Object.values(schema.messages || {}).forEach((m) => {
+          (m.request || []).forEach((p) => scanReferenced(p.type, ns));
+          scanReferenced(m.response, ns);
+        });
+      }
+    }
+  }
+
+  scanDefined(json, null);
+  scanReferenced(json, null);
+  defined.forEach((d) => referenced.delete(d));
+  PRIMITIVE_TYPES_SET.forEach((p) => referenced.delete(p));
+
+  return { defined, referenced };
+}
+
+/**
+ * Sort schemata in dependency order (types that define referenced types come first).
+ * Uses Kahn's topological sort. Falls back to original order on cycles.
+ *
+ * @param {Array<{filename: string, json: any}>} schemata
+ * @returns {Array<{filename: string, json: any}>}
+ */
+function sortSchemataDependencyOrder(schemata) {
+  if (schemata.length <= 1) return schemata;
+
+  const typeInfos = schemata.map((s) => extractTypeInfo(s.json));
+
+  // Map each defined qualified name -> set of schema indices that define it
+  /** @type {Map<string, Set<number>>} */
+  const typeToProviders = new Map();
+  typeInfos.forEach(({ defined }, i) => {
+    defined.forEach((name) => {
+      if (!typeToProviders.has(name)) typeToProviders.set(name, new Set());
+      typeToProviders.get(name).add(i);
+    });
+  });
+
+  // For each schema i, find which schemas j must run before i
+  const n = schemata.length;
+  /** @type {Set<number>[]} */
+  const deps = Array.from({ length: n }, () => new Set());
+
+  typeInfos.forEach(({ referenced }, i) => {
+    referenced.forEach((ref) => {
+      // Exact match
+      typeToProviders.get(ref)?.forEach((j) => {
+        if (j !== i) deps[i].add(j);
+      });
+      // Suffix match for unqualified references (e.g. "LogLevel" -> "com.example.LogLevel")
+      if (!ref.includes(".")) {
+        typeToProviders.forEach((indices, qname) => {
+          if (qname.endsWith("." + ref)) {
+            indices.forEach((j) => {
+              if (j !== i) deps[i].add(j);
+            });
+          }
+        });
+      }
+    });
+  });
+
+  // Kahn's algorithm
+  const inDegree = new Array(n).fill(0);
+  /** @type {Set<number>[]} */
+  const adjList = Array.from({ length: n }, () => new Set());
+  deps.forEach((depSet, i) => {
+    depSet.forEach((j) => {
+      adjList[j].add(i);
+      inDegree[i]++;
+    });
+  });
+
+  const queue = /** @type {number[]} */ ([]);
+  for (let i = 0; i < n; i++) {
+    if (inDegree[i] === 0) queue.push(i);
+  }
+
+  const order = /** @type {number[]} */ ([]);
+  while (queue.length > 0) {
+    const node = /** @type {number} */ (queue.shift());
+    order.push(node);
+    adjList[node].forEach((neighbor) => {
+      inDegree[neighbor]--;
+      if (inDegree[neighbor] === 0) queue.push(neighbor);
+    });
+  }
+
+  // If cycle detected, fall back to original order
+  if (order.length !== n) return schemata;
+
+  return order.map((i) => schemata[i]);
+}
+
+/**
+ * Build the full context object for rendering Avrodoc templates.
+ *
+ * @param {Array<{filename: string, json: any}>} input_schemata
+ * @param {{ annotationFields?: string[] }} [options]
+ * @returns {{ schema_by_name: Record<string, any>, shared_types: Record<string, any[]>, schemata: any[], by_qualified_name: Record<string, any>, namespaces: any[], protocols: any[] }}
+ */
+export function buildAvroDocContext(input_schemata, options = {}) {
+  const annotationFields = options.annotationFields || [
+    "logicalType",
+    "aliases",
+    "order",
+  ];
+  const schema_by_name = {};
+  const shared_types = {};
+
+  const ordered_schemata = sortSchemataDependencyOrder(input_schemata);
+
+  for (const { filename, json } of ordered_schemata) {
+    let fname = filename || "default";
+    if (schema_by_name[fname]) {
+      let i = 1;
+      while (schema_by_name[fname + i]) i++;
+      fname = fname + i;
+    }
+    schema_by_name[fname] = parseAvroSchema(
+      { annotationFields, inputSchemataCount: input_schemata.length },
+      shared_types,
+      json,
+      fname,
+    );
+  }
+
+  const by_qualified_name = {};
+  for (const [qualified_name, versions] of Object.entries(shared_types)) {
+    by_qualified_name[qualified_name] = { ...versions[0] };
+    by_qualified_name[qualified_name].versions = versions;
+  }
+
+  const namespacesMap = {};
+  for (const shared_type of Object.values(by_qualified_name)) {
+    if (shared_type.is_record || shared_type.is_enum || shared_type.is_fixed) {
+      const namespace = shared_type.namespace || "";
+      if (!Object.prototype.hasOwnProperty.call(namespacesMap, namespace)) {
+        namespacesMap[namespace] = { namespace, types: [] };
+      }
+      namespacesMap[namespace].types.push(shared_type);
+    }
+  }
+  const namespaces = Object.values(namespacesMap)
+    .sort((a, b) => (a.namespace ?? "").localeCompare(b.namespace ?? ""))
+    .map((ns) => ({
+      namespace: ns.namespace || "No namespace",
+      types: [...ns.types].sort((a, b) =>
+        (a.name ?? "").localeCompare(b.name ?? ""),
+      ),
+    }));
+
+  const protocols = Object.values(by_qualified_name)
+    .filter((t) => t.is_protocol)
+    .sort((a, b) =>
+      (a.qualified_name ?? "").localeCompare(b.qualified_name ?? ""),
+    );
+
+  const schemata = Object.values(schema_by_name);
+
+  return {
+    schema_by_name,
+    shared_types,
+    schemata,
+    by_qualified_name,
+    namespaces,
+    protocols,
+  };
+}
+
 const stringCompareByS = (property) => (a, b) => {
   const aProp = a[property] ?? "";
   const bProp = b[property] ?? "";
   return aProp.localeCompare(bProp);
 };
 
-/**
- * TODO: should be imported from avrodoc.js
- *
- * Checks if property exists on object
- *
- * @param {object} object
- * @param {string} property
- * @returns {boolean}
- */
 const hasOwnPropertyS = (object, property) =>
   Object.prototype.hasOwnProperty.call(object, property);

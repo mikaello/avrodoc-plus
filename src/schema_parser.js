@@ -549,10 +549,6 @@ function parseAvroSchema(options, shared_types, schema_json, filename) {
     return decorate(protocol);
   }
 
-  if (typeof schema_json === "string") {
-    schema_json = JSON.parse(schema_json);
-  }
-
   if (isObject(schema_json) && schema_json.protocol) {
     _public.root_type = parseProtocol(schema_json);
   } else {
@@ -566,6 +562,181 @@ function parseAvroSchema(options, shared_types, schema_json, filename) {
   );
 
   return _public;
+}
+
+const PRIMITIVE_TYPES_SET = new Set([
+  "null",
+  "boolean",
+  "int",
+  "long",
+  "float",
+  "double",
+  "bytes",
+  "string",
+]);
+
+/**
+ * Lightweight pre-scan of a raw schema JSON to collect:
+ * - `defined`: qualified type names this schema defines (best-effort namespace resolution)
+ * - `referenced`: type name strings referenced by this schema (may be unqualified)
+ *
+ * @param {any} json
+ * @returns {{ defined: Set<string>, referenced: Set<string> }}
+ */
+function extractTypeInfo(json) {
+  const defined = new Set();
+  const referenced = new Set();
+
+  function bestEffortQName(name, namespace) {
+    if (!name) return null;
+    if (name.includes(".")) return name;
+    return namespace ? `${namespace}.${name}` : name;
+  }
+
+  function scanDefined(schema, namespace) {
+    if (!schema || typeof schema !== "object") return;
+    if (Array.isArray(schema)) {
+      schema.forEach((s) => scanDefined(s, namespace));
+      return;
+    }
+    const ns = schema.namespace || namespace;
+    if (
+      schema.type === "record" ||
+      schema.type === "error" ||
+      schema.type === "enum" ||
+      schema.type === "fixed"
+    ) {
+      const qname = bestEffortQName(schema.name, ns);
+      if (qname) defined.add(qname);
+      (schema.fields || []).forEach((f) => scanDefined(f.type, ns));
+    }
+    if (schema.protocol) {
+      (schema.types || []).forEach((t) =>
+        scanDefined(t, schema.namespace || namespace),
+      );
+    }
+  }
+
+  function scanReferenced(schema, namespace) {
+    if (schema == null) return;
+    if (typeof schema === "string") {
+      if (!PRIMITIVE_TYPES_SET.has(schema)) referenced.add(schema);
+      return;
+    }
+    if (Array.isArray(schema)) {
+      schema.forEach((s) => scanReferenced(s, namespace));
+      return;
+    }
+    if (typeof schema === "object") {
+      const ns = schema.namespace || namespace;
+      if (schema.type === "record" || schema.type === "error") {
+        (schema.fields || []).forEach((f) => {
+          scanDefined(f.type, ns);
+          scanReferenced(f.type, ns);
+        });
+      } else if (schema.type === "array") {
+        scanDefined(schema.items, namespace);
+        scanReferenced(schema.items, namespace);
+      } else if (schema.type === "map") {
+        scanDefined(schema.values, namespace);
+        scanReferenced(schema.values, namespace);
+      } else if (schema.protocol) {
+        (schema.types || []).forEach((t) => {
+          scanDefined(t, ns);
+          scanReferenced(t, ns);
+        });
+        Object.values(schema.messages || {}).forEach((m) => {
+          (m.request || []).forEach((p) => scanReferenced(p.type, ns));
+          scanReferenced(m.response, ns);
+        });
+      }
+    }
+  }
+
+  scanDefined(json, null);
+  scanReferenced(json, null);
+  defined.forEach((d) => referenced.delete(d));
+  PRIMITIVE_TYPES_SET.forEach((p) => referenced.delete(p));
+
+  return { defined, referenced };
+}
+
+/**
+ * Sort schemata in dependency order (types that define referenced types come first).
+ * Uses Kahn's topological sort. Falls back to original order on cycles.
+ *
+ * @param {Array<{filename: string, json: any}>} schemata
+ * @returns {Array<{filename: string, json: any}>}
+ */
+function sortSchemataDependencyOrder(schemata) {
+  if (schemata.length <= 1) return schemata;
+
+  const typeInfos = schemata.map((s) => extractTypeInfo(s.json));
+
+  // Map each defined qualified name -> set of schema indices that define it
+  /** @type {Map<string, Set<number>>} */
+  const typeToProviders = new Map();
+  typeInfos.forEach(({ defined }, i) => {
+    defined.forEach((name) => {
+      if (!typeToProviders.has(name)) typeToProviders.set(name, new Set());
+      typeToProviders.get(name).add(i);
+    });
+  });
+
+  // For each schema i, find which schemas j must run before i
+  const n = schemata.length;
+  /** @type {Set<number>[]} */
+  const deps = Array.from({ length: n }, () => new Set());
+
+  typeInfos.forEach(({ referenced }, i) => {
+    referenced.forEach((ref) => {
+      // Exact match
+      typeToProviders.get(ref)?.forEach((j) => {
+        if (j !== i) deps[i].add(j);
+      });
+      // Suffix match for unqualified references (e.g. "LogLevel" -> "com.example.LogLevel")
+      if (!ref.includes(".")) {
+        typeToProviders.forEach((indices, qname) => {
+          if (qname.endsWith("." + ref)) {
+            indices.forEach((j) => {
+              if (j !== i) deps[i].add(j);
+            });
+          }
+        });
+      }
+    });
+  });
+
+  // Kahn's algorithm
+  const inDegree = new Array(n).fill(0);
+  /** @type {Set<number>[]} */
+  const adjList = Array.from({ length: n }, () => new Set());
+  deps.forEach((depSet, i) => {
+    depSet.forEach((j) => {
+      adjList[j].add(i);
+      inDegree[i]++;
+    });
+  });
+
+  const queue = /** @type {number[]} */ ([]);
+  for (let i = 0; i < n; i++) {
+    if (inDegree[i] === 0) queue.push(i);
+  }
+
+  const order = /** @type {number[]} */ ([]);
+  while (queue.length > 0) {
+    const node = /** @type {number} */ (queue.shift());
+    order.push(node);
+    adjList[node].forEach((neighbor) => {
+      inDegree[neighbor]--;
+      if (inDegree[neighbor] === 0) queue.push(neighbor);
+    });
+  }
+
+  // If cycle detected, fall back to original order
+  if (order.length !== n) return schemata;
+
+  return order.map((i) => schemata[i]);
 }
 
 /**
@@ -584,7 +755,9 @@ export function buildAvroDocContext(input_schemata, options = {}) {
   const schema_by_name = {};
   const shared_types = {};
 
-  for (const { filename, json } of input_schemata) {
+  const ordered_schemata = sortSchemataDependencyOrder(input_schemata);
+
+  for (const { filename, json } of ordered_schemata) {
     let fname = filename || "default";
     if (schema_by_name[fname]) {
       let i = 1;

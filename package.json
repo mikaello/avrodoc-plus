@@ -25,7 +25,7 @@
     "@types/express": "5.0.6",
     "@types/morgan": "1.9.10",
     "@types/node": "25.9.3",
-    "eslint": "10.4.0",
+    "eslint": "10.6.0",
     "eslint-config-prettier": "10.1.8",
     "express": "5.2.1",
     "glob": "13.0.6",

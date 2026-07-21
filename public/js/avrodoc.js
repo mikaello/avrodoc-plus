@@ -5,6 +5,173 @@ dust.filters.md = function (value) {
   return markdown.toHTML(value);
 };
 
+// ---------------------------------------------------------------------------
+// Topological sort helpers — ensure schemas that define types are processed
+// before schemas that reference those types (fixes cross-file ordering bug).
+// ---------------------------------------------------------------------------
+
+const _AVRODOC_PRIMITIVE_TYPES = new Set([
+  "null",
+  "boolean",
+  "int",
+  "long",
+  "float",
+  "double",
+  "bytes",
+  "string",
+]);
+
+/**
+ * Lightweight pre-scan: returns the sets of type names a schema JSON defines
+ * and references (best-effort namespace resolution for unqualified names).
+ *
+ * @param {any} json
+ * @returns {{ defined: Set<string>, referenced: Set<string> }}
+ */
+function _extractTypeInfo(json) {
+  const defined = new Set();
+  const referenced = new Set();
+
+  function qname(name, ns) {
+    if (!name) return null;
+    return name.includes(".") ? name : ns ? ns + "." + name : name;
+  }
+
+  function scanDefined(schema, ns) {
+    if (!schema || typeof schema !== "object") return;
+    if (Array.isArray(schema)) {
+      schema.forEach((s) => scanDefined(s, ns));
+      return;
+    }
+    const n = schema.namespace || ns;
+    if (
+      schema.type === "record" ||
+      schema.type === "error" ||
+      schema.type === "enum" ||
+      schema.type === "fixed"
+    ) {
+      const q = qname(schema.name, n);
+      if (q) defined.add(q);
+      (schema.fields || []).forEach((f) => scanDefined(f.type, n));
+    }
+    if (schema.protocol) {
+      (schema.types || []).forEach((t) =>
+        scanDefined(t, schema.namespace || ns),
+      );
+    }
+  }
+
+  function scanReferenced(schema, ns) {
+    if (schema == null) return;
+    if (typeof schema === "string") {
+      if (!_AVRODOC_PRIMITIVE_TYPES.has(schema)) referenced.add(schema);
+      return;
+    }
+    if (Array.isArray(schema)) {
+      schema.forEach((s) => scanReferenced(s, ns));
+      return;
+    }
+    if (typeof schema === "object") {
+      const n = schema.namespace || ns;
+      if (schema.type === "record" || schema.type === "error") {
+        (schema.fields || []).forEach((f) => {
+          scanDefined(f.type, n);
+          scanReferenced(f.type, n);
+        });
+      } else if (schema.type === "array") {
+        scanDefined(schema.items, ns);
+        scanReferenced(schema.items, ns);
+      } else if (schema.type === "map") {
+        scanDefined(schema.values, ns);
+        scanReferenced(schema.values, ns);
+      } else if (schema.protocol) {
+        (schema.types || []).forEach((t) => {
+          scanDefined(t, n);
+          scanReferenced(t, n);
+        });
+        Object.values(schema.messages || {}).forEach((m) => {
+          (m.request || []).forEach((p) => scanReferenced(p.type, n));
+          scanReferenced(m.response, n);
+        });
+      }
+    }
+  }
+
+  scanDefined(json, null);
+  scanReferenced(json, null);
+  defined.forEach((d) => referenced.delete(d));
+  _AVRODOC_PRIMITIVE_TYPES.forEach((p) => referenced.delete(p));
+  return { defined, referenced };
+}
+
+/**
+ * Sort schemata so type definitions come before their references.
+ * Uses Kahn's topological sort; falls back to original order on cycles.
+ * Only sorts entries that have a pre-parsed `json` property.
+ *
+ * @param {Array<{json?: any, filename?: string}>} schemata
+ * @returns {Array<{json?: any, filename?: string}>}
+ */
+function _sortSchemataDependencyOrder(schemata) {
+  if (schemata.length <= 1) return schemata;
+
+  const typeInfos = schemata.map((s) =>
+    s.json != null
+      ? _extractTypeInfo(s.json)
+      : { defined: new Set(), referenced: new Set() },
+  );
+
+  const typeToProviders = new Map();
+  typeInfos.forEach(({ defined }, i) => {
+    defined.forEach((name) => {
+      if (!typeToProviders.has(name)) typeToProviders.set(name, new Set());
+      typeToProviders.get(name).add(i);
+    });
+  });
+
+  const n = schemata.length;
+  const deps = Array.from({ length: n }, () => new Set());
+  typeInfos.forEach(({ referenced }, i) => {
+    referenced.forEach((ref) => {
+      typeToProviders.get(ref)?.forEach((j) => {
+        if (j !== i) deps[i].add(j);
+      });
+      if (!ref.includes(".")) {
+        typeToProviders.forEach((indices, qn) => {
+          if (qn.endsWith("." + ref))
+            indices.forEach((j) => {
+              if (j !== i) deps[i].add(j);
+            });
+        });
+      }
+    });
+  });
+
+  const inDegree = new Array(n).fill(0);
+  const adjList = Array.from({ length: n }, () => new Set());
+  deps.forEach((depSet, i) => {
+    depSet.forEach((j) => {
+      adjList[j].add(i);
+      inDegree[i]++;
+    });
+  });
+
+  const queue = [];
+  for (let i = 0; i < n; i++) {
+    if (inDegree[i] === 0) queue.push(i);
+  }
+  const order = [];
+  while (queue.length > 0) {
+    const node = queue.shift();
+    order.push(node);
+    adjList[node].forEach((nb) => {
+      if (--inDegree[nb] === 0) queue.push(nb);
+    });
+  }
+
+  return order.length === n ? order.map((i) => schemata[i]) : schemata;
+}
+
 // eslint-disable-next-line
 function AvroDoc(page_title, input_schemata, options) {
   var _public = { page_title: page_title };
@@ -275,7 +442,7 @@ function AvroDoc(page_title, input_schemata, options) {
   var in_progress = 0,
     schemata_to_load;
 
-  _public.input_schemata = input_schemata ?? [];
+  _public.input_schemata = _sortSchemataDependencyOrder(input_schemata ?? []);
   _public.input_schemata.forEach(function (schema) {
     if (schema.json) {
       addSchema(schema.json, schema.filename);

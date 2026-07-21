@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "Referrer",
+  "namespace": "com.example.crossref",
+  "doc": "Schema that references a type defined in a file that sorts after this one",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Name field"
+    },
+    {
+      "name": "level",
+      "type": "com.example.crossref.ZLogLevel",
+      "doc": "References a type from cross_ref_z_types.avsc (sorts after this file)"
+    }
+  ]
+}

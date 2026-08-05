@@ -4,7 +4,7 @@
     "checkJs": true,
     "noEmit": true,
     "module": "ESNext",
-    "moduleResolution": "node10",
+    "moduleResolution": "bundler",
     "ignoreDeprecations": "6.0",
     "target": "ES2020",
     "lib": ["ES2020"],
@@ -17,6 +17,6 @@
     "typeRoots": ["./node_modules/@types", "./types"],
     "types": ["node"]
   },
-  "include": ["src/**/*.js", "app.js", "bin/**/*.js"],
+  "include": ["src/**/*.js", "app.js", "bin/**/*.js", "types/**/*.d.ts"],
   "exclude": ["node_modules", "public/vendor/**/*.js", "**/*.test.js"]
 }

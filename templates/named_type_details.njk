@@ -1,5 +1,9 @@
 {% if doc %}<div class="type-doc">{{ doc | markdown | safe }}</div>{% endif %}
 
+{% if is_primitive %}
+    <p>Primitive type: <code>{{ type }}</code></p>
+{% endif %}
+
 {% if is_record %}
     {% if fields and fields.length > 0 %}
         <h3>Fields</h3>

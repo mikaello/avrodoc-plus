@@ -5,6 +5,7 @@ import nunjucks from "nunjucks";
 import { marked } from "marked";
 import { transformSync } from "esbuild";
 import { buildAvroDocContext } from "./schema_parser.js";
+import { sortSchemataDependencyOrder } from "./schema_order.js";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -220,7 +221,7 @@ async function topLevelHTML(title, extra_css_files, options) {
     : remoteContent(extra_css_files);
 
   const page_title = title ?? "Avrodoc";
-  const input_schemata = options.schemata || [];
+  const input_schemata = sortSchemataDependencyOrder(options.schemata || []);
 
   const avroContext = buildAvroDocContext(input_schemata, {
     annotationFields: options.annotationFields,

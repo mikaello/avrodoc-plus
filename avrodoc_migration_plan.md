@@ -138,7 +138,7 @@ Define a `markdown` filter in Nunjucks config to replace `dust.filters.md`.
 - Replace `dust.compile` / `dust.compileFn` calls with `nunjucks.render()` / `nunjucks.configure()`.
 - The `dustTemplates()` export is no longer needed (templates run server-side).
 - Remove all references to `dustjs-linkedin` and `dustjs-helpers`.
-- Remove `dust-core-2.7.2.js` and `dust-helpers-1.7.4.js` from `client_js` array.
+- Remove `dust-core-3.0.1.js` and `dust-helpers-1.7.4.js` from `client_js` array.
 
 **Key architectural change:** instead of embedding JSON and rendering in the browser, `inlineContent()` now renders all type detail pages to HTML strings server-side, embeds them as hidden `<section>` elements, and Vanilla JS shows/hides the right one based on the URL hash.
 
@@ -178,13 +178,20 @@ Remove `vendor/jquery-3.6.0.js` from `client_js`.
 
 After Phase 2, `public/vendor/` will contain only:
 - `bootstrap.bundle.min.js` ✅ (added in Phase 1)
-- `markdown.js` ✅ (kept)
 
 Removed:
-- `dust-core-2.7.2.js`
+- `dust-core-3.0.1.js`
 - `dust-helpers-1.7.4.js`
 - `sammy-0.7.6.js`
 - `jquery-3.6.0.js`
+- `markdown.js` (replaced by server-side `marked`)
+
+#### 7. Bound large-schema overhead
+
+- Render popover content from the existing section DOM instead of embedding a second JSON/HTML copy.
+- Cache server-mode HTML after the startup render because the server already loads its schema set only at startup.
+- Keep CLI output self-contained and avoid a separate lazy-section HTTP API in this phase.
+- Pin development, CI, preview, and documentation builds to Node 20.
 
 ---
 

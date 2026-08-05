@@ -6,6 +6,7 @@ import path from "path";
 import dust from "dustjs-linkedin";
 import "dustjs-helpers";
 import { transformSync } from "esbuild";
+import { sortSchemataDependencyOrder } from "./schema_order.js";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -172,7 +173,9 @@ function topLevelHTML(title, extra_css_files, options) {
         };
 
         if (typeof context.schemata !== "string") {
-          context.schemata = JSON.stringify(context.schemata);
+          context.schemata = JSON.stringify(
+            sortSchemataDependencyOrder(context.schemata),
+          );
         }
         return client_html(context)
           .then((/** @type {string} */ html) => resolve(html))

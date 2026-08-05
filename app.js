@@ -15,11 +15,12 @@ const schema_dir = path.resolve(
   process.cwd(),
   process.env.SCHEMA_DIR ?? "schemata"
 );
-/** @type {Array<{filename: string}>} */
+/** @type {Array<{filename: string, json: any}>} */
 const schemata = [];
 const files = await glob("**/*.avsc", { cwd: schema_dir });
 files.sort().forEach(function (file) {
-  schemata.push({ filename: "/schemata/" + file });
+  const json = JSON.parse(fs.readFileSync(path.join(schema_dir, file), "utf-8"));
+  schemata.push({ filename: "/schemata/" + file, json });
 });
 
 // Precompile dust templates at app startup, and then serve them out of memory

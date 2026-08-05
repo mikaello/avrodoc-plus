@@ -427,7 +427,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       if (Array.isArray(a)) {
         length = a.length;
         if (length != b.length) return false;
-        for (i = length; i-- !== 0; ) if (!isEqual(a[i], b[i])) return false;
+        for (i = length; i-- !== 0;) if (!isEqual(a[i], b[i])) return false;
         return true;
       }
 
@@ -446,7 +446,7 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
         length = a.length;
         if (length != b.length) return false;
-        for (i = length; i-- !== 0; ) if (a[i] !== b[i]) return false;
+        for (i = length; i-- !== 0;) if (a[i] !== b[i]) return false;
         return true;
       }
 
@@ -461,10 +461,10 @@ AvroDoc.Schema = function (avrodoc, shared_types, schema_json, filename) {
       length = keys.length;
       if (length !== Object.keys(b).length) return false;
 
-      for (i = length; i-- !== 0; )
+      for (i = length; i-- !== 0;)
         if (!hasOwnPropertyS(b, keys[i])) return false;
 
-      for (i = length; i-- !== 0; ) {
+      for (i = length; i-- !== 0;) {
         var key = keys[i];
 
         if (!isEqual(a[key], b[key])) return false;

@@ -19,11 +19,7 @@ describe("test HTML generation", () => {
       testFile,
     );
 
-    assert.ok(
-      readFileSync(testFile, "utf-8").includes(
-        '<!DOCTYPE html><html lang="en">',
-      ),
-    );
+    assert.ok(readFileSync(testFile, "utf-8").includes('data-route="#/"'));
   });
 });
 
@@ -94,6 +90,10 @@ describe("bare primitive type schema", () => {
         testFile,
       ),
     );
-    assert.ok(readFileSync(testFile, "utf-8").includes("bare_primitive.avsc"));
+    assert.ok(
+      readFileSync(testFile, "utf-8").includes(
+        '<h1 class="type-name">boolean</h1>',
+      ),
+    );
   });
 });

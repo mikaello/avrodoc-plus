@@ -234,8 +234,7 @@ body {
 }
 
 /* =====================================================================
-   Dark mode toggle button — fixed over the sidebar, never overwritten
-   by DustJS rendering
+   Dark mode toggle button — fixed over the sidebar
    ===================================================================== */
 
 #theme-toggle {

@@ -16,8 +16,6 @@
       })();
     </script>
 
-    <script id="popover-data" type="application/json">{"schemata/bare_primitive.avsc":{},"schemata/cross_ref_z_types.avsc":{"com.example.crossref.ZLogLevel":{"title":"<span class=\"namespace\">com.example.crossref.<\/span><span class=\"type-name\">ZLogLevel<\/span>","content":"<div class=\"type-doc\"><p>Enum defined in a file that sorts after the file referencing it<\/p>\n<\/div>\n\n\n\n\n    \n        <p>Enum symbols:<\/p>\n        <code>DEBUG<\/code>, <code>INFO<\/code>, <code>WARN<\/code>, <code>ERROR<\/code>\n    \n    \n\n\n\n\n\n\n\n"}},"schemata/example.avsc":{"com.example.avro.User":{"title":"<span class=\"namespace\">com.example.avro.<\/span><span class=\"type-name\">User<\/span>","content":"<div class=\"type-doc\"><p>This is a user record in a fictitious to-do-list management app. It supports arbitrary grouping and nesting of items, and allows you to add items by email or by tweeting.<\/p>\n<p>Note this app doesn&#39;t actually exist. The schema is just a demo for <a href=\"https://github.com/mikaello/avrodoc-plus\">Avrodoc<\/a>!<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">id<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>System-assigned numeric user ID. Cannot be changed by the user.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                            <ul><li><code>logicalType<\/code>: uuid<\/li><\/ul>\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">username<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The username chosen by the user. Can be changed by the user.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">passwordHash<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The user&#39;s password, hashed using <a href=\"http://www.tarsnap.com/scrypt.html\">scrypt<\/a>.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">long<\/td>\n                    <td class=\"field\">signupDate<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Timestamp (milliseconds since epoch) when the user signed up<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                            <ul><li><code>logicalType<\/code>: timestamp-millis<\/li><\/ul>\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">array&lt;<a href=\"#/schema/schemata%2Fexample.avsc/com.example.avro.EmailAddress\">EmailAddress<\/a>&gt;<\/td>\n                    <td class=\"field\">emailAddresses<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>All email addresses on the user&#39;s account<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">array&lt;<a href=\"#/schema/schemata%2Fexample.avsc/com.example.avro.TwitterAccount\">TwitterAccount<\/a>&gt;<\/td>\n                    <td class=\"field\">twitterAccounts<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>All Twitter accounts that the user has OAuthed<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">array&lt;<a href=\"#/schema/schemata%2Fexample.avsc/com.example.avro.ToDoItem\">ToDoItem<\/a>&gt;<\/td>\n                    <td class=\"field\">toDoItems<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The top-level items in the user&#39;s to-do list<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.avro.EmailAddress":{"title":"<span class=\"namespace\">com.example.avro.<\/span><span class=\"type-name\">EmailAddress<\/span>","content":"<div class=\"type-doc\"><p>Stores details about an email address that a user has associated with their account.<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">address<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The email address, e.g. <code>foo@example.com<\/code><\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">boolean<\/td>\n                    <td class=\"field\">verified<\/td>\n                    <td class=\"field-doc\">false<\/td>\n                    <td class=\"field-doc\"><p>true if the user has clicked the link in a confirmation email to this address.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">long<\/td>\n                    <td class=\"field\">dateAdded<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Timestamp (milliseconds since epoch) when the email address was added to the account.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                            <ul><li><code>logicalType<\/code>: timestamp-millis<\/li><\/ul>\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;int<\/td>\n                    <td class=\"field\">dateBounced<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Date (days since epoch) when an email sent to this address last bounced. Reset to null when the address no longer bounces.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.avro.TwitterAccount":{"title":"<span class=\"namespace\">com.example.avro.<\/span><span class=\"type-name\">TwitterAccount<\/span>","content":"<div class=\"type-doc\"><p>Stores access credentials for one Twitter account, as granted to us by the user by OAuth.<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Fexample.avsc/com.example.avro.OAuthStatus\">OAuthStatus<\/a><\/td>\n                    <td class=\"field\">status<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Indicator of whether this authorization is currently active, or has been revoked<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">long<\/td>\n                    <td class=\"field\">userId<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Twitter&#39;s numeric ID for this user<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">screenName<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The twitter username for this account (can be changed by the user)<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">oauthToken<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The OAuth token for this Twitter account<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">oauthTokenSecret<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The OAuth secret, used for signing requests on behalf of this Twitter account. <code>null<\/code> whilst the OAuth flow is not yet complete.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">long<\/td>\n                    <td class=\"field\">dateAuthorized<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Timestamp (milliseconds since epoch) when the user last authorized this Twitter account<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                            <ul><li><code>logicalType<\/code>: timestamp-millis<\/li><\/ul>\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.avro.OAuthStatus":{"title":"<span class=\"namespace\">com.example.avro.<\/span><span class=\"type-name\">OAuthStatus<\/span>","content":"<div class=\"type-doc\"><ul>\n<li><code>PENDING<\/code>: the user has started authorizing, but not yet finished<\/li>\n<li><code>ACTIVE<\/code>: the token should work<\/li>\n<li><code>DENIED<\/code>: the user declined the authorization<\/li>\n<li><code>EXPIRED<\/code>: the token used to work, but now it doesn&#39;t<\/li>\n<li><code>REVOKED<\/code>: the user has explicitly revoked the token<\/li>\n<\/ul>\n<\/div>\n\n\n\n\n    \n        <p>Enum symbols:<\/p>\n        <code>PENDING<\/code>, <code>ACTIVE<\/code>, <code>DENIED<\/code>, <code>EXPIRED<\/code>, <code>REVOKED<\/code>\n    \n    \n\n\n\n\n\n\n\n"},"com.example.avro.ToDoItem":{"title":"<span class=\"namespace\">com.example.avro.<\/span><span class=\"type-name\">ToDoItem<\/span>","content":"<div class=\"type-doc\"><p>A record is one node in a To-Do item tree (every record can contain nested sub-records).<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Fexample.avsc/com.example.avro.ToDoStatus\">ToDoStatus<\/a><\/td>\n                    <td class=\"field\">status<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>User-selected state for this item (e.g. whether or not it is marked as done)<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">title<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>One-line summary of the item<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">description<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Detailed description (may contain HTML markup)<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;long<\/td>\n                    <td class=\"field\">snoozeDate<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Timestamp (milliseconds since epoch) at which the item should go from <code>HIDDEN<\/code> to <code>ACTIONABLE<\/code> status<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">array&lt;<a href=\"#/schema/schemata%2Fexample.avsc/com.example.avro.ToDoItem\">ToDoItem<\/a>&gt;<\/td>\n                    <td class=\"field\">subItems<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>List of children of this to-do tree node<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.avro.ToDoStatus":{"title":"<span class=\"namespace\">com.example.avro.<\/span><span class=\"type-name\">ToDoStatus<\/span>","content":"<div class=\"type-doc\"><ul>\n<li><code>HIDDEN<\/code>: not currently visible, e.g. because it becomes actionable in future<\/li>\n<li><code>ACTIONABLE<\/code>: appears in the current to-do list<\/li>\n<li><code>DONE<\/code>: marked as done, but still appears in the list<\/li>\n<li><code>ARCHIVED<\/code>: marked as done and no longer visible<\/li>\n<li><code>DELETED<\/code>: not done and removed from list (preserved for undo purposes)<\/li>\n<\/ul>\n<\/div>\n\n\n\n\n    \n        <p>Enum symbols:<\/p>\n        <code>HIDDEN<\/code>, <code>ACTIONABLE<\/code>, <code>DONE<\/code>, <code>ARCHIVED<\/code>, <code>DELETED<\/code>\n    \n    \n\n\n\n\n\n\n\n"}},"schemata/example_with_messages.avsc":{"com.example.service.DependencyType":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">DependencyType<\/span>","content":"\n\n\n\n\n    \n        <p>Enum symbols:<\/p>\n        <code>REQUIRED<\/code>, <code>OPTIONAL<\/code>\n    \n    \n\n\n\n\n\n\n\n"},"com.example.service.DependencyDetail":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">DependencyDetail<\/span>","content":"<div class=\"type-doc\"><p>Details about status of a dependency.<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">name<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>A short name of the service who&#39;s status is being reported<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">descendingField <span class=\"badge text-bg-secondary\">descending<\/span><\/td>\n                    <td class=\"field-doc\">&quot;Default value&quot;<\/td>\n                    <td class=\"field-doc\"><p>A descending sort order field<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                            <ul><li><code>order<\/code>: descending<\/li><\/ul>\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">ignoredField <span class=\"badge text-bg-secondary\">ignore<\/span><\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>An ignored order sort field<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                            <ul><li><code>order<\/code>: ignore<\/li><\/ul>\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">status<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>A string representing the operational status for this service<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.DependencyType\">DependencyType<\/a><\/td>\n                    <td class=\"field\">dependencyType<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Indicates what type of dependency this refers to<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">timestamp<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>A timestamp showing the time at which this particular dependency was compiled.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    <h3>Annotations<\/h3>\n<table class=\"table table-striped table-hover\">\n    <thead>\n        <tr>\n            <th>Annotation<\/th>\n            <th>Value<\/th>\n        <\/tr>\n    <\/thead>\n    <tbody>\n    \n        <tr>\n            <td class=\"type\">enumerationType<\/td>\n            \n                <td class=\"field-doc\"><a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.DependencyType\">DependencyType<\/a><\/td>\n            \n        <\/tr>\n    \n    <\/tbody>\n<\/table>\n\n\n\n\n\n\n\n\n\n\n"},"com.example.service.ResponseDetail":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">ResponseDetail<\/span>","content":"<div class=\"type-doc\"><p>Details about the outcome of the request.<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">int&nbsp;|&nbsp;null<\/td>\n                    <td class=\"field\">subCode<\/td>\n                    <td class=\"field-doc\">0<\/td>\n                    <td class=\"field-doc\"><p>A secondary response code with greater precision.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string&nbsp;|&nbsp;null<\/td>\n                    <td class=\"field\">message<\/td>\n                    <td class=\"field-doc\">&quot;&quot;<\/td>\n                    <td class=\"field-doc\"><p>A short message describing the response status code (see the strings listing with the response codes).<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.service.CustomException":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">CustomException<\/span>","content":"<div class=\"type-doc\"><p>A exception that should be for unexpected errors and/or exceptions.<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">int<\/td>\n                    <td class=\"field\">errorCode<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>An error code defined by common.ResponseCode constant<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">msg<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>A short message string such as Error, Success, Exception, etc.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">detail<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>A detailed message string<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.service.PingResponse":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">PingResponse<\/span>","content":"<div class=\"type-doc\"><p>Response from ping request.<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;string<\/td>\n                    <td class=\"field\">serviceStatus<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>The string <code>OK<\/code> if the service is currently up and running fully. Otherwise the string contains a diagnostic message describing the current error state.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">int&nbsp;|&nbsp;null<\/td>\n                    <td class=\"field\">responseCode<\/td>\n                    <td class=\"field-doc\">0<\/td>\n                    <td class=\"field-doc\"><p>The status code indicating success, failure and other response statuses.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;<a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.ResponseDetail\">ResponseDetail<\/a><\/td>\n                    <td class=\"field\">responseDetail<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>Details about the outcome of the request. Set to <code>null<\/code> if the request had <code>outputDetail == false<\/code>.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">null&nbsp;|&nbsp;array&lt;<a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.DependencyDetail\">DependencyDetail<\/a>&gt;<\/td>\n                    <td class=\"field\">dependencies<\/td>\n                    <td class=\"field-doc\">null<\/td>\n                    <td class=\"field-doc\"><p>List of details about all dependencies for this service.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"},"com.example.service.ping":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">ping<\/span>","content":"<div class=\"type-doc\"><p>Indicates whether this service is available to respond to requests.<\/p>\n<\/div>\n\n\n\n\n\n\n\n\n\n\n    \n        <h3>Method Parameters<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead><tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr><\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">boolean<\/td>\n                    <td class=\"field\">outputDetail<\/td>\n                    <td class=\"field-doc\">&quot;false&quot;<\/td>\n                    <td class=\"field-doc\"><p><code>true<\/code> if the response should contain additional details in the <code>responseDetail<\/code> field.<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n        <h3>Return Type<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead><tr><th>Type<\/th><th>Description<\/th><\/tr><\/thead>\n            <tbody>\n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.PingResponse\">PingResponse<\/a><\/td>\n                    <td class=\"field-doc\"><p>Response from ping request.<\/p>\n<\/td>\n                <\/tr>\n            <\/tbody>\n        <\/table>\n    \n    \n        <h3>Errors<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead><tr><th>Type<\/th><th>Description<\/th><\/tr><\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.CustomException\">CustomException<\/a><\/td>\n                    <td class=\"field-doc\"><p>A exception that should be for unexpected errors and/or exceptions.<\/p>\n<\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    <h3>Annotations<\/h3>\n<table class=\"table table-striped table-hover\">\n    <thead>\n        <tr>\n            <th>Annotation<\/th>\n            <th>Value<\/th>\n        <\/tr>\n    <\/thead>\n    <tbody>\n    \n        <tr>\n            <td class=\"type\">messageAttribute<\/td>\n            \n                <td class=\"field-doc\"><pre>{\n   &quot;addedBy&quot;: &quot;inome, inc&quot;,\n   &quot;date&quot;: &quot;01 May 2013&quot;\n}<\/pre><\/td>\n            \n        <\/tr>\n    \n    <\/tbody>\n<\/table>\n\n\n"},"com.example.service.logTime":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">logTime<\/span>","content":"<div class=\"type-doc\"><p>Inserts a timestamp into the log file indicating that this service is still alive.<\/p>\n<\/div>\n\n\n\n\n\n\n\n\n\n\n    \n    \n    \n    <h3>Annotations<\/h3>\n<table class=\"table table-striped table-hover\">\n    <thead>\n        <tr>\n            <th>Annotation<\/th>\n            <th>Value<\/th>\n        <\/tr>\n    <\/thead>\n    <tbody>\n    \n        <tr>\n            <td class=\"type\">one-way<\/td>\n            \n                <td class=\"field-doc\">true<\/td>\n            \n        <\/tr>\n    \n    <\/tbody>\n<\/table>\n\n\n"},"com.example.service.ExampleProtocol":{"title":"<span class=\"namespace\">com.example.service.<\/span><span class=\"type-name\">ExampleProtocol<\/span>","content":"<div class=\"type-doc\"><p>This is a protocol description for a fictitious network service.<\/p>\n<\/div>\n\n\n\n\n\n\n\n\n    <h3>Messages<\/h3>\n    \n        <table class=\"table table-striped table-hover\">\n            <thead><tr><th>Name<\/th><th>Description<\/th><\/tr><\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"name\"><a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.logTime\">logTime<\/a> <span class=\"badge text-bg-secondary\">One-Way<\/span><\/td>\n                    <td class=\"message-doc\"><p>Inserts a timestamp into the log file indicating that this service is still alive.<\/p>\n<\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"name\"><a href=\"#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.ping\">ping<\/a><\/td>\n                    <td class=\"message-doc\"><p>Indicates whether this service is available to respond to requests.<\/p>\n<\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n"}},"schemata/reference_referent.avsc":{"com.example_referent.ToBeReferred":{"title":"<span class=\"namespace\">com.example_referent.<\/span><span class=\"type-name\">ToBeReferred<\/span>","content":"<div class=\"type-doc\"><p>A simple object provided as a building block<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">boolean<\/td>\n                    <td class=\"field\">value<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>The value of the object to be referenced<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">history<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>A history field detailing random information about the object<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"}},"schemata/cross_ref_a_referrer.avsc":{"com.example.crossref.Referrer":{"title":"<span class=\"namespace\">com.example.crossref.<\/span><span class=\"type-name\">Referrer<\/span>","content":"<div class=\"type-doc\"><p>Schema that references a type defined in a file that sorts after this one<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">name<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>Name field<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Fcross_ref_z_types.avsc/com.example.crossref.ZLogLevel\">ZLogLevel<\/a><\/td>\n                    <td class=\"field\">level<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>References a type from cross_ref_z_types.avsc (sorts after this file)<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"}},"schemata/reference_referrer.avsc":{"com.example_referrer.TheReferrer":{"title":"<span class=\"namespace\">com.example_referrer.<\/span><span class=\"type-name\">TheReferrer<\/span>","content":"<div class=\"type-doc\"><p>A complex object referencing object from another schemata<\/p>\n<\/div>\n\n\n    \n        <h3>Fields<\/h3>\n        <table class=\"table table-striped table-hover\">\n            <thead>\n                <tr><th>Type<\/th><th>Field<\/th><th>Default Value<\/th><th>Description<\/th><th>Annotations<\/th><\/tr>\n            <\/thead>\n            <tbody>\n            \n                <tr>\n                    <td class=\"type\">string<\/td>\n                    <td class=\"field\">name<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>the name of the referrer object<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n                <tr>\n                    <td class=\"type\"><a href=\"#/schema/schemata%2Freference_referent.avsc/com.example_referent.ToBeReferred\">ToBeReferred<\/a><\/td>\n                    <td class=\"field\">externalObject<\/td>\n                    <td class=\"field-doc\"><\/td>\n                    <td class=\"field-doc\"><p>An object from another schemata<\/p>\n<\/td>\n                    <td class=\"field-doc\">\n                        \n                    <\/td>\n                <\/tr>\n            \n            <\/tbody>\n        <\/table>\n    \n    \n\n\n\n\n\n\n\n\n\n"}}}</script>
-
     <style type="text/css">
 @charset "UTF-8";/*!
  * Bootstrap  v5.3.3 (https://getbootstrap.com/)
@@ -260,8 +258,7 @@ body {
 }
 
 /* =====================================================================
-   Dark mode toggle button — fixed over the sidebar, never overwritten
-   by DustJS rendering
+   Dark mode toggle button — fixed over the sidebar
    ===================================================================== */
 
 #theme-toggle {
@@ -312,7 +309,7 @@ body {
 
 </script>
 <script type="text/javascript">
-function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementById("popover-data");if(e)try{m=JSON.parse(e.textContent||"{}")}catch{}}var u=null,d=null,o=null,c=null,s=null;function b(){clearTimeout(u),clearTimeout(d),o&&(o.hide(),o=null,c=null,s=null)}function h(){clearTimeout(u),clearTimeout(d),d=setTimeout(function(){var e=c&&c.matches(":hover"),t=s&&s.matches(":hover");!e&&!t&&o&&(o.hide(),o=null,c=null,s=null)},150)}function L(){document.querySelectorAll('#content-pane a[href^="#/schema/"]').forEach(function(e){if(!bootstrap.Popover.getInstance(e)){var t=e.getAttribute("href")||"",n=t.split("/");if(!(n.length<4)){var i=m[decodeURIComponent(n[2])];if(i){var r=i[decodeURIComponent(n[3])];if(r){var l=new bootstrap.Popover(e,{trigger:"manual",animation:!1,placement:"bottom",container:"body",title:function(){return r.title},content:function(){return r.content},html:!0,sanitize:!1,customClass:"avrodoc-named-type"});e.addEventListener("mouseenter",function(){clearTimeout(d),clearTimeout(u),o&&o!==l&&o.hide(),u=setTimeout(function(){o=l,c=e,l.show()},120)}),e.addEventListener("mouseleave",h),e.addEventListener("shown.bs.popover",function(){var v=e.getAttribute("aria-describedby"),a=v?document.getElementById(v):null;a&&!a._avrodocHooked&&(a._avrodocHooked=!0,a.addEventListener("mouseleave",h)),s=a||null})}}}}})}function E(e){document.querySelectorAll("#list-pane li").forEach(function(t){t.classList.remove("selected")}),document.querySelectorAll("#list-pane a").forEach(function(t){if(t.getAttribute("href")===e){var n=t.closest("li");n&&n.classList.add("selected")}})}function T(e){for(var t=document.querySelectorAll("#content-pane > section[data-route]"),n=0;n<t.length;n++)if(t[n].getAttribute("data-route")===e)return t[n];return null}function p(e){var t=window.location.hash||"#/",n=T(t);if(!n){window.location.hash="#/";return}document.querySelectorAll("#content-pane > section").forEach(function(i){i.hidden=!0}),n.hidden=!1,e!==void 0?window.scrollTo(0,e):(document.body.scrollTop=0,document.documentElement.scrollTop=0),E(t),L()}var y={},f=!1;window.addEventListener("popstate",function(){f=!0}),window.addEventListener("hashchange",function(e){var t=e.oldURL&&new URL(e.oldURL).hash||"#/";y[t]=document.documentElement.scrollTop||document.body.scrollTop||0,b();var n;f&&(n=y[window.location.hash||"#/"]),f=!1,p(n)}),document.addEventListener("DOMContentLoaded",function(){g(),p(),A()});function A(){var e=document.getElementById("search-schemas"),t=document.getElementById("showNamespace");!e||!t||(e.addEventListener("keyup",function(){w(e.value,t.checked)}),t.addEventListener("change",function(){w(e.value,t.checked)}))}function w(e,t){e=e.toLowerCase(),document.querySelectorAll("#list-pane .schema").forEach(function(n){var i=(n.getAttribute("data-schema")||"").toLowerCase(),r=n.closest("li[data-namespace]");if(r){var l=(r.getAttribute("data-schemas")||"").toLowerCase(),v=(r.getAttribute("data-namespace")||"").toLowerCase(),a=l.includes(e)||v.includes(e);a?(r.style.display="",t||i.includes(e)?n.style.display="":n.style.display="none"):(r.style.display="none",n.style.display="none")}})}})();
+function AvroDoc(){}(function(){var d=null,v=null,o=null,i=null,s=null;function b(){clearTimeout(d),clearTimeout(v),o&&(o.hide(),o=null,i=null,s=null)}function h(){clearTimeout(d),clearTimeout(v),v=setTimeout(function(){var e=i&&i.matches(":hover"),n=s&&s.matches(":hover");!e&&!n&&o&&(o.hide(),o=null,i=null,s=null)},150)}function g(){document.querySelectorAll('#content-pane a[href^="#/schema/"]').forEach(function(e){if(!bootstrap.Popover.getInstance(e)){var n=e.getAttribute("href")||"",t=p(n);if(t){var r=t.querySelector("h2.namespace"),a=t.querySelector("h1.type-name"),c="";r&&(c+='<span class="namespace">'+r.innerHTML+".</span>"),a&&(c+='<span class="type-name">'+a.innerHTML+"</span>");var f=t.querySelector(".type-details"),l=new bootstrap.Popover(e,{trigger:"manual",animation:!1,placement:"bottom",container:"body",title:c,content:function(){return f?f.innerHTML:t.innerHTML},html:!0,sanitize:!1,customClass:"avrodoc-named-type"});e.addEventListener("mouseenter",function(){clearTimeout(v),clearTimeout(d),o&&o!==l&&o.hide(),d=setTimeout(function(){o=l,i=e,l.show()},120)}),e.addEventListener("mouseleave",h),e.addEventListener("shown.bs.popover",function(){var T=e.getAttribute("aria-describedby"),u=T?document.getElementById(T):null;u&&!u._avrodocHooked&&(u._avrodocHooked=!0,u.addEventListener("mouseleave",h)),s=u||null})}}})}function E(e){document.querySelectorAll("#list-pane li").forEach(function(n){n.classList.remove("selected")}),document.querySelectorAll("#list-pane a").forEach(function(n){if(n.getAttribute("href")===e){var t=n.closest("li");t&&t.classList.add("selected")}})}function p(e){for(var n=document.querySelectorAll("#content-pane > section[data-route]"),t=0;t<n.length;t++)if(n[t].getAttribute("data-route")===e)return n[t];return null}function y(e){var n=window.location.hash||"#/",t=p(n);if(!t){window.location.hash="#/";return}document.querySelectorAll("#content-pane > section").forEach(function(r){r.hidden=!0}),t.hidden=!1,e!==void 0?window.scrollTo(0,e):(document.body.scrollTop=0,document.documentElement.scrollTop=0),E(n),g()}var w={},m=!1;window.addEventListener("popstate",function(){m=!0}),window.addEventListener("hashchange",function(e){var n=e.oldURL&&new URL(e.oldURL).hash||"#/";w[n]=document.documentElement.scrollTop||document.body.scrollTop||0,b();var t;m&&(t=w[window.location.hash||"#/"]),m=!1,y(t)}),document.addEventListener("DOMContentLoaded",function(){y(),A()});function A(){var e=document.getElementById("search-schemas"),n=document.getElementById("showNamespace");!e||!n||(e.addEventListener("keyup",function(){L(e.value,n.checked)}),n.addEventListener("change",function(){L(e.value,n.checked)}))}function L(e,n){e=e.toLowerCase(),document.querySelectorAll("#list-pane .schema").forEach(function(t){var r=(t.getAttribute("data-schema")||"").toLowerCase(),a=t.closest("li[data-namespace]");if(a){var c=(a.getAttribute("data-schemas")||"").toLowerCase(),f=(a.getAttribute("data-namespace")||"").toLowerCase(),l=c.includes(e)||f.includes(e);l?(a.style.display="",n||r.includes(e)?t.style.display="":t.style.display="none"):(a.style.display="none",t.style.display="none")}})}})();
 
 </script>
   </head>
@@ -648,10 +645,13 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 <h2 class="namespace">com.example.crossref</h2>
 <h1 class="type-name">ZLogLevel</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Enum defined in a file that sorts after the file referencing it</p>
 </div>
+
+
 
 
 
@@ -670,17 +670,21 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.User" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">User</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>This is a user record in a fictitious to-do-list management app. It supports arbitrary grouping and nesting of items, and allows you to add items by email or by tweeting.</p>
 <p>Note this app doesn&#39;t actually exist. The schema is just a demo for <a href="https://github.com/mikaello/avrodoc-plus">Avrodoc</a>!</p>
 </div>
+
+
 
 
     
@@ -787,16 +791,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.EmailAddress" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">EmailAddress</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Stores details about an email address that a user has associated with their account.</p>
 </div>
+
+
 
 
     
@@ -868,16 +876,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.TwitterAccount" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">TwitterAccount</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Stores access credentials for one Twitter account, as granted to us by the user by OAuth.</p>
 </div>
+
+
 
 
     
@@ -971,12 +983,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.OAuthStatus" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">OAuthStatus</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><ul>
@@ -987,6 +1001,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 <li><code>REVOKED</code>: the user has explicitly revoked the token</li>
 </ul>
 </div>
+
+
 
 
 
@@ -1005,16 +1021,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.ToDoItem" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">ToDoItem</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>A record is one node in a To-Do item tree (every record can contain nested sub-records).</p>
 </div>
+
+
 
 
     
@@ -1095,12 +1115,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample.avsc/com.example.avro.ToDoStatus" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">ToDoStatus</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><ul>
@@ -1111,6 +1133,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 <li><code>DELETED</code>: not done and removed from list (preserved for undo purposes)</li>
 </ul>
 </div>
+
+
 
 
 
@@ -1129,15 +1153,19 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.DependencyType" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">DependencyType</h1>
 
+<div class="type-details">
 
     
     
+
+
 
 
 
@@ -1156,16 +1184,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.DependencyDetail" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">DependencyDetail</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Details about status of a dependency.</p>
 </div>
+
+
 
 
     
@@ -1280,16 +1312,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.ResponseDetail" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">ResponseDetail</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Details about the outcome of the request.</p>
 </div>
+
+
 
 
     
@@ -1337,16 +1373,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.CustomException" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">CustomException</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>A exception that should be for unexpected errors and/or exceptions.</p>
 </div>
+
+
 
 
     
@@ -1405,16 +1445,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.PingResponse" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">PingResponse</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Response from ping request.</p>
 </div>
+
+
 
 
     
@@ -1484,16 +1528,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.ping" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">ping</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Indicates whether this service is available to respond to requests.</p>
 </div>
+
+
 
 
 
@@ -1578,16 +1626,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.logTime" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">logTime</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Inserts a timestamp into the log file indicating that this service is still alive.</p>
 </div>
+
+
 
 
 
@@ -1624,16 +1676,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fexample_with_messages.avsc/com.example.service.ExampleProtocol" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">ExampleProtocol</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>This is a protocol description for a fictitious network service.</p>
 </div>
+
+
 
 
 
@@ -1669,16 +1725,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Freference_referent.avsc/com.example_referent.ToBeReferred" hidden>
 <h2 class="namespace">com.example_referent</h2>
 <h1 class="type-name">ToBeReferred</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>A simple object provided as a building block</p>
 </div>
+
+
 
 
     
@@ -1726,16 +1786,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Fcross_ref_a_referrer.avsc/com.example.crossref.Referrer" hidden>
 <h2 class="namespace">com.example.crossref</h2>
 <h1 class="type-name">Referrer</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>Schema that references a type defined in a file that sorts after this one</p>
 </div>
+
+
 
 
     
@@ -1783,16 +1847,20 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/schemata%2Freference_referrer.avsc/com.example_referrer.TheReferrer" hidden>
 <h2 class="namespace">com.example_referrer</h2>
 <h1 class="type-name">TheReferrer</h1>
 
+<div class="type-details">
 
     
     <div class="type-doc"><p>A complex object referencing object from another schemata</p>
 </div>
+
+
 
 
     
@@ -1840,12 +1908,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.crossref.ZLogLevel" hidden>
 <h2 class="namespace">com.example.crossref</h2>
 <h1 class="type-name">ZLogLevel</h1>
 
+<div class="type-details">
 
     
         
@@ -1875,6 +1945,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+
+
     
         <p>Enum symbols:</p>
         <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code>
@@ -1890,12 +1962,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.avro.User" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">User</h1>
 
+<div class="type-details">
 
     
         
@@ -1922,6 +1996,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         <div class="type-doc"><p>This is a user record in a fictitious to-do-list management app. It supports arbitrary grouping and nesting of items, and allows you to add items by email or by tweeting.</p>
 <p>Note this app doesn&#39;t actually exist. The schema is just a demo for <a href="https://github.com/mikaello/avrodoc-plus">Avrodoc</a>!</p>
 </div>
+
+
 
 
     
@@ -2029,12 +2105,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.avro.EmailAddress" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">EmailAddress</h1>
 
+<div class="type-details">
 
     
         
@@ -2060,6 +2138,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Stores details about an email address that a user has associated with their account.</p>
 </div>
+
+
 
 
     
@@ -2132,12 +2212,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.avro.TwitterAccount" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">TwitterAccount</h1>
 
+<div class="type-details">
 
     
         
@@ -2163,6 +2245,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Stores access credentials for one Twitter account, as granted to us by the user by OAuth.</p>
 </div>
+
+
 
 
     
@@ -2257,12 +2341,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.avro.OAuthStatus" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">OAuthStatus</h1>
 
+<div class="type-details">
 
     
         
@@ -2298,6 +2384,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+
+
     
         <p>Enum symbols:</p>
         <code>PENDING</code>, <code>ACTIVE</code>, <code>DENIED</code>, <code>EXPIRED</code>, <code>REVOKED</code>
@@ -2313,12 +2401,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.avro.ToDoItem" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">ToDoItem</h1>
 
+<div class="type-details">
 
     
         
@@ -2344,6 +2434,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>A record is one node in a To-Do item tree (every record can contain nested sub-records).</p>
 </div>
+
+
 
 
     
@@ -2425,12 +2517,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.avro.ToDoStatus" hidden>
 <h2 class="namespace">com.example.avro</h2>
 <h1 class="type-name">ToDoStatus</h1>
 
+<div class="type-details">
 
     
         
@@ -2466,6 +2560,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+
+
     
         <p>Enum symbols:</p>
         <code>HIDDEN</code>, <code>ACTIONABLE</code>, <code>DONE</code>, <code>ARCHIVED</code>, <code>DELETED</code>
@@ -2481,12 +2577,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.DependencyType" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">DependencyType</h1>
 
+<div class="type-details">
 
     
         
@@ -2515,6 +2613,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+
+
     
         <p>Enum symbols:</p>
         <code>REQUIRED</code>, <code>OPTIONAL</code>
@@ -2530,12 +2630,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.DependencyDetail" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">DependencyDetail</h1>
 
+<div class="type-details">
 
     
         
@@ -2561,6 +2663,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Details about status of a dependency.</p>
 </div>
+
+
 
 
     
@@ -2676,12 +2780,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.ResponseDetail" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">ResponseDetail</h1>
 
+<div class="type-details">
 
     
         
@@ -2707,6 +2813,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Details about the outcome of the request.</p>
 </div>
+
+
 
 
     
@@ -2755,12 +2863,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.CustomException" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">CustomException</h1>
 
+<div class="type-details">
 
     
         
@@ -2786,6 +2896,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>A exception that should be for unexpected errors and/or exceptions.</p>
 </div>
+
+
 
 
     
@@ -2845,12 +2957,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.PingResponse" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">PingResponse</h1>
 
+<div class="type-details">
 
     
         
@@ -2876,6 +2990,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Response from ping request.</p>
 </div>
+
+
 
 
     
@@ -2946,12 +3062,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.ping" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">ping</h1>
 
+<div class="type-details">
 
     
         
@@ -2987,6 +3105,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
 
 
+
+
     
         <h3>Method Parameters</h3>
         <table class="table table-striped table-hover">
@@ -3062,12 +3182,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.logTime" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">logTime</h1>
 
+<div class="type-details">
 
     
         
@@ -3093,6 +3215,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Inserts a timestamp into the log file indicating that this service is still alive.</p>
 </div>
+
+
 
 
 
@@ -3130,12 +3254,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.service.ExampleProtocol" hidden>
 <h2 class="namespace">com.example.service</h2>
 <h1 class="type-name">ExampleProtocol</h1>
 
+<div class="type-details">
 
     
         
@@ -3161,6 +3287,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>This is a protocol description for a fictitious network service.</p>
 </div>
+
+
 
 
 
@@ -3197,12 +3325,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example_referent.ToBeReferred" hidden>
 <h2 class="namespace">com.example_referent</h2>
 <h1 class="type-name">ToBeReferred</h1>
 
+<div class="type-details">
 
     
         
@@ -3228,6 +3358,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>A simple object provided as a building block</p>
 </div>
+
+
 
 
     
@@ -3276,12 +3408,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example.crossref.Referrer" hidden>
 <h2 class="namespace">com.example.crossref</h2>
 <h1 class="type-name">Referrer</h1>
 
+<div class="type-details">
 
     
         
@@ -3307,6 +3441,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>Schema that references a type defined in a file that sorts after this one</p>
 </div>
+
+
 
 
     
@@ -3355,12 +3491,14 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
 <section data-route="#/schema/com.example_referrer.TheReferrer" hidden>
 <h2 class="namespace">com.example_referrer</h2>
 <h1 class="type-name">TheReferrer</h1>
 
+<div class="type-details">
 
     
         
@@ -3386,6 +3524,8 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
         
         <div class="type-doc"><p>A complex object referencing object from another schemata</p>
 </div>
+
+
 
 
     
@@ -3434,6 +3574,7 @@ function AvroDoc(){}(function(){var m={};function g(){var e=document.getElementB
 
     
 
+</div>
 
 </section>
         </div>

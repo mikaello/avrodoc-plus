@@ -23,17 +23,17 @@ files.sort().forEach(function (file) {
 });
 
 const app = express();
+const documentHtml = await topLevelHTML('Server side Avrodoc', [], {
+    schemata,
+});
 
 app.set('port', process.env.PORT ?? 8080);
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', async function (req, res) {
-    const html = await topLevelHTML('Server side Avrodoc', [], {
-        schemata: schemata,
-    });
-    res.set('Content-Type', 'text/html').send(html);
+app.get('/', function (req, res) {
+    res.set('Content-Type', 'text/html').send(documentHtml);
 });
 
 app.get(/^\/schemata\/(\w[\w.-]*(?:\/\w[\w.-]*)*)$/, function (req, res) {

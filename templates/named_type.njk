@@ -1,5 +1,5 @@
 {% if namespace %}<h2 class="namespace">{{ namespace }}</h2>{% endif %}
-<h1 class="type-name">{{ name }}</h1>
+<h1 class="type-name">{{ name or type }}</h1>
 
 <div class="type-details">
 {% if versions %}

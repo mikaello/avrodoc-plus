@@ -17,14 +17,14 @@
   },
   "dependencies": {
     "esbuild": "0.28.1",
-    "marked": "18.0.0",
+    "marked": "18.0.9",
     "nunjucks": "3.2.4"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/express": "5.0.6",
     "@types/morgan": "1.9.10",
-    "@types/node": "25.9.5",
+    "@types/node": "20.19.43",
     "@types/nunjucks": "3.2.6",
     "eslint": "10.8.0",
     "eslint-config-prettier": "10.1.8",
@@ -37,7 +37,7 @@
   },
   "prettier": {},
   "engines": {
-    "node": ">=18.x"
+    "node": "20.x"
   },
   "license": "Apache-2.0"
 }

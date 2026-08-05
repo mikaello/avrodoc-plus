@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "dustjs-helpers": "1.7.4",
-    "dustjs-linkedin": "3.0.0",
+    "dustjs-linkedin": "3.0.1",
     "esbuild": "0.28.1"
   },
   "devDependencies": {
@@ -35,6 +35,11 @@
     "typescript": "7.0.2"
   },
   "prettier": {},
+  "overrides": {
+    "dustjs-helpers": {
+      "dustjs-linkedin": "$dustjs-linkedin"
+    }
+  },
   "engines": {
     "node": ">=18.x"
   },

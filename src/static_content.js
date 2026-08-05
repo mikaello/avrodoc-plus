@@ -17,7 +17,7 @@ const client_css = ["stylesheets/bootstrap.min.css", "stylesheets/style.css"];
 /** JS code required in the browser (relative to public/ directory) */
 const client_js = [
   "vendor/jquery-3.6.0.js",
-  "vendor/dust-core-2.7.2.js",
+  "vendor/dust-core-3.0.1.js",
   "vendor/dust-helpers-1.7.4.js",
   "vendor/sammy-0.7.6.js",
   "vendor/bootstrap.bundle.min.js",

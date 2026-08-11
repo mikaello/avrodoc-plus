@@ -191,7 +191,7 @@ Removed:
 - Render popover content from the existing section DOM instead of embedding a second JSON/HTML copy.
 - Cache server-mode HTML after the startup render because the server already loads its schema set only at startup.
 - Keep CLI output self-contained and avoid a separate lazy-section HTTP API in this phase.
-- Pin development, CI, preview, and documentation builds to Node 20.
+- Use Node 24 for development, preview, and documentation builds, and test the supported Node 22 and Node 24 LTS lines in CI.
 
 ---
 

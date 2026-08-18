@@ -130,8 +130,9 @@ function extractTypeInfo(json) {
  * Entries without parsed JSON keep their relative position unless other parsed
  * entries establish a dependency order around them.
  *
- * @param {Array<{json?: any, filename?: string}>} schemata
- * @returns {Array<{json?: any, filename?: string}>}
+ * @template {{json?: any, filename?: string}} T
+ * @param {T[]} schemata
+ * @returns {T[]}
  */
 function sortSchemataDependencyOrder(schemata) {
   if (schemata.length <= 1) return [...schemata];

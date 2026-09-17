@@ -1,8 +1,0 @@
-<li>
-    <a href="{shared_link}" title="{qualified_name}">
-        <span class="type-name">{name}</span>
-        {?is_enum} <span class="badge text-bg-secondary">Enum</span> {/is_enum}
-        {?is_root_type} <span class="badge text-bg-info">Root</span> {/is_root_type}
-        {?is_error} <span class="badge text-bg-secondary">Error</span> {/is_error}
-    </a>
-</li>

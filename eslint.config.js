@@ -11,8 +11,6 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
-        $: 'readonly',
-        jQuery: 'readonly'
       }
     },
     rules: {

@@ -1,381 +1,261 @@
-/* global dust:false, markdown:false, Sammy:false, bootstrap:false */
-
-// If foo contains markdown, {foo|md|s} renders it to HTML in a Dust template
-dust.filters.md = function (value) {
-  return markdown.toHTML(value);
-};
+/* global bootstrap:false */
 
 // eslint-disable-next-line
-function AvroDoc(page_title, input_schemata, options) {
-  var _public = { page_title: page_title };
-  _public.annotationFields = (options && options.annotationFields) || [
-    "logicalType",
-    "aliases",
-    "order",
-  ];
-  var list_pane = $("#list-pane"),
-    content_pane = $("#content-pane");
-  var schema_by_name = {};
-  var shared_types = {};
+function AvroDoc() {
+  // Kept for backward compatibility -- all rendering is now server-side.
+}
 
-  // popover_by_name[filename][qualified_name] = {title: 'html', content: 'html'}
-  var popover_by_name = {};
+(function () {
+  var showTimer = null;
+  var hideTimer = null;
+  var activePopover = null;
+  var activeTrigger = null;
+  var activeTip = null;
+  var sectionByRoute = new Map();
 
-  // Render all the popovers ahead of time, because Dust's rendering is async but the popover
-  // plugin expects to receive the popover content synchronously when it is triggered.
-  function renderPopovers() {
-    for (const [filename, schema] of Object.entries(schema_by_name)) {
-      popover_by_name[filename] = {};
-      Object.entries(schema.named_types).forEach(([qualified_name, type]) => {
-        let popover = (popover_by_name[filename][qualified_name] = {});
-
-        // Do the actual rendering in the background, to keep the page responsive
-        window.setTimeout(function () {
-          dust.render("popover_title", type, function (err, html) {
-            popover.title = html;
-          });
-          dust.render("named_type_details", type, function (err, html) {
-            popover.content = html;
-          });
-        }, 100);
-      });
+  function dismissActivePopover() {
+    clearTimeout(showTimer);
+    clearTimeout(hideTimer);
+    if (activePopover) {
+      activePopover.hide();
+      activePopover = null;
+      activeTrigger = null;
+      activeTip = null;
     }
   }
 
-  // Configures all links to types in the current content pane to show popovers on hover.
-  function setupPopovers() {
-    /* Shared state across all popover instances — only one popover open at
-       a time. Sharing the timers means mouseenter on a new trigger cancels
-       any pending hide from the previous one (and vice versa). */
-    var showTimer = null;
-    var hideTimer = null;
-    var activePopover = null;
-    var activeTrigger = null;
-    var activeTip = null;
+  function scheduleHide() {
+    clearTimeout(showTimer);
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () {
+      var trigHovered = activeTrigger && activeTrigger.matches(":hover");
+      var tipHovered = activeTip && activeTip.matches(":hover");
+      if (!trigHovered && !tipHovered && activePopover) {
+        activePopover.hide();
+        activePopover = null;
+        activeTrigger = null;
+        activeTip = null;
+      }
+    }, 150);
+  }
 
-    function scheduleHide() {
-      clearTimeout(showTimer);
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(function () {
-        var trigHovered = activeTrigger && activeTrigger.matches(":hover");
-        var tipHovered = activeTip && activeTip.matches(":hover");
-        if (!trigHovered && !tipHovered && activePopover) {
-          activePopover.hide();
-          activePopover = null;
-          activeTrigger = null;
-          activeTip = null;
-        }
-      }, 150);
-    }
+  function createPopover(el) {
+    var existing = bootstrap.Popover.getInstance(el);
+    if (existing) return existing;
 
-    content_pane.find('a[href^="#/schema/"]').each(function () {
-      var url_segments = $(this).attr("href").split("/");
-      var schema_popovers =
-        popover_by_name[decodeURIComponent(url_segments[2])];
-      if (!schema_popovers) return;
-      var popover = schema_popovers[decodeURIComponent(url_segments[3])];
+    var section = findSection(el.getAttribute("href") || "");
+    if (!section) return null;
+
+    var nsEl = section.querySelector("h2.namespace");
+    var nameEl = section.querySelector("h1.type-name");
+    var titleHtml = "";
+    if (nsEl)
+      titleHtml += '<span class="namespace">' + nsEl.innerHTML + ".</span>";
+    if (nameEl)
+      titleHtml += '<span class="type-name">' + nameEl.innerHTML + "</span>";
+
+    var detailsEl = section.querySelector(".type-details");
+    var popover = new bootstrap.Popover(el, {
+      trigger: "manual",
+      animation: false,
+      placement: "bottom",
+      container: "body",
+      title: titleHtml,
+      content: function () {
+        return detailsEl ? detailsEl.innerHTML : section.innerHTML;
+      },
+      html: true,
+      sanitize: false,
+      customClass: "avrodoc-named-type",
+    });
+
+    el.addEventListener("shown.bs.popover", function () {
+      var tipId = el.getAttribute("aria-describedby");
+      var tip = tipId ? document.getElementById(tipId) : null;
+      if (tip && !tip._avrodocHooked) {
+        tip._avrodocHooked = true;
+        tip.addEventListener("mouseleave", scheduleHide);
+      }
+      activeTip = tip || null;
+    });
+    return popover;
+  }
+
+  function setupPopovers(section) {
+    if (section._avrodocPopoversHooked) return;
+    section._avrodocPopoversHooked = true;
+
+    section.addEventListener("mouseover", function (event) {
+      var el = event.target.closest?.('a[href^="#/schema/"]');
+      if (!el || !section.contains(el) || el.contains(event.relatedTarget))
+        return;
+
+      var popover = createPopover(el);
       if (!popover) return;
 
-      var el = this;
+      clearTimeout(hideTimer);
+      clearTimeout(showTimer);
+      if (activePopover && activePopover !== popover) activePopover.hide();
+      showTimer = setTimeout(function () {
+        activePopover = popover;
+        activeTrigger = el;
+        popover.show();
+      }, 120);
+    });
 
-      /* animation:false makes show/hide instant — no fade-transition race
-         conditions where calling show() during a hide() blinks the popover. */
-      var bsPopover = new bootstrap.Popover(el, {
-        trigger: "manual",
-        animation: false,
-        placement: "bottom",
-        container: "body",
-        title: function () {
-          return popover.title;
-        },
-        content: function () {
-          return popover.content;
-        },
-        html: true,
-        sanitize: false,
-        customClass: "avrodoc-named-type",
-      });
-
-      el.addEventListener("mouseenter", function () {
-        clearTimeout(hideTimer);
-        clearTimeout(showTimer);
-        /* Close any different popover that is currently open. */
-        if (activePopover && activePopover !== bsPopover) {
-          activePopover.hide();
-        }
-        /* Small show-delay so the cursor merely passing through doesn't
-           trigger a flash. */
-        showTimer = setTimeout(function () {
-          activePopover = bsPopover;
-          activeTrigger = el;
-          bsPopover.show();
-        }, 120);
-      });
-
-      el.addEventListener("mouseleave", scheduleHide);
-
-      /* After first show, hook the tip's mouseleave so moving the mouse
-         directly out of the popover (without returning to the trigger)
-         also schedules a hide. The tip element is stable with animation:false
-         so we only need to attach once. */
-      el.addEventListener("shown.bs.popover", function () {
-        var tipId = el.getAttribute("aria-describedby");
-        var tip = tipId && document.getElementById(tipId);
-        if (tip && !tip._avrodocHooked) {
-          tip._avrodocHooked = true;
-          tip.addEventListener("mouseleave", scheduleHide);
-        }
-        activeTip = tip || null;
-      });
+    section.addEventListener("mouseout", function (event) {
+      var el = event.target.closest?.('a[href^="#/schema/"]');
+      if (!el || !section.contains(el) || el.contains(event.relatedTarget))
+        return;
+      scheduleHide();
     });
   }
 
-  // Renders the named template with the given context and updates the content pane to show the
-  // result.
-  function renderContentPane(template, context) {
-    // Clean up old content and dispose any existing Bootstrap popovers
-    list_pane.find("li").removeClass("selected");
-    content_pane
-      .find('[data-bs-toggle="popover"], a[href^="#/schema/"]')
-      .each(function () {
-        var existingPopover = bootstrap.Popover.getInstance(this);
-        if (existingPopover) existingPopover.dispose();
-      });
-    $("body").scrollTop(0);
-
-    dust.render(template, context, function (err, html) {
-      content_pane.html(html);
-      setupPopovers();
+  function updateSidebarSelection(hash) {
+    var segments = hash.split("/");
+    var sidebarHash = segments.length === 4 ? "#/schema/" + segments[3] : hash;
+    document.querySelectorAll("#list-pane li").forEach(function (li) {
+      li.classList.remove("selected");
     });
-  }
-
-  // Renders the details of the given type in the main content pane.
-  function showType(type) {
-    if (!type) {
-      content_pane.empty();
-    } else {
-      renderContentPane("named_type", type);
-
-      // Mark the currently displayed type with a 'selected' CSS class in the type list
-      list_pane
-        .find("a")
-        .filter(function () {
-          return $(this).attr("href") === type.shared_link;
-        })
-        .closest("li")
-        .addClass("selected");
-    }
-  }
-
-  // Returns a mapping from qualified name to shared type. A shared type may have one or more
-  // versions (conflicting definitions for the same qualified name). Each version may have one or
-  // more definitions (equivalent definitions of the same type in different schema files).
-  function typeByQualifiedName() {
-    const by_qualified_name = {};
-    for (const [qualified_name, versions] of Object.entries(shared_types)) {
-      by_qualified_name[qualified_name] = { ...versions[0] };
-      by_qualified_name[qualified_name].versions = versions;
-    }
-    return by_qualified_name;
-  }
-
-  // Groups the types defined in all schemas by namespace, and sorts them alphabetically.
-  // A namespace has many named types (records, enums or fixed).
-  function typesByNamespace() {
-    const namespaces = {};
-    for (const shared_type of Object.values(_public.by_qualified_name)) {
-      if (
-        shared_type.is_record ||
-        shared_type.is_enum ||
-        shared_type.is_fixed
-      ) {
-        const namespace = shared_type.namespace || "";
-        if (!hasOwnProperty(namespaces, namespace)) {
-          namespaces[namespace] = { namespace, types: [] };
-        }
-        namespaces[namespace].types.push(shared_type);
+    document.querySelectorAll("#list-pane a").forEach(function (a) {
+      if (a.getAttribute("href") === sidebarHash) {
+        var li = a.closest("li");
+        if (li) li.classList.add("selected");
       }
-    }
-
-    return Object.values(namespaces)
-      .sort(stringCompareBy("namespace"))
-      .map(function (ns_types) {
-        return {
-          namespace: ns_types.namespace || "No namespace",
-          types: [...ns_types.types].sort(stringCompareBy("name")),
-        };
-      });
-  }
-
-  // Selects all the protocols from all namespaces, and sorts them alphabetically.
-  function protocolsSorted() {
-    const protocols = Object.values(_public.by_qualified_name).filter(
-      (shared_type) => shared_type.is_protocol,
-    );
-
-    return protocols.sort(stringCompareBy("qualified_name"));
-  }
-
-  // Call this once when the schemata have been loaded and we want to launch the app.
-  function ready() {
-    // Fields used by the schema_list template
-    _public.schemata = Object.values(schema_by_name);
-    _public.by_qualified_name = typeByQualifiedName();
-    _public.namespaces = typesByNamespace();
-    _public.protocols = protocolsSorted();
-    renderPopovers();
-
-    dust.render("schema_list", _public, function (err, html) {
-      list_pane.html(html);
     });
+  }
 
-    Sammy(function () {
-      this.get("#/schema/:filename/:qualified_name", function () {
-        var schema = schema_by_name[this.params.filename];
-        showType(schema && schema.named_types[this.params.qualified_name]);
+  function findSection(hash) {
+    var section = sectionByRoute.get(hash);
+    if (section) return section;
+
+    var segments = hash.split("/");
+    if (segments.length !== 4) return null;
+    try {
+      var filename = decodeURIComponent(segments[2]);
+      if (!filename.startsWith("/schemata/")) return null;
+      var alias =
+        "#/schema/" +
+        encodeURIComponent(filename.slice("/schemata/".length)) +
+        "/" +
+        segments[3];
+      return sectionByRoute.get(alias) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function handleRoute(savedScrollY) {
+    var hash = window.location.hash || "#/";
+    var section = findSection(hash);
+    if (!section) {
+      window.location.hash = "#/";
+      return;
+    }
+    document.querySelectorAll("#content-pane > section").forEach(function (s) {
+      s.hidden = true;
+    });
+    section.hidden = false;
+    if (savedScrollY !== undefined) {
+      window.scrollTo(0, savedScrollY);
+    } else {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+    updateSidebarSelection(hash);
+    setupPopovers(section);
+  }
+
+  var scrollPositions = {};
+  var currentHash = window.location.hash || "#/";
+  var isLinkNavigation = false;
+  var isHistoryNavigation = false;
+
+  if (window.history && "scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
+
+  function scrollY() {
+    return document.documentElement.scrollTop || document.body.scrollTop || 0;
+  }
+
+  function rememberScrollPosition() {
+    scrollPositions[currentHash] = scrollY();
+  }
+
+  window.addEventListener("scroll", rememberScrollPosition, { passive: true });
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest?.('a[href^="#/"]');
+    if (!link || link.getAttribute("href") === currentHash) return;
+    rememberScrollPosition();
+    isLinkNavigation = true;
+  });
+
+  window.addEventListener("popstate", function () {
+    isHistoryNavigation = !isLinkNavigation;
+  });
+
+  window.addEventListener("hashchange", function () {
+    dismissActivePopover();
+
+    var nextHash = window.location.hash || "#/";
+    var restoredScroll = isHistoryNavigation
+      ? scrollPositions[nextHash]
+      : undefined;
+    currentHash = nextHash;
+    isLinkNavigation = false;
+    isHistoryNavigation = false;
+
+    handleRoute(restoredScroll);
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .querySelectorAll("#content-pane > section[data-route]")
+      .forEach(function (section) {
+        sectionByRoute.set(section.getAttribute("data-route"), section);
       });
+    handleRoute();
+    setupSearch();
+  });
 
-      this.get("#/schema/:qualified_name", function () {
-        showType(_public.by_qualified_name[this.params.qualified_name]);
-      });
+  function setupSearch() {
+    var searchInput = document.getElementById("search-schemas");
+    var showNamespaceCheckbox = document.getElementById("showNamespace");
+    if (!searchInput || !showNamespaceCheckbox) return;
 
-      this.get("#/", function () {
-        if (_public.schemata.length === 1) {
-          showType(_public.schemata[0].root_type);
+    searchInput.addEventListener("keyup", function () {
+      search(searchInput.value, showNamespaceCheckbox.checked);
+    });
+    showNamespaceCheckbox.addEventListener("change", function () {
+      search(searchInput.value, showNamespaceCheckbox.checked);
+    });
+  }
+
+  function search(text, showNamespace) {
+    text = text.toLowerCase();
+    document
+      .querySelectorAll("#list-pane .schema")
+      .forEach(function (schemaEl) {
+        var name = (schemaEl.getAttribute("data-schema") || "").toLowerCase();
+        var nsEl = schemaEl.closest("li[data-namespace]");
+        if (!nsEl) return;
+        var nsSchemas = (nsEl.getAttribute("data-schemas") || "").toLowerCase();
+        var nsName = (nsEl.getAttribute("data-namespace") || "").toLowerCase();
+
+        var nsMatches = nsSchemas.includes(text) || nsName.includes(text);
+        if (nsMatches) {
+          nsEl.style.display = "";
+          if (showNamespace || name.includes(text)) {
+            schemaEl.style.display = "";
+          } else {
+            schemaEl.style.display = "none";
+          }
         } else {
-          renderContentPane("schema_file_list", _public);
+          nsEl.style.display = "none";
+          schemaEl.style.display = "none";
         }
       });
-
-      this.notFound = function () {
-        window.location.hash = "#/";
-      };
-    }).run();
   }
-
-  function addSchema(json, filename) {
-    filename = filename || "default";
-
-    // If the name is already taken, append a number to make it unique
-    if (schema_by_name[filename]) {
-      let i = 1;
-      while (schema_by_name[filename + i]) i++;
-      filename = filename + i;
-    }
-
-    schema_by_name[filename] = AvroDoc.Schema(
-      _public,
-      shared_types,
-      json,
-      filename,
-    );
-  }
-
-  // Load any schemata that were specified by filename. When they are loaded, start up the app.
-  var in_progress = 0,
-    schemata_to_load;
-
-  _public.input_schemata = input_schemata ?? [];
-  _public.input_schemata.forEach(function (schema) {
-    if (schema.json) {
-      addSchema(schema.json, schema.filename);
-    } else if (schema.filename) {
-      in_progress++;
-      $.getJSON(schema.filename, function (json) {
-        addSchema(json, schema.filename);
-        in_progress--;
-        if (in_progress === 0) {
-          content_pane.text("Processing...");
-          window.setTimeout(ready, 10);
-        } else {
-          content_pane.text(
-            "Loaded " +
-              (schemata_to_load - in_progress) +
-              " out of " +
-              schemata_to_load +
-              " schemata...",
-          );
-        }
-      });
-    } else {
-      throw "You must specify JSON or a filename for a schema";
-    }
-  });
-
-  schemata_to_load = in_progress;
-
-  if (in_progress === 0) {
-    ready();
-  }
-
-  return _public;
-}
-
-function search(text, showNamespace) {
-  text = text.toLowerCase();
-  var schemas = $(".schema").map(function (index, e) {
-    var el = $(e);
-    return {
-      name: el.data("schema"),
-      element: el,
-      namespaceElement: el.parent(),
-    };
-  });
-  schemas.each(function (index, schema) {
-    if (
-      schema.namespaceElement.data("schemas").toLowerCase().includes(text) ||
-      schema.namespaceElement.data("namespace").toLowerCase().includes(text)
-    ) {
-      schema.namespaceElement.show();
-
-      if (showNamespace) {
-        schema.element.show();
-      } else if (schema.name.toLowerCase().includes(text)) {
-        schema.element.show();
-      } else {
-        schema.element.hide();
-      }
-    } else {
-      schema.namespaceElement.hide();
-      schema.element.hide();
-    }
-  });
-}
-
-$(function () {
-  setTimeout(function () {
-    $("#search-schemas").on("keyup", function () {
-      var text = $(this).val();
-      var showNamespace = $("#showNamespace").prop("checked");
-      search(text, showNamespace);
-    });
-
-    $("#showNamespace").on("change", function () {
-      var text = $("#search-schemas").val();
-      var showNamespace = $(this).prop("checked");
-      search(text, showNamespace);
-    });
-  }, 1000);
-});
-
-/**
- * Case insensitive string compare
- *
- * @param {string} property to campare by
- * @returns {function(object, object): boolean} objects to have a property compared
- */
-const stringCompareBy = (property) => (a, b) => {
-  const aProp = a[property] ?? "";
-  const bProp = b[property] ?? "";
-  return aProp.localeCompare(bProp);
-};
-
-/**
- * Checks if property exists on object
- *
- * @param {object} object
- * @param {string} property
- * @returns {boolean}
- */
-const hasOwnProperty = (object, property) =>
-  Object.prototype.hasOwnProperty.call(object, property);
+})();

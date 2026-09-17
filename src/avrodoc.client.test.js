@@ -139,3 +139,16 @@ test("selects the shared sidebar item for a file-specific type route", () => {
 
   assert.ok(document.getElementById("item").classList.contains("selected"));
 });
+
+test("accepts legacy server routes with the encoded schemata prefix", () => {
+  const markup = `
+    <nav id="list-pane"></nav>
+    <div id="content-pane">
+      <section id="type" data-route="#/schema/example.avsc/Example" hidden>Example</section>
+    </div>`;
+  const legacyRoute = "#/schema/%2Fschemata%2Fexample.avsc/Example";
+  const { document, window } = loadClient(markup, legacyRoute);
+
+  assert.equal(document.getElementById("type").hidden, false);
+  assert.equal(window.location.hash, legacyRoute);
+});

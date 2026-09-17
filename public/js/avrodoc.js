@@ -126,7 +126,23 @@ function AvroDoc() {
   }
 
   function findSection(hash) {
-    return sectionByRoute.get(hash) || null;
+    var section = sectionByRoute.get(hash);
+    if (section) return section;
+
+    var segments = hash.split("/");
+    if (segments.length !== 4) return null;
+    try {
+      var filename = decodeURIComponent(segments[2]);
+      if (!filename.startsWith("/schemata/")) return null;
+      var alias =
+        "#/schema/" +
+        encodeURIComponent(filename.slice("/schemata/".length)) +
+        "/" +
+        segments[3];
+      return sectionByRoute.get(alias) || null;
+    } catch {
+      return null;
+    }
   }
 
   function handleRoute(savedScrollY) {

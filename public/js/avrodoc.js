@@ -149,24 +149,45 @@ function AvroDoc() {
   }
 
   var scrollPositions = {};
-  var isBackForward = false;
+  var currentHash = window.location.hash || "#/";
+  var isLinkNavigation = false;
+  var isHistoryNavigation = false;
 
-  window.addEventListener("popstate", function () {
-    isBackForward = true;
+  if (window.history && "scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
+
+  function scrollY() {
+    return document.documentElement.scrollTop || document.body.scrollTop || 0;
+  }
+
+  function rememberScrollPosition() {
+    scrollPositions[currentHash] = scrollY();
+  }
+
+  window.addEventListener("scroll", rememberScrollPosition, { passive: true });
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest?.('a[href^="#/"]');
+    if (!link || link.getAttribute("href") === currentHash) return;
+    rememberScrollPosition();
+    isLinkNavigation = true;
   });
 
-  window.addEventListener("hashchange", function (e) {
-    var oldHash = e.oldURL ? new URL(e.oldURL).hash || "#/" : "#/";
-    scrollPositions[oldHash] =
-      document.documentElement.scrollTop || document.body.scrollTop || 0;
+  window.addEventListener("popstate", function () {
+    isHistoryNavigation = !isLinkNavigation;
+  });
 
+  window.addEventListener("hashchange", function () {
     dismissActivePopover();
 
-    var restoredScroll;
-    if (isBackForward) {
-      restoredScroll = scrollPositions[window.location.hash || "#/"];
-    }
-    isBackForward = false;
+    var nextHash = window.location.hash || "#/";
+    var restoredScroll = isHistoryNavigation
+      ? scrollPositions[nextHash]
+      : undefined;
+    currentHash = nextHash;
+    isLinkNavigation = false;
+    isHistoryNavigation = false;
 
     handleRoute(restoredScroll);
   });

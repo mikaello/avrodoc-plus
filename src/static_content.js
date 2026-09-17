@@ -26,9 +26,7 @@ const nunjucksEnv = new nunjucks.Environment(
   { autoescape: true },
 );
 
-nunjucksEnv.addFilter("markdown", (value) =>
-  value ? marked(String(value)) : "",
-);
+nunjucksEnv.addFilter("markdown", renderMarkdown);
 nunjucksEnv.addFilter("inlineType", renderInlineType);
 
 /**
@@ -41,6 +39,34 @@ function escHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+/**
+ * Render Markdown while treating embedded HTML as text and rejecting links
+ * with executable URL schemes.
+ * @param {unknown} value
+ * @returns {string}
+ */
+function renderMarkdown(value) {
+  if (!value) return "";
+
+  const renderer = new marked.Renderer();
+  renderer.link = function ({ href, title, tokens }) {
+    const label = this.parser.parseInline(tokens);
+    const protocol = /^[a-z][a-z0-9+.-]*:/i.exec(href)?.[0].toLowerCase();
+    if (protocol && !["http:", "https:", "mailto:"].includes(protocol)) {
+      return label;
+    }
+
+    const titleAttr = title ? ` title="${escHtml(title)}"` : "";
+    return `<a href="${escHtml(href)}"${titleAttr}>${label}</a>`;
+  };
+
+  const html = marked(escHtml(String(value)), { renderer });
+  if (typeof html !== "string") {
+    throw new TypeError("Markdown rendering unexpectedly returned a Promise");
+  }
+  return html;
 }
 
 /**

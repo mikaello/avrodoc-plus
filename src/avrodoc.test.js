@@ -1,4 +1,5 @@
 import { createAvroDoc } from "./avrodoc.js";
+import { topLevelHTML } from "./static_content.js";
 import { sortSchemataDependencyOrder } from "./schema_order.js";
 import { readFileSync, unlinkSync, existsSync } from "fs";
 import { test, after, describe } from "node:test";
@@ -20,6 +21,33 @@ describe("test HTML generation", () => {
     );
 
     assert.ok(readFileSync(testFile, "utf-8").includes('data-route="#/"'));
+  });
+
+  test("escapes raw HTML and unsafe links in Markdown documentation", async () => {
+    const html = await topLevelHTML("Safe Markdown", [], {
+      inline: true,
+      schemata: [
+        {
+          filename: "unsafe.avsc",
+          json: {
+            type: "record",
+            name: "Unsafe",
+            doc: '<img src="missing" onerror="alert(1)"> <String> **bold** [bad](javascript:alert(1))',
+            fields: [],
+          },
+        },
+      ],
+    });
+
+    assert.ok(
+      html.includes(
+        "&lt;img src=&quot;missing&quot; onerror=&quot;alert(1)&quot;&gt;",
+      ),
+    );
+    assert.ok(html.includes("&lt;String&gt;"));
+    assert.ok(html.includes("<strong>bold</strong>"));
+    assert.ok(!html.includes('<img src="missing"'));
+    assert.ok(!html.includes('href="javascript:'));
   });
 });
 

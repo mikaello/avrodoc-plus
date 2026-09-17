@@ -33,7 +33,7 @@
     "globals": "17.11.0",
     "linkedom": "0.18.13",
     "morgan": "1.12.1",
-    "prettier": "3.9.6",
+    "prettier": "3.9.7",
     "typescript": "7.0.2"
   },
   "prettier": {},

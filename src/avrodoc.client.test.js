@@ -128,3 +128,14 @@ test("restores each route scroll position through back and forward navigation", 
   navigate("#/schema/A", "popstate");
   assert.equal(document.documentElement.scrollTop, 0);
 });
+
+test("selects the shared sidebar item for a file-specific type route", () => {
+  const markup = `
+    <nav id="list-pane"><ul><li id="item"><a href="#/schema/Example">Example</a></li></ul></nav>
+    <div id="content-pane">
+      <section data-route="#/schema/example.avsc/Example" hidden></section>
+    </div>`;
+  const { document } = loadClient(markup, "#/schema/example.avsc/Example");
+
+  assert.ok(document.getElementById("item").classList.contains("selected"));
+});

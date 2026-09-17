@@ -112,11 +112,13 @@ function AvroDoc() {
   }
 
   function updateSidebarSelection(hash) {
+    var segments = hash.split("/");
+    var sidebarHash = segments.length === 4 ? "#/schema/" + segments[3] : hash;
     document.querySelectorAll("#list-pane li").forEach(function (li) {
       li.classList.remove("selected");
     });
     document.querySelectorAll("#list-pane a").forEach(function (a) {
-      if (a.getAttribute("href") === hash) {
+      if (a.getAttribute("href") === sidebarHash) {
         var li = a.closest("li");
         if (li) li.classList.add("selected");
       }

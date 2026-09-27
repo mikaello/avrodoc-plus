@@ -4,6 +4,19 @@
     <p>Primitive type: <code>{{ type }}</code></p>
 {% endif %}
 
+{% if is_union %}
+    <p>Union branches:</p>
+    <ul>{% for branch in types %}<li>{{ branch | inlineType | safe }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% if is_array %}
+    <p>Array items: {{ items | inlineType | safe }}</p>
+{% endif %}
+
+{% if is_map %}
+    <p>Map values: {{ values | inlineType | safe }}</p>
+{% endif %}
+
 {% if is_record %}
     {% if fields and fields.length > 0 %}
         <h3>Fields</h3>

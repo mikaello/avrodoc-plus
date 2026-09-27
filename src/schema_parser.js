@@ -7,10 +7,13 @@
  * @param {Record<string, any[]>} shared_types  mutated in-place
  * @param {any} schema_json
  * @param {string} filename
- * @returns {{ filename: string, root_type: any, named_types: Record<string, any>, sorted_types: any[] }}
+ * @returns {{ filename: string, link: string, root_type: any, named_types: Record<string, any>, sorted_types: any[] }}
  */
 function parseAvroSchema(options, shared_types, schema_json, filename) {
-  var _public = { filename: filename };
+  var _public = {
+    filename: filename,
+    link: "#/file/" + encodeURIComponent(filename),
+  };
 
   // {'namespace.name': {type: 'record', fields: [...]}}
   var named_types = {};
@@ -482,6 +485,7 @@ function parseAvroSchema(options, shared_types, schema_json, filename) {
       if (schema.length === 0) {
         throw "Unions must have at least one branch type at " + path;
       }
+      const branchNames = new Set();
       return decorate({
         type: "union",
         types: schema.map((branch_type) => {
@@ -491,7 +495,23 @@ function parseAvroSchema(options, shared_types, schema_json, filename) {
           const type_name = isObject(branch_type)
             ? branch_type.name || branch_type.type
             : branch_type;
-          return parseSchema(branch_type, namespace, joinPath(path, type_name));
+          const branch = parseSchema(
+            branch_type,
+            namespace,
+            joinPath(path, type_name),
+          );
+          // Named branches are distinguished by fullname; all other branches
+          // must have distinct Avro types, regardless of their attributes.
+          const branchName = ["record", "error", "enum", "fixed"].includes(
+            branch.type,
+          )
+            ? branch.qualified_name
+            : branch.type;
+          if (branchNames.has(branchName)) {
+            throw "Duplicate union branch " + branchName + " at " + path;
+          }
+          branchNames.add(branchName);
+          return branch;
         }),
       });
     } else {

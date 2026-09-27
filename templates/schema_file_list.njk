@@ -13,7 +13,7 @@
     {% for schema in schemata %}
         <tr>
             <td class="type">{{ schema.root_type | inlineType | safe }}</td>
-            <td class="filename">{{ schema.filename }}</td>
+            <td class="filename"><a href="{{ schema.link }}">{{ schema.filename }}</a></td>
             <td class="root-type-doc">{{ schema.root_type.doc | markdown | safe }}</td>
         </tr>
     {% endfor %}

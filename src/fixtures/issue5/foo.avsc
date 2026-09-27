@@ -1,0 +1,18 @@
+{
+  "name": "Foo",
+  "type": "record",
+  "namespace": "example.com",
+  "doc": "A simple object provided as a building block",
+  "fields": [
+    {
+      "name": "value",
+      "type": "string",
+      "doc": "The value of the object"
+    },
+    {
+      "name": "history",
+      "type": "string",
+      "doc": "A history field detailing random information about the object"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Bar",
+  "doc": "A complex object referencing the foo object",
+  "namespace": "example.com",
+  "type": "record",
+  "fields": [
+    {
+      "name": "fooObject",
+      "type": "example.com.Foo",
+      "doc": "A foo object"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "the name of the bar object"
+    }
+  ]
+}

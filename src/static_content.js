@@ -195,6 +195,18 @@ function renderSections(ctx) {
     sections.push('<section data-route="#/" hidden>\n' + html + "\n</section>");
   }
 
+  // Per-file root sections also cover schemas without a named root type.
+  for (const schema of ctx.schemata) {
+    const html = nunjucksEnv.render("named_type.njk", schema.root_type);
+    sections.push(
+      '<section data-route="' +
+        escAttr(schema.link) +
+        '" hidden>\n' +
+        html +
+        "\n</section>",
+    );
+  }
+
   // Per-file type sections: #/schema/<filename>/<qualified_name>
   for (const [filename, schema] of Object.entries(ctx.schema_by_name)) {
     for (const [qualified_name, type] of Object.entries(schema.named_types)) {

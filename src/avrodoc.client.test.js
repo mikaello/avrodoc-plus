@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import vm from "node:vm";
 import { parseHTML } from "linkedom";
+import { topLevelHTML } from "./static_content.js";
 
 const clientScript = readFileSync("./public/js/avrodoc.js", "utf8");
 
@@ -75,6 +76,31 @@ function dispatch(window, target, type) {
   Object.defineProperty(event, "relatedTarget", { value: null });
   target.dispatchEvent(event);
 }
+
+test("opens unnamed root schemas through generated file links", async () => {
+  const markup = await topLevelHTML("Root schemas", [], {
+    schemata: [
+      { filename: "string.avsc", json: "string" },
+      { filename: "union.avsc", json: ["null", "boolean"] },
+    ],
+  });
+  const { document, window } = loadClient(markup);
+  const home = document.querySelector('section[data-route="#/"]');
+  assert.equal(home.hidden, false);
+
+  for (const link of home.querySelectorAll("td.filename a")) {
+    dispatch(window, link, "click");
+    window.location.hash = link.getAttribute("href");
+    dispatch(window, window, "hashchange");
+
+    const root = document.querySelector(
+      `section[data-route="${window.location.hash}"]`,
+    );
+    assert.equal(root.hidden, false);
+    assert.equal(home.hidden, true);
+    assert.ok(root.querySelector(".type-details").textContent.trim());
+  }
+});
 
 test("indexes routes once and creates popovers only on first interaction", async () => {
   const markup = `

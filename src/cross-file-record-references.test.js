@@ -11,7 +11,7 @@ import { createAvroDoc } from "./avrodoc.js";
 
 const runFile = promisify(execFile);
 const fixtureDirectory = fileURLToPath(
-  new URL("./fixtures/issue5/", import.meta.url),
+  new URL("./fixtures/cross-file-record-references/", import.meta.url),
 );
 
 function assertFooReference(html) {
@@ -45,13 +45,15 @@ for (const filenames of [
   ["foo.avsc", "bar.avsc"],
   ["bar.avsc", "foo.avsc"],
 ]) {
-  test(`issue #5 resolves Foo from Bar with input order ${filenames.join(", ")}`, async (t) => {
-    const directory = await mkdtemp(join(tmpdir(), "avrodoc-issue5-"));
+  test(`resolves cross-file record references with input order ${filenames.join(", ")}`, async (t) => {
+    const directory = await mkdtemp(
+      join(tmpdir(), "avrodoc-cross-file-record-references-"),
+    );
     t.after(() => rm(directory, { recursive: true, force: true }));
     const output = join(directory, "out.html");
 
     await createAvroDoc(
-      "Issue #5",
+      "Cross-file record references",
       [],
       filenames.map((filename) => join(fixtureDirectory, filename)),
       output,
@@ -61,8 +63,10 @@ for (const filenames of [
   });
 }
 
-test("issue #5 resolves references across recursively discovered directories", async (t) => {
-  const directory = await mkdtemp(join(tmpdir(), "avrodoc-issue5-"));
+test("resolves cross-file record references across recursively discovered directories", async (t) => {
+  const directory = await mkdtemp(
+    join(tmpdir(), "avrodoc-cross-file-record-references-"),
+  );
   t.after(() => rm(directory, { recursive: true, force: true }));
   const input = join(directory, "schemas");
   const consumers = join(input, "a-consumers");
